@@ -30,7 +30,7 @@ coverage.out
 *.tmp
 
 # Other repos
-# /docs/xai-sdk-python
+/docs/xai-sdk-python
 
 # Local binaries
 /basic
