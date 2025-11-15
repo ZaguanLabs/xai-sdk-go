@@ -1,11 +1,12 @@
 # xAI SDK for Go
 
 [![Go Version](https://img.shields.io/badge/Go-1.22+-blue.svg)](https://golang.org)
+[![Release](https://img.shields.io/github/v/release/ZaguanLabs/xai-sdk-go)](https://github.com/ZaguanLabs/xai-sdk-go/releases/latest)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 The official Go SDK for xAI provides a first-class, idiomatic Go interface to xAI's powerful AI capabilities. This SDK enables Go developers to integrate chat completions, streaming responses, and upcoming features like file operations, image generation, and more.
 
-> **Status**: **Alpha** - Core chat functionality is implemented and tested. Advanced features are under active development.
+> **Status**: **v0.1.0** - This is the first official release. The API is stabilizing, but breaking changes may occur.
 
 ## ✨ Features
 
@@ -25,7 +26,7 @@ The official Go SDK for xAI provides a first-class, idiomatic Go interface to xA
 ### Installation
 
 ```bash
-go get github.com/ZaguanLabs/xai-sdk-go
+go get github.com/ZaguanLabs/xai-sdk-go@v0.1.0
 ```
 
 ### Basic Usage
@@ -179,10 +180,10 @@ make clean
 
 ```bash
 # Basic chat example
-go run examples/chat/basic.go
+go run examples/chat/basic/main.go
 
 # Streaming example
-go run examples/chat/streaming.go
+go run examples/chat/streaming/main.go
 ```
 
 ## 📚 Documentation
@@ -195,17 +196,14 @@ go run examples/chat/streaming.go
 
 The SDK is being developed in phases. Current status:
 
-- ✅ **Phase 0-8**: Foundation, proto, configuration, client, auth, basic and advanced chat
-- 🚧 **Phase 9**: Deferred and stored chat
-- 📋 **Phase 10-15**: Additional modules (files, image, models, collections)
-- 📋 **Phase 16-17**: Telemetry and observability
-- 📋 **Phase 18-22**: Polish, documentation, testing, release
+- ✅ **v0.1.0**: Foundation, proto, configuration, client, auth, basic and advanced chat
+- 🚧 **Upcoming**: Deferred chat, files, image generation, and more.
 
 See [`docs/development-plan.md`](docs/development-plan.md) for detailed progress.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please review our contributing guidelines:
+Contributions are welcome! We encourage you to submit pull requests and bug reports to help improve the SDK. Please review our contributing guidelines:
 
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) - Contribution guidelines and process
 - [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) - Community standards
@@ -215,7 +213,7 @@ Contributions are welcome! Please review our contributing guidelines:
 1. Fork the repository
 2. Create a feature branch
 3. Implement your changes with tests
-4. Run `make fmt lint test`
+4. Run `make fmt test`
 5. Submit a pull request
 
 ## 📄 License
