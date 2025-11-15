@@ -8,9 +8,27 @@ option go_package = "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1"
 service Chat {
   // Create a chat completion
   rpc CreateChatCompletion(CreateChatCompletionRequest) returns (CreateChatCompletionResponse);
-  
+
   // Stream chat completion chunks
   rpc StreamChatCompletion(CreateChatCompletionRequest) returns (stream ChatCompletionChunk);
+}
+
+// Files service for file operations
+service Files {
+  // Upload a file
+  rpc UploadFile(UploadFileRequest) returns (UploadFileResponse);
+
+  // Download a file
+  rpc DownloadFile(DownloadFileRequest) returns (DownloadFileResponse);
+
+  // List files
+  rpc ListFiles(ListFilesRequest) returns (ListFilesResponse);
+
+  // Get file information
+  rpc GetFile(GetFileRequest) returns (GetFileResponse);
+
+  // Delete a file
+  rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse);
 }
 
 // Request to create a chat completion
@@ -19,6 +37,14 @@ message CreateChatCompletionRequest {
   repeated Message messages = 2;
   optional float temperature = 3;
   optional int32 max_tokens = 4;
+  optional repeated Tool tools = 5;
+  optional ToolChoice tool_choice = 6;
+  optional ResponseFormat response_format = 7;
+  optional SearchParameters search = 8;
+  optional string reasoning_effort = 9;
+  optional bool store_messages = 10;
+  optional string previous_response_id = 11;
+  optional bool encrypted_content = 12;
 }
 
 // Response from chat completion
@@ -27,6 +53,9 @@ message CreateChatCompletionResponse {
   string model = 2;
   repeated Choice choices = 3;
   Usage usage = 4;
+  optional string status = 5; // For deferred responses
+  optional string created_at = 6; // For deferred responses
+  optional string completed_at = 7; // For deferred responses
 }
 
 // Streaming chunk
@@ -39,6 +68,7 @@ message ChatCompletionChunk {
 message Message {
   string role = 1;
   string content = 2;
+  optional repeated ToolCall tool_calls = 3; // For assistant messages with tool calls
 }
 
 // Choice in response
@@ -58,6 +88,7 @@ message ChoiceDelta {
 message MessageDelta {
   optional string role = 1;
   optional string content = 2;
+  optional repeated ToolCall tool_calls = 3; // For streaming tool calls
 }
 
 // Token usage information
@@ -65,4 +96,125 @@ message Usage {
   int32 prompt_tokens = 1;
   int32 completion_tokens = 2;
   int32 total_tokens = 3;
+}
+
+// Tool definition
+message Tool {
+  string type = 1;
+  message function = 2;
+}
+
+// Tool choice configuration
+message ToolChoice {
+  oneof choice {
+    string none = 1;
+    string auto = 2;
+    string required = 3;
+    string function = 4;
+  }
+}
+
+// Response format configuration
+message ResponseFormat {
+  oneof format {
+    string text = 1;
+    string json_object = 2;
+    JsonSchema json_schema = 3;
+  }
+}
+
+// JSON schema for structured output
+message JsonSchema {
+  string schema = 1;
+}
+
+// Search parameters
+message SearchParameters {
+  optional int32 count = 1;
+  repeated string domains = 2;
+  optional string recency = 3; // "default", "day", "week", "month", "year"
+}
+
+// Tool call information
+message ToolCall {
+  string id = 1;
+  string type = 2; // "function"
+  message function = 3;
+}
+
+// File upload request
+message UploadFileRequest {
+  string filename = 1;
+  bytes content = 2;
+  optional string content_type = 3;
+  optional string purpose = 4;
+}
+
+// File upload response
+message UploadFileResponse {
+  string id = 1;
+  string filename = 2;
+  int64 size = 3;
+  string content_type = 4;
+  string purpose = 5;
+  int64 created_at = 6;
+}
+
+// File download request
+message DownloadFileRequest {
+  string file_id = 1;
+}
+
+// File download response
+message DownloadFileResponse {
+  string id = 1;
+  string filename = 2;
+  int64 size = 3;
+  string content_type = 4;
+  string purpose = 5;
+  bytes content = 6;
+  int64 created_at = 7;
+}
+
+// List files request
+message ListFilesRequest {
+  optional string purpose = 1;
+  optional int32 limit = 2;
+  optional string sort_by = 3;
+  optional string sort_order = 4;
+}
+
+// List files response
+message ListFilesResponse {
+  repeated File files = 1;
+}
+
+// Get file request
+message GetFileRequest {
+  string file_id = 1;
+}
+
+// Get file response
+message GetFileResponse {
+  File file = 1;
+}
+
+// Delete file request
+message DeleteFileRequest {
+  string file_id = 1;
+}
+
+// Delete file response
+message DeleteFileResponse {
+  bool success = 1;
+}
+
+// File information
+message File {
+  string id = 1;
+  string filename = 2;
+  int64 size = 3;
+  string content_type = 4;
+  string purpose = 5;
+  int64 created_at = 6;
 }
