@@ -37,3 +37,5 @@ coverage.out
 /function_calling
 /streaming
 /structured_outputs
+/list
+/main
