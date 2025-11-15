@@ -28,3 +28,6 @@ coverage.out
 # Logs & temp files
 *.log
 *.tmp
+
+# Other repos
+/docs/xai-sdk-python
