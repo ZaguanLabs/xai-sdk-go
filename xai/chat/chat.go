@@ -100,15 +100,10 @@ func (c *Choice) Message() *Message {
 	if c.proto == nil || c.proto.Message == nil {
 		return nil
 	}
-	// Convert CompletionMessage to Message
-	contents := make([]*xaiv1.Content, 0)
-	if c.proto.Message.Content != "" {
-		contents = append(contents, &xaiv1.Content{Text: c.proto.Message.Content})
-	}
 	return &Message{
 		proto: &xaiv1.Message{
 			Role:    c.proto.Message.Role,
-			Content: contents,
+			Content: c.proto.Message.Content,
 		},
 	}
 }
@@ -291,7 +286,7 @@ func WithToolResults(results ...ToolResult) RequestOption {
 
 			msg := &xaiv1.Message{
 				Role:    xaiv1.MessageRole_ROLE_TOOL,
-				Content: []*xaiv1.Content{{Text: content}},
+				Content: content,
 				// Additional tool call info would be added here
 			}
 			r.proto.Messages = append(r.proto.Messages, msg)
@@ -529,7 +524,7 @@ func (r *Request) validate() error {
 		if msg.Role == xaiv1.MessageRole_INVALID_ROLE {
 			return fmt.Errorf("message at index %d has invalid role", i)
 		}
-		if len(msg.Content) == 0 {
+		if msg.Content == "" {
 			return fmt.Errorf("message at index %d has empty content", i)
 		}
 

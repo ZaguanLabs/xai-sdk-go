@@ -11,10 +11,8 @@ import (
 func main() {
 	// Create a simple message like the SDK would
 	msg := &xaiv1.Message{
-		Role: xaiv1.MessageRole_ROLE_USER,
-		Content: []*xaiv1.Content{
-			{Text: "Hello and greetings to you!"},
-		},
+		Role:    xaiv1.MessageRole_ROLE_USER,
+		Content: "Hello and greetings to you!",
 	}
 
 	// Encode it

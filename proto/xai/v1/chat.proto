@@ -114,7 +114,7 @@ message GetChatCompletionChunk {
 // Supporting messages
 message Message {
   MessageRole role = 1;
-  repeated Content content = 2;
+  string content = 2;
   string reasoning_content = 3;
   string name = 4;
   repeated ToolCall tool_calls = 5;
