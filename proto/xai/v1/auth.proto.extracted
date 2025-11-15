@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package xai_api;
+
+option go_package = "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1";
+
+import "google/protobuf/timestamp.proto";
+
+message ApiKey {
+  string redacted_api_key = 1;
+  string user_id = 3;
+  string name = 4;
+  Timestamp create_time = 5;
+  string team_id = 6;
+  repeated string acls = 7;
+  string api_key_id = 8;
+  Timestamp modify_time = 9;
+  bool api_key_blocked = 10;
+  string modified_by = 11;
+  bool disabled = 12;
+  bool team_blocked = 13;
+}

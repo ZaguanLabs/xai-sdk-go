@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package xai_api;
+
+option go_package = "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1";
+
+import "google/protobuf/timestamp.proto";
+
+enum DeferredStatus {
+  INVALID_DEFERRED_STATUS = 0;
+  DONE = 1;
+  EXPIRED = 2;
+  PENDING = 3;
+}
+
+message GetDeferredRequest {
+  string request_id = 1;
+}
+
+message StartDeferredResponse {
+  string request_id = 1;
+}

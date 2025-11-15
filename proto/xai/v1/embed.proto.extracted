@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package xai_api;
+
+option go_package = "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1";
+
+import "google/protobuf/timestamp.proto";
+
+enum EmbedEncodingFormat {
+  FORMAT_INVALID = 0;
+  FORMAT_FLOAT = 1;
+  FORMAT_BASE64 = 2;
+}
+
+message EmbedInput {
+  string string = 1;
+  ImageUrlContent image_url = 2;
+}
+
+message EmbedRequest {
+  repeated EmbedInput input = 1;
+  string model = 2;
+  EmbedEncodingFormat encoding_format = 3;
+  string user = 4;
+}
+
+message EmbedResponse {
+  string id = 1;
+  repeated Embedding embeddings = 2;
+  EmbeddingUsage usage = 3;
+  string model = 4;
+  string system_fingerprint = 5;
+}
+
+message Embedding {
+  int32 index = 1;
+  repeated FeatureVector embeddings = 2;
+}
+
+message FeatureVector {
+  repeated float float_array = 1;
+  string base64_array = 2;
+}

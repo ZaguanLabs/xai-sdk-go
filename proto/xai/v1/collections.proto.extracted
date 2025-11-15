@@ -1,0 +1,172 @@
+syntax = "proto3";
+
+package xai_api;
+
+option go_package = "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1";
+
+import "google/protobuf/timestamp.proto";
+
+enum CollectionsSortBy {
+  COLLECTIONS_SORT_BY_NAME = 0;
+  COLLECTIONS_SORT_BY_AGE = 1;
+}
+
+enum DocumentStatus {
+  DOCUMENT_STATUS_UNKNOWN = 0;
+  DOCUMENT_STATUS_PROCESSING = 1;
+  DOCUMENT_STATUS_PROCESSED = 2;
+  DOCUMENT_STATUS_FAILED = 3;
+}
+
+enum DocumentsSortBy {
+  DOCUMENTS_SORT_BY_NAME = 0;
+  DOCUMENTS_SORT_BY_SIZE = 1;
+  DOCUMENTS_SORT_BY_AGE = 2;
+}
+
+message AddDocumentToCollectionRequest {
+  string file_id = 1;
+  string team_id = 2;
+  string collection_id = 3;
+  repeated FieldsEntry fields = 5;
+}
+
+message BatchGetDocumentsRequest {
+  string team_id = 1;
+  string collection_id = 2;
+  repeated string file_ids = 3;
+}
+
+message BatchGetDocumentsResponse {
+  repeated DocumentMetadata documents = 1;
+}
+
+message CollectionMetadata {
+  string collection_id = 1;
+  string collection_name = 2;
+  Timestamp created_at = 3;
+  IndexConfiguration index_configuration = 4;
+  ChunkConfiguration chunk_configuration = 5;
+  int32 documents_count = 6;
+}
+
+message CreateCollectionRequest {
+  string team_id = 1;
+  string collection_name = 2;
+  IndexConfiguration index_configuration = 4;
+  ChunkConfiguration chunk_configuration = 5;
+}
+
+message DeleteCollectionRequest {
+  string team_id = 1;
+  string collection_id = 2;
+}
+
+message DocumentMetadata {
+  FileMetadata file_metadata = 1;
+  repeated FieldsEntry fields = 2;
+  DocumentStatus status = 3;
+  string error_message = 4;
+}
+
+message FileMetadata {
+  string file_id = 1;
+  string name = 2;
+  int64 size_bytes = 3;
+  string content_type = 4;
+  Timestamp created_at = 5;
+  Timestamp expires_at = 6;
+  string hash = 7;
+}
+
+message GetCollectionMetadataRequest {
+  string team_id = 1;
+  string collection_id = 2;
+}
+
+message GetDocumentMetadataRequest {
+  string file_id = 1;
+  string team_id = 2;
+  string collection_id = 3;
+}
+
+message ListAvailableEmbeddingModelsRequest {
+  string team_id = 1;
+}
+
+message ListAvailableEmbeddingModelsResponse {
+  repeated string embedding_models = 1;
+}
+
+message ListAvailableTokenEncodingsRequest {
+  string team_id = 1;
+}
+
+message ListAvailableTokenEncodingsResponse {
+  repeated string encodings = 1;
+}
+
+message ListCollectionsRequest {
+  string team_id = 1;
+  int32 limit = 2;
+  Ordering order = 3;
+  CollectionsSortBy sort_by = 4;
+  string pagination_token = 5;
+}
+
+message ListCollectionsResponse {
+  repeated CollectionMetadata collections = 1;
+  string pagination_token = 2;
+}
+
+message ListDocumentsRequest {
+  string team_id = 1;
+  string collection_id = 2;
+  int32 limit = 3;
+  Ordering order = 4;
+  DocumentsSortBy sort_by = 5;
+  string pagination_token = 6;
+}
+
+message ListDocumentsResponse {
+  repeated DocumentMetadata documents = 1;
+  string pagination_token = 2;
+}
+
+message ReIndexDocumentRequest {
+  string team_id = 1;
+  string collection_id = 2;
+  string file_id = 3;
+}
+
+message RemoveDocumentFromCollectionRequest {
+  string file_id = 1;
+  string team_id = 2;
+  string collection_id = 3;
+}
+
+message UpdateCollectionRequest {
+  string team_id = 1;
+  string collection_id = 2;
+  string collection_name = 3;
+  ChunkConfiguration chunk_configuration = 4;
+}
+
+message UpdateDocumentRequest {
+  string team_id = 1;
+  string collection_id = 2;
+  string file_id = 3;
+  string name = 4;
+  bytes data = 5;
+  string content_type = 6;
+  repeated FieldsEntry fields = 7;
+}
+
+message UploadDocumentRequest {
+  string team_id = 1;
+  string collection_id = 2;
+  string name = 3;
+  bytes data = 4;
+  string content_type = 5;
+  repeated FieldsEntry fields = 7;
+}
