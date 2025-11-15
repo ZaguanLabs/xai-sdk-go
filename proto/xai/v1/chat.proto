@@ -3,6 +3,7 @@ syntax = "proto3";
 package xai_api;
 
 import "google/protobuf/timestamp.proto";
+import "xai/v1/usage.proto";
 
 option go_package = "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1";
 
@@ -153,12 +154,6 @@ message Delta {
   MessageRole role = 3;
   repeated ToolCall tool_calls = 4;
   string encrypted_content = 5;
-}
-
-message SamplingUsage {
-  int32 prompt_tokens = 1;
-  int32 completion_tokens = 2;
-  int32 total_tokens = 3;
 }
 
 message Tool {

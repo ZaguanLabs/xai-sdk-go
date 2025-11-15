@@ -86,12 +86,12 @@ message ImageGenerationModel {
   string name = 1;
   string version = 2;
   repeated Modality input_modalities = 3;
-  repeated Modality output_modalities = 4;
-  int64 image_price = 5;
-  google.protobuf.Timestamp created = 6;
-  int32 max_prompt_length = 7;
-  string system_fingerprint = 8;
+  repeated Modality output_modalities = 6;
+  google.protobuf.Timestamp created = 8;
+  int32 max_prompt_length = 9;
+  string system_fingerprint = 10;
   repeated string aliases = 11;
+  int64 image_price = 12;
 }
 
 // List image generation models response

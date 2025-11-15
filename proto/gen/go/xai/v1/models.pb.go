@@ -467,12 +467,12 @@ type ImageGenerationModel struct {
 	Name              string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Version           string                 `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
 	InputModalities   []Modality             `protobuf:"varint,3,rep,packed,name=input_modalities,json=inputModalities,proto3,enum=xai_api.Modality" json:"input_modalities,omitempty"`
-	OutputModalities  []Modality             `protobuf:"varint,4,rep,packed,name=output_modalities,json=outputModalities,proto3,enum=xai_api.Modality" json:"output_modalities,omitempty"`
-	ImagePrice        int64                  `protobuf:"varint,5,opt,name=image_price,json=imagePrice,proto3" json:"image_price,omitempty"`
-	Created           *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created,proto3" json:"created,omitempty"`
-	MaxPromptLength   int32                  `protobuf:"varint,7,opt,name=max_prompt_length,json=maxPromptLength,proto3" json:"max_prompt_length,omitempty"`
-	SystemFingerprint string                 `protobuf:"bytes,8,opt,name=system_fingerprint,json=systemFingerprint,proto3" json:"system_fingerprint,omitempty"`
+	OutputModalities  []Modality             `protobuf:"varint,6,rep,packed,name=output_modalities,json=outputModalities,proto3,enum=xai_api.Modality" json:"output_modalities,omitempty"`
+	Created           *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=created,proto3" json:"created,omitempty"`
+	MaxPromptLength   int32                  `protobuf:"varint,9,opt,name=max_prompt_length,json=maxPromptLength,proto3" json:"max_prompt_length,omitempty"`
+	SystemFingerprint string                 `protobuf:"bytes,10,opt,name=system_fingerprint,json=systemFingerprint,proto3" json:"system_fingerprint,omitempty"`
 	Aliases           []string               `protobuf:"bytes,11,rep,name=aliases,proto3" json:"aliases,omitempty"`
+	ImagePrice        int64                  `protobuf:"varint,12,opt,name=image_price,json=imagePrice,proto3" json:"image_price,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -535,13 +535,6 @@ func (x *ImageGenerationModel) GetOutputModalities() []Modality {
 	return nil
 }
 
-func (x *ImageGenerationModel) GetImagePrice() int64 {
-	if x != nil {
-		return x.ImagePrice
-	}
-	return 0
-}
-
 func (x *ImageGenerationModel) GetCreated() *timestamppb.Timestamp {
 	if x != nil {
 		return x.Created
@@ -568,6 +561,13 @@ func (x *ImageGenerationModel) GetAliases() []string {
 		return x.Aliases
 	}
 	return nil
+}
+
+func (x *ImageGenerationModel) GetImagePrice() int64 {
+	if x != nil {
+		return x.ImagePrice
+	}
+	return 0
 }
 
 // List image generation models response
@@ -655,13 +655,14 @@ const file_xai_v1_models_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
 	"\aversion\x18\x02 \x01(\tR\aversion\x12<\n" +
 	"\x10input_modalities\x18\x03 \x03(\x0e2\x11.xai_api.ModalityR\x0finputModalities\x12>\n" +
-	"\x11output_modalities\x18\x04 \x03(\x0e2\x11.xai_api.ModalityR\x10outputModalities\x12\x1f\n" +
-	"\vimage_price\x18\x05 \x01(\x03R\n" +
-	"imagePrice\x124\n" +
-	"\acreated\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\acreated\x12*\n" +
-	"\x11max_prompt_length\x18\a \x01(\x05R\x0fmaxPromptLength\x12-\n" +
-	"\x12system_fingerprint\x18\b \x01(\tR\x11systemFingerprint\x12\x18\n" +
-	"\aaliases\x18\v \x03(\tR\aaliases\"Z\n" +
+	"\x11output_modalities\x18\x06 \x03(\x0e2\x11.xai_api.ModalityR\x10outputModalities\x124\n" +
+	"\acreated\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\acreated\x12*\n" +
+	"\x11max_prompt_length\x18\t \x01(\x05R\x0fmaxPromptLength\x12-\n" +
+	"\x12system_fingerprint\x18\n" +
+	" \x01(\tR\x11systemFingerprint\x12\x18\n" +
+	"\aaliases\x18\v \x03(\tR\aaliases\x12\x1f\n" +
+	"\vimage_price\x18\f \x01(\x03R\n" +
+	"imagePrice\"Z\n" +
 	"!ListImageGenerationModelsResponse\x125\n" +
 	"\x06models\x18\x01 \x03(\v2\x1d.xai_api.ImageGenerationModelR\x06models*D\n" +
 	"\bModality\x12\x14\n" +

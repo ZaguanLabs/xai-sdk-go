@@ -1152,66 +1152,6 @@ func (x *Delta) GetEncryptedContent() string {
 	return ""
 }
 
-type SamplingUsage struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	PromptTokens     int32                  `protobuf:"varint,1,opt,name=prompt_tokens,json=promptTokens,proto3" json:"prompt_tokens,omitempty"`
-	CompletionTokens int32                  `protobuf:"varint,2,opt,name=completion_tokens,json=completionTokens,proto3" json:"completion_tokens,omitempty"`
-	TotalTokens      int32                  `protobuf:"varint,3,opt,name=total_tokens,json=totalTokens,proto3" json:"total_tokens,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
-}
-
-func (x *SamplingUsage) Reset() {
-	*x = SamplingUsage{}
-	mi := &file_xai_v1_chat_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SamplingUsage) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SamplingUsage) ProtoMessage() {}
-
-func (x *SamplingUsage) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SamplingUsage.ProtoReflect.Descriptor instead.
-func (*SamplingUsage) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *SamplingUsage) GetPromptTokens() int32 {
-	if x != nil {
-		return x.PromptTokens
-	}
-	return 0
-}
-
-func (x *SamplingUsage) GetCompletionTokens() int32 {
-	if x != nil {
-		return x.CompletionTokens
-	}
-	return 0
-}
-
-func (x *SamplingUsage) GetTotalTokens() int32 {
-	if x != nil {
-		return x.TotalTokens
-	}
-	return 0
-}
-
 type Tool struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Function      *Function              `protobuf:"bytes,1,opt,name=function,proto3" json:"function,omitempty"` // Other tool types simplified for now
@@ -1221,7 +1161,7 @@ type Tool struct {
 
 func (x *Tool) Reset() {
 	*x = Tool{}
-	mi := &file_xai_v1_chat_proto_msgTypes[10]
+	mi := &file_xai_v1_chat_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1233,7 +1173,7 @@ func (x *Tool) String() string {
 func (*Tool) ProtoMessage() {}
 
 func (x *Tool) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[10]
+	mi := &file_xai_v1_chat_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1246,7 +1186,7 @@ func (x *Tool) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Tool.ProtoReflect.Descriptor instead.
 func (*Tool) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{10}
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *Tool) GetFunction() *Function {
@@ -1268,7 +1208,7 @@ type Function struct {
 
 func (x *Function) Reset() {
 	*x = Function{}
-	mi := &file_xai_v1_chat_proto_msgTypes[11]
+	mi := &file_xai_v1_chat_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1280,7 +1220,7 @@ func (x *Function) String() string {
 func (*Function) ProtoMessage() {}
 
 func (x *Function) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[11]
+	mi := &file_xai_v1_chat_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1293,7 +1233,7 @@ func (x *Function) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Function.ProtoReflect.Descriptor instead.
 func (*Function) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{11}
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *Function) GetName() string {
@@ -1335,7 +1275,7 @@ type ToolCall struct {
 
 func (x *ToolCall) Reset() {
 	*x = ToolCall{}
-	mi := &file_xai_v1_chat_proto_msgTypes[12]
+	mi := &file_xai_v1_chat_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1347,7 +1287,7 @@ func (x *ToolCall) String() string {
 func (*ToolCall) ProtoMessage() {}
 
 func (x *ToolCall) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[12]
+	mi := &file_xai_v1_chat_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1360,7 +1300,7 @@ func (x *ToolCall) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ToolCall.ProtoReflect.Descriptor instead.
 func (*ToolCall) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{12}
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ToolCall) GetId() string {
@@ -1394,7 +1334,7 @@ type FunctionCall struct {
 
 func (x *FunctionCall) Reset() {
 	*x = FunctionCall{}
-	mi := &file_xai_v1_chat_proto_msgTypes[13]
+	mi := &file_xai_v1_chat_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1406,7 +1346,7 @@ func (x *FunctionCall) String() string {
 func (*FunctionCall) ProtoMessage() {}
 
 func (x *FunctionCall) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[13]
+	mi := &file_xai_v1_chat_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1419,7 +1359,7 @@ func (x *FunctionCall) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FunctionCall.ProtoReflect.Descriptor instead.
 func (*FunctionCall) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{13}
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *FunctionCall) GetName() string {
@@ -1446,7 +1386,7 @@ type ToolChoice struct {
 
 func (x *ToolChoice) Reset() {
 	*x = ToolChoice{}
-	mi := &file_xai_v1_chat_proto_msgTypes[14]
+	mi := &file_xai_v1_chat_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1458,7 +1398,7 @@ func (x *ToolChoice) String() string {
 func (*ToolChoice) ProtoMessage() {}
 
 func (x *ToolChoice) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[14]
+	mi := &file_xai_v1_chat_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1471,7 +1411,7 @@ func (x *ToolChoice) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ToolChoice.ProtoReflect.Descriptor instead.
 func (*ToolChoice) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{14}
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *ToolChoice) GetMode() ToolMode {
@@ -1498,7 +1438,7 @@ type ResponseFormat struct {
 
 func (x *ResponseFormat) Reset() {
 	*x = ResponseFormat{}
-	mi := &file_xai_v1_chat_proto_msgTypes[15]
+	mi := &file_xai_v1_chat_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1510,7 +1450,7 @@ func (x *ResponseFormat) String() string {
 func (*ResponseFormat) ProtoMessage() {}
 
 func (x *ResponseFormat) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[15]
+	mi := &file_xai_v1_chat_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1523,7 +1463,7 @@ func (x *ResponseFormat) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResponseFormat.ProtoReflect.Descriptor instead.
 func (*ResponseFormat) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{15}
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *ResponseFormat) GetFormatType() FormatType {
@@ -1551,7 +1491,7 @@ type SearchParameters struct {
 
 func (x *SearchParameters) Reset() {
 	*x = SearchParameters{}
-	mi := &file_xai_v1_chat_proto_msgTypes[16]
+	mi := &file_xai_v1_chat_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1563,7 +1503,7 @@ func (x *SearchParameters) String() string {
 func (*SearchParameters) ProtoMessage() {}
 
 func (x *SearchParameters) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[16]
+	mi := &file_xai_v1_chat_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1576,7 +1516,7 @@ func (x *SearchParameters) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchParameters.ProtoReflect.Descriptor instead.
 func (*SearchParameters) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{16}
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *SearchParameters) GetMode() SearchMode {
@@ -1604,7 +1544,7 @@ var File_xai_v1_chat_proto protoreflect.FileDescriptor
 
 const file_xai_v1_chat_proto_rawDesc = "" +
 	"\n" +
-	"\x11xai/v1/chat.proto\x12\axai_api\x1a\x1fgoogle/protobuf/timestamp.proto\"\xf9\x06\n" +
+	"\x11xai/v1/chat.proto\x12\axai_api\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x12xai/v1/usage.proto\"\xf9\x06\n" +
 	"\x15GetCompletionsRequest\x12,\n" +
 	"\bmessages\x18\x01 \x03(\v2\x10.xai_api.MessageR\bmessages\x12\x14\n" +
 	"\x05model\x18\x02 \x01(\tR\x05model\x12\x12\n" +
@@ -1678,11 +1618,7 @@ const file_xai_v1_chat_proto_rawDesc = "" +
 	"\x04role\x18\x03 \x01(\x0e2\x14.xai_api.MessageRoleR\x04role\x120\n" +
 	"\n" +
 	"tool_calls\x18\x04 \x03(\v2\x11.xai_api.ToolCallR\ttoolCalls\x12+\n" +
-	"\x11encrypted_content\x18\x05 \x01(\tR\x10encryptedContent\"\x84\x01\n" +
-	"\rSamplingUsage\x12#\n" +
-	"\rprompt_tokens\x18\x01 \x01(\x05R\fpromptTokens\x12+\n" +
-	"\x11completion_tokens\x18\x02 \x01(\x05R\x10completionTokens\x12!\n" +
-	"\ftotal_tokens\x18\x03 \x01(\x05R\vtotalTokens\"5\n" +
+	"\x11encrypted_content\x18\x05 \x01(\tR\x10encryptedContent\"5\n" +
 	"\x04Tool\x12-\n" +
 	"\bfunction\x18\x01 \x01(\v2\x11.xai_api.FunctionR\bfunction\"x\n" +
 	"\bFunction\x12\x12\n" +
@@ -1767,7 +1703,7 @@ func file_xai_v1_chat_proto_rawDescGZIP() []byte {
 }
 
 var file_xai_v1_chat_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_xai_v1_chat_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_xai_v1_chat_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_xai_v1_chat_proto_goTypes = []any{
 	(MessageRole)(0),                  // 0: xai_api.MessageRole
 	(ReasoningEffort)(0),              // 1: xai_api.ReasoningEffort
@@ -1784,41 +1720,41 @@ var file_xai_v1_chat_proto_goTypes = []any{
 	(*CompletionMessage)(nil),         // 12: xai_api.CompletionMessage
 	(*CompletionOutputChunk)(nil),     // 13: xai_api.CompletionOutputChunk
 	(*Delta)(nil),                     // 14: xai_api.Delta
-	(*SamplingUsage)(nil),             // 15: xai_api.SamplingUsage
-	(*Tool)(nil),                      // 16: xai_api.Tool
-	(*Function)(nil),                  // 17: xai_api.Function
-	(*ToolCall)(nil),                  // 18: xai_api.ToolCall
-	(*FunctionCall)(nil),              // 19: xai_api.FunctionCall
-	(*ToolChoice)(nil),                // 20: xai_api.ToolChoice
-	(*ResponseFormat)(nil),            // 21: xai_api.ResponseFormat
-	(*SearchParameters)(nil),          // 22: xai_api.SearchParameters
-	(*timestamppb.Timestamp)(nil),     // 23: google.protobuf.Timestamp
+	(*Tool)(nil),                      // 15: xai_api.Tool
+	(*Function)(nil),                  // 16: xai_api.Function
+	(*ToolCall)(nil),                  // 17: xai_api.ToolCall
+	(*FunctionCall)(nil),              // 18: xai_api.FunctionCall
+	(*ToolChoice)(nil),                // 19: xai_api.ToolChoice
+	(*ResponseFormat)(nil),            // 20: xai_api.ResponseFormat
+	(*SearchParameters)(nil),          // 21: xai_api.SearchParameters
+	(*timestamppb.Timestamp)(nil),     // 22: google.protobuf.Timestamp
+	(*SamplingUsage)(nil),             // 23: xai_api.SamplingUsage
 }
 var file_xai_v1_chat_proto_depIdxs = []int32{
 	9,  // 0: xai_api.GetCompletionsRequest.messages:type_name -> xai_api.Message
-	16, // 1: xai_api.GetCompletionsRequest.tools:type_name -> xai_api.Tool
-	20, // 2: xai_api.GetCompletionsRequest.tool_choice:type_name -> xai_api.ToolChoice
-	21, // 3: xai_api.GetCompletionsRequest.response_format:type_name -> xai_api.ResponseFormat
+	15, // 1: xai_api.GetCompletionsRequest.tools:type_name -> xai_api.Tool
+	19, // 2: xai_api.GetCompletionsRequest.tool_choice:type_name -> xai_api.ToolChoice
+	20, // 3: xai_api.GetCompletionsRequest.response_format:type_name -> xai_api.ResponseFormat
 	1,  // 4: xai_api.GetCompletionsRequest.reasoning_effort:type_name -> xai_api.ReasoningEffort
-	22, // 5: xai_api.GetCompletionsRequest.search_parameters:type_name -> xai_api.SearchParameters
+	21, // 5: xai_api.GetCompletionsRequest.search_parameters:type_name -> xai_api.SearchParameters
 	11, // 6: xai_api.GetChatCompletionResponse.outputs:type_name -> xai_api.CompletionOutput
-	23, // 7: xai_api.GetChatCompletionResponse.created:type_name -> google.protobuf.Timestamp
-	15, // 8: xai_api.GetChatCompletionResponse.usage:type_name -> xai_api.SamplingUsage
+	22, // 7: xai_api.GetChatCompletionResponse.created:type_name -> google.protobuf.Timestamp
+	23, // 8: xai_api.GetChatCompletionResponse.usage:type_name -> xai_api.SamplingUsage
 	13, // 9: xai_api.GetChatCompletionChunk.outputs:type_name -> xai_api.CompletionOutputChunk
-	23, // 10: xai_api.GetChatCompletionChunk.created:type_name -> google.protobuf.Timestamp
-	15, // 11: xai_api.GetChatCompletionChunk.usage:type_name -> xai_api.SamplingUsage
+	22, // 10: xai_api.GetChatCompletionChunk.created:type_name -> google.protobuf.Timestamp
+	23, // 11: xai_api.GetChatCompletionChunk.usage:type_name -> xai_api.SamplingUsage
 	10, // 12: xai_api.Message.content:type_name -> xai_api.Content
 	0,  // 13: xai_api.Message.role:type_name -> xai_api.MessageRole
-	18, // 14: xai_api.Message.tool_calls:type_name -> xai_api.ToolCall
+	17, // 14: xai_api.Message.tool_calls:type_name -> xai_api.ToolCall
 	12, // 15: xai_api.CompletionOutput.message:type_name -> xai_api.CompletionMessage
 	0,  // 16: xai_api.CompletionMessage.role:type_name -> xai_api.MessageRole
-	18, // 17: xai_api.CompletionMessage.tool_calls:type_name -> xai_api.ToolCall
+	17, // 17: xai_api.CompletionMessage.tool_calls:type_name -> xai_api.ToolCall
 	14, // 18: xai_api.CompletionOutputChunk.delta:type_name -> xai_api.Delta
 	0,  // 19: xai_api.Delta.role:type_name -> xai_api.MessageRole
-	18, // 20: xai_api.Delta.tool_calls:type_name -> xai_api.ToolCall
-	17, // 21: xai_api.Tool.function:type_name -> xai_api.Function
+	17, // 20: xai_api.Delta.tool_calls:type_name -> xai_api.ToolCall
+	16, // 21: xai_api.Tool.function:type_name -> xai_api.Function
 	4,  // 22: xai_api.ToolCall.type:type_name -> xai_api.ToolCallType
-	19, // 23: xai_api.ToolCall.function:type_name -> xai_api.FunctionCall
+	18, // 23: xai_api.ToolCall.function:type_name -> xai_api.FunctionCall
 	2,  // 24: xai_api.ToolChoice.mode:type_name -> xai_api.ToolMode
 	3,  // 25: xai_api.ResponseFormat.format_type:type_name -> xai_api.FormatType
 	5,  // 26: xai_api.SearchParameters.mode:type_name -> xai_api.SearchMode
@@ -1838,13 +1774,14 @@ func file_xai_v1_chat_proto_init() {
 	if File_xai_v1_chat_proto != nil {
 		return
 	}
+	file_xai_v1_usage_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_xai_v1_chat_proto_rawDesc), len(file_xai_v1_chat_proto_rawDesc)),
 			NumEnums:      6,
-			NumMessages:   17,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
