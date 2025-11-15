@@ -17,7 +17,9 @@ builds:
 
 # Archives
 archives:
-  - format: tar.gz
+  - format_overrides:
+      - goos: windows
+        format: zip
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     files:
       - README.md
@@ -29,7 +31,7 @@ checksum:
 
 # Snapshot
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  version_template: "{{ .Tag }}-next"
 
 # Changelog
 changelog:
