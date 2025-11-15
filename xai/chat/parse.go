@@ -13,10 +13,10 @@ type ResponseFormat string
 const (
 	// ResponseFormatText indicates plain text response.
 	ResponseFormatText ResponseFormat = "text"
-	
+
 	// ResponseFormatJSONObject indicates JSON object response.
 	ResponseFormatJSONObject ResponseFormat = "json_object"
-	
+
 	// ResponseFormatJSONSchema indicates JSON schema response.
 	ResponseFormatJSONSchema ResponseFormat = "json_schema"
 )
@@ -52,17 +52,17 @@ func (r *Request) Parse(ctx context.Context, client ChatServiceClient, v any) er
 	}
 
 	// Perform chat completion
-	resp, err := client.CreateChatCompletion(ctx, r.proto)
+	resp, err := client.GetCompletion(ctx, r.proto)
 	if err != nil {
 		return fmt.Errorf("chat completion failed: %w", err)
 	}
 
-	if resp == nil || len(resp.Choices) == 0 {
+	if resp == nil || len(resp.Outputs) == 0 {
 		return fmt.Errorf("empty response received")
 	}
 
-	// Get the content from the first choice
-	content := resp.Choices[0].Message.Content
+	// Get the content from the first output
+	content := resp.Outputs[0].Message.Content
 	if content == "" {
 		return fmt.Errorf("empty content in response")
 	}
@@ -141,11 +141,11 @@ func (rfo *ResponseFormatOption) Validate() error {
 	default:
 		return fmt.Errorf("unsupported response format: %s", rfo.Type)
 	}
-	
+
 	// Validate schema if present for json_schema format
 	if rfo.Type == ResponseFormatJSONSchema && rfo.Schema == nil {
 		return fmt.Errorf("schema is required for json_schema format")
 	}
-	
+
 	return nil
 }

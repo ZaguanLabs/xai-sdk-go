@@ -13,7 +13,7 @@ import (
 
 // DeferredRequest represents a deferred chat completion request.
 type DeferredRequest struct {
-	proto *xaiv1.CreateChatCompletionRequest
+	proto *xaiv1.GetCompletionsRequest
 }
 
 // DeferredRequestOption represents a functional option for DeferredRequest.
@@ -22,7 +22,7 @@ type DeferredRequestOption func(*DeferredRequest)
 // NewDeferredRequest creates a new deferred chat completion request.
 func NewDeferredRequest(model string, opts ...DeferredRequestOption) *DeferredRequest {
 	req := &DeferredRequest{
-		proto: &xaiv1.CreateChatCompletionRequest{
+		proto: &xaiv1.GetCompletionsRequest{
 			Model: model,
 		},
 	}
@@ -95,7 +95,7 @@ func (r *DeferredRequest) WithMaxTokens(maxTokens int32) *DeferredRequest {
 }
 
 // Proto returns the underlying protobuf request.
-func (r *DeferredRequest) Proto() *xaiv1.CreateChatCompletionRequest {
+func (r *DeferredRequest) Proto() *xaiv1.GetCompletionsRequest {
 	return r.proto
 }
 
@@ -112,7 +112,7 @@ func (r *DeferredRequest) Submit(ctx context.Context, client ChatServiceClient) 
 	}
 
 	// Submit the request
-	resp, err := client.CreateChatCompletion(ctx, r.proto)
+	resp, err := client.GetCompletion(ctx, r.proto)
 	if err != nil {
 		// Handle specific gRPC errors
 		if st, ok := status.FromError(err); ok {
@@ -147,7 +147,7 @@ func (r *DeferredRequest) Submit(ctx context.Context, client ChatServiceClient) 
 
 // DeferredResponse represents a deferred chat completion response.
 type DeferredResponse struct {
-	proto *xaiv1.CreateChatCompletionResponse
+	proto *xaiv1.GetChatCompletionResponse
 }
 
 // ID returns the response ID.
@@ -186,7 +186,7 @@ func (r *DeferredResponse) CompletedAt() time.Time {
 }
 
 // Proto returns the underlying protobuf response.
-func (r *DeferredResponse) Proto() *xaiv1.CreateChatCompletionResponse {
+func (r *DeferredResponse) Proto() *xaiv1.GetChatCompletionResponse {
 	return r.proto
 }
 
@@ -345,10 +345,10 @@ func (r *DeferredRequest) Validate() error {
 	if r.proto == nil {
 		return fmt.Errorf("request proto is nil")
 	}
-	
+
 	if r.proto.Model == "" {
 		return fmt.Errorf("model is required")
 	}
-	
+
 	return nil
 }
