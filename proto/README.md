@@ -32,9 +32,7 @@ Or directly with buf:
 
 ## Important Notes
 
-**Current Status**: The proto definitions in this directory are **stub implementations** created to bootstrap the project. They provide minimal service definitions for chat, files, and models APIs.
-
-**TODO**: These stubs need to be replaced with the actual proto definitions from the xAI API once they become available. The Python SDK (`docs/xai-sdk-python`) only contains generated Python code, not the original `.proto` files.
+The `.proto` files here are derived from the definitions used by the official xAI Python SDK. As the official API evolves, these files will be updated to match.
 
 ## Adding New Services
 

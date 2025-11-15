@@ -20,7 +20,8 @@ fmt:
 	@gofmt -w $(shell find . -name '*.go')
 
 lint:
-	@echo "lint: configure golangci-lint in later phase"
+	@echo "Running linter..."
+	@golangci-lint run ./...
 
 test:
 	@go test ./...

@@ -15,7 +15,7 @@ import (
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/metadata"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/models"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/tokenizer"
-	"github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
 	"google.golang.org/grpc"
 )
 
