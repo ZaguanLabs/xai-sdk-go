@@ -6,7 +6,7 @@
 
 The official Go SDK for xAI provides a first-class, idiomatic Go interface to xAI's powerful AI capabilities. This SDK enables Go developers to integrate chat completions, streaming responses, and upcoming features like file operations, image generation, and more.
 
-> **Status**: **v0.2.0** - Major release with 100% proto alignment to official xAI Python SDK v1.4.0.
+> **Status**: **v0.2.1** - Hotfix release fixing compilation errors from v0.2.0.
 
 ## ✨ Features
 
@@ -26,7 +26,7 @@ The official Go SDK for xAI provides a first-class, idiomatic Go interface to xA
 ### Installation
 
 ```bash
-go get github.com/ZaguanLabs/xai-sdk-go@v0.2.0
+go get github.com/ZaguanLabs/xai-sdk-go@v0.2.1
 ```
 
 ### Basic Usage

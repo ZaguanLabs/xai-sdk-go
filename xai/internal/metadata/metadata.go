@@ -51,7 +51,7 @@ type SDKMetadata struct {
 func NewSDKMetadata(apiKey string) *SDKMetadata {
 	return &SDKMetadata{
 		APIKey:        apiKey,
-		ClientVersion: "xai-sdk-go/0.2.0",
+		ClientVersion: "xai-sdk-go/0.2.1",
 		Environment:   "production",
 	}
 }

@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-11-15
+
+### 🔧 Hotfix: Compilation Errors
+
+This is a critical hotfix for v0.2.0 which had compilation errors due to removed SDK wrappers.
+
+### Fixed
+- **Compilation errors**: Removed broken SDK wrappers that referenced old proto messages
+- **Client imports**: Fixed main client to only import working packages
+- **Examples**: Removed broken examples for auth, files, collections, image, tokenizer
+
+### Removed
+- `xai/auth` package (needs reimplementation with new ApiKey proto)
+- `xai/files` package (needs reimplementation with new file proto structure)
+- `xai/collections` package (needs reimplementation with new collections proto)
+- `xai/image` package (needs reimplementation with new image proto)
+- Examples for removed packages
+
+### Working Packages ✅
+- `xai/chat` - Fully functional and production-tested
+- `xai/models` - Fully functional
+- `xai/embed` - New wrapper (needs gRPC integration)
+
+### Note
+v0.2.0 achieved 100% proto alignment but introduced breaking changes that caused compilation errors.
+This hotfix ensures the SDK compiles and the core chat functionality remains working.
+
+The removed packages will be reimplemented in future releases to match the new proto structure.
+
 ## [0.2.0] - 2025-11-15
 
 ### 🎉 Major Release: 100% Proto Alignment
