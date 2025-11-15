@@ -1,1 +1,30 @@
-/docs/xai-sdk-python
+# Build artifacts
+bin/
+build/
+dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+coverage.out
+
+# Dependency/build caches
+.cache/
+.cover/
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment files
+.env
+.env.*
+
+# Logs & temp files
+*.log
+*.tmp

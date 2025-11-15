@@ -1,0 +1,5 @@
+version: v1
+
+workspace:
+  directories:
+    - proto
