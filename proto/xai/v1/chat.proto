@@ -13,38 +13,20 @@ service Chat {
   rpc StreamChatCompletion(CreateChatCompletionRequest) returns (stream ChatCompletionChunk);
 }
 
-// Files service for file operations
-service Files {
-  // Upload a file
-  rpc UploadFile(UploadFileRequest) returns (UploadFileResponse);
-
-  // Download a file
-  rpc DownloadFile(DownloadFileRequest) returns (DownloadFileResponse);
-
-  // List files
-  rpc ListFiles(ListFilesRequest) returns (ListFilesResponse);
-
-  // Get file information
-  rpc GetFile(GetFileRequest) returns (GetFileResponse);
-
-  // Delete a file
-  rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse);
-}
-
 // Request to create a chat completion
 message CreateChatCompletionRequest {
   string model = 1;
   repeated Message messages = 2;
-  optional float temperature = 3;
-  optional int32 max_tokens = 4;
-  optional repeated Tool tools = 5;
-  optional ToolChoice tool_choice = 6;
-  optional ResponseFormat response_format = 7;
-  optional SearchParameters search = 8;
-  optional string reasoning_effort = 9;
-  optional bool store_messages = 10;
-  optional string previous_response_id = 11;
-  optional bool encrypted_content = 12;
+  float temperature = 3;
+  int32 max_tokens = 4;
+  repeated Tool tools = 5;
+  ToolChoice tool_choice = 6;
+  ResponseFormat response_format = 7;
+  SearchParameters search = 8;
+  string reasoning_effort = 9;
+  bool store_messages = 10;
+  string previous_response_id = 11;
+  bool encrypted_content = 12;
 }
 
 // Response from chat completion
@@ -53,9 +35,9 @@ message CreateChatCompletionResponse {
   string model = 2;
   repeated Choice choices = 3;
   Usage usage = 4;
-  optional string status = 5; // For deferred responses
-  optional string created_at = 6; // For deferred responses
-  optional string completed_at = 7; // For deferred responses
+  string status = 5; // For deferred responses
+  string created_at = 6; // For deferred responses
+  string completed_at = 7; // For deferred responses
 }
 
 // Streaming chunk
@@ -68,7 +50,7 @@ message ChatCompletionChunk {
 message Message {
   string role = 1;
   string content = 2;
-  optional repeated ToolCall tool_calls = 3; // For assistant messages with tool calls
+  repeated ToolCall tool_calls = 3; // For assistant messages with tool calls
 }
 
 // Choice in response
@@ -86,9 +68,9 @@ message ChoiceDelta {
 
 // Message delta
 message MessageDelta {
-  optional string role = 1;
-  optional string content = 2;
-  optional repeated ToolCall tool_calls = 3; // For streaming tool calls
+  string role = 1;
+  string content = 2;
+  repeated ToolCall tool_calls = 3; // For streaming tool calls
 }
 
 // Token usage information
@@ -101,7 +83,20 @@ message Usage {
 // Tool definition
 message Tool {
   string type = 1;
-  message function = 2;
+  Function function = 2;
+}
+
+// Function definition for tools
+message Function {
+  string name = 1;
+  string description = 2;
+  string parameters = 3; // JSON schema
+}
+
+// Function call information
+message FunctionCall {
+  string name = 1;
+  string arguments = 2; // JSON arguments
 }
 
 // Tool choice configuration
@@ -130,87 +125,28 @@ message JsonSchema {
 
 // Search parameters
 message SearchParameters {
-  optional int32 count = 1;
+  int32 count = 1;
   repeated string domains = 2;
-  optional string recency = 3; // "default", "day", "week", "month", "year"
+  string recency = 3; // "default", "day", "week", "month", "year"
 }
 
 // Tool call information
 message ToolCall {
   string id = 1;
   string type = 2; // "function"
-  message function = 3;
+  FunctionCall function = 3;
 }
 
 // File upload request
 message UploadFileRequest {
   string filename = 1;
   bytes content = 2;
-  optional string content_type = 3;
-  optional string purpose = 4;
+  string content_type = 3;
+  string purpose = 4;
 }
 
 // File upload response
 message UploadFileResponse {
-  string id = 1;
-  string filename = 2;
-  int64 size = 3;
-  string content_type = 4;
-  string purpose = 5;
-  int64 created_at = 6;
-}
-
-// File download request
-message DownloadFileRequest {
-  string file_id = 1;
-}
-
-// File download response
-message DownloadFileResponse {
-  string id = 1;
-  string filename = 2;
-  int64 size = 3;
-  string content_type = 4;
-  string purpose = 5;
-  bytes content = 6;
-  int64 created_at = 7;
-}
-
-// List files request
-message ListFilesRequest {
-  optional string purpose = 1;
-  optional int32 limit = 2;
-  optional string sort_by = 3;
-  optional string sort_order = 4;
-}
-
-// List files response
-message ListFilesResponse {
-  repeated File files = 1;
-}
-
-// Get file request
-message GetFileRequest {
-  string file_id = 1;
-}
-
-// Get file response
-message GetFileResponse {
-  File file = 1;
-}
-
-// Delete file request
-message DeleteFileRequest {
-  string file_id = 1;
-}
-
-// Delete file response
-message DeleteFileResponse {
-  bool success = 1;
-}
-
-// File information
-message File {
   string id = 1;
   string filename = 2;
   int64 size = 3;

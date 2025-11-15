@@ -4,8 +4,6 @@ package chat
 import (
 	"encoding/json"
 	"fmt"
-
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
 )
 
 // Tool represents a function tool that can be called by the model.
@@ -137,87 +135,6 @@ func (t *Tool) Validate() error {
 	return nil
 }
 
-// ToolChoice represents how tools should be chosen.
-type ToolChoice string
-
-const (
-	// ToolChoiceNone means no tools will be used.
-	ToolChoiceNone ToolChoice = "none"
-
-	// ToolChoiceAuto means the model will decide whether to use tools.
-	ToolChoiceAuto ToolChoice = "auto"
-
-	// ToolChoiceRequired means tools must be used.
-	ToolChoiceRequired ToolChoice = "required"
-
-	// ToolChoiceSpecific means a specific tool must be used.
-	ToolChoiceSpecific ToolChoice = "specific"
-)
-
-// NewToolChoiceNone creates a "none" tool choice.
-func NewToolChoiceNone() *ToolChoiceOption {
-	return &ToolChoiceOption{
-		choice: ToolChoiceNone,
-	}
-}
-
-// NewToolChoiceAuto creates an "auto" tool choice.
-func NewToolChoiceAuto() *ToolChoiceOption {
-	return &ToolChoiceOption{
-		choice: ToolChoiceAuto,
-	}
-}
-
-// NewToolChoiceRequired creates a "required" tool choice.
-func NewToolChoiceRequired() *ToolChoiceOption {
-	return &ToolChoiceOption{
-		choice: ToolChoiceRequired,
-	}
-}
-
-// NewToolChoiceSpecific creates a "specific" tool choice.
-func NewToolChoiceSpecific(toolName string) *ToolChoiceOption {
-	return &ToolChoiceOption{
-		choice:  ToolChoiceSpecific,
-		tool:   &toolName,
-	}
-}
-
-// ToolChoiceOption represents a tool choice configuration.
-type ToolChoiceOption struct {
-	choice ToolChoice
-	tool   *string // for ToolChoiceSpecific
-}
-
-// ToJSON converts the tool choice to JSON representation.
-func (tco *ToolChoiceOption) ToJSON() map[string]interface{} {
-	result := map[string]interface{}{
-		"type": string(tco.choice),
-	}
-
-	if tco.choice == ToolChoiceSpecific && tco.tool != nil {
-		result["function"] = map[string]interface{}{
-			"name": *tco.tool,
-		}
-	}
-
-	return result
-}
-
-// Validate validates the tool choice option.
-func (tco *ToolChoiceOption) Validate() error {
-	switch tco.choice {
-	case ToolChoiceNone, ToolChoiceAuto, ToolChoiceRequired:
-		return nil
-	case ToolChoiceSpecific:
-		if tco.tool == nil || *tco.tool == "" {
-			return fmt.Errorf("tool name is required for specific tool choice")
-		}
-		return nil
-	default:
-		return fmt.Errorf("unknown tool choice: %s", tco.choice)
-	}
-}
 
 // ToolCall represents a call to a tool.
 type ToolCall struct {
@@ -251,6 +168,33 @@ func (tc *ToolCall) Arguments() map[string]interface{} {
 		return make(map[string]interface{})
 	}
 	return tc.arguments
+}
+
+// Function returns a function representation of the tool call.
+func (tc *ToolCall) Function() *ToolCallFunction {
+	return &ToolCallFunction{
+		name:      tc.name,
+		arguments: tc.arguments,
+	}
+}
+
+// ToolCallFunction represents the function part of a tool call.
+type ToolCallFunction struct {
+	name      string
+	arguments map[string]interface{}
+}
+
+// Name returns the function name.
+func (f *ToolCallFunction) Name() string {
+	return f.name
+}
+
+// Arguments returns the function arguments.
+func (f *ToolCallFunction) Arguments() map[string]interface{} {
+	if f.arguments == nil {
+		return make(map[string]interface{})
+	}
+	return f.arguments
 }
 
 // ToJSON converts the tool call to JSON representation.

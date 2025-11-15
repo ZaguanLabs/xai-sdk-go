@@ -6,7 +6,7 @@ import (
 
 func TestMessageBuilders(t *testing.T) {
 	// Test System message
-	systemMsg := System("You are a helpful assistant.")
+	systemMsg := System(Text("You are a helpful assistant."))
 	if systemMsg.Role() != "system" {
 		t.Errorf("Expected role 'system', got '%s'", systemMsg.Role())
 	}
@@ -15,7 +15,7 @@ func TestMessageBuilders(t *testing.T) {
 	}
 
 	// Test User message
-	userMsg := User("Hello, how are you?")
+	userMsg := User(Text("Hello, how are you?"))
 	if userMsg.Role() != "user" {
 		t.Errorf("Expected role 'user', got '%s'", userMsg.Role())
 	}
@@ -24,7 +24,7 @@ func TestMessageBuilders(t *testing.T) {
 	}
 
 	// Test Assistant message
-	assistantMsg := Assistant("I'm doing well, thank you!")
+	assistantMsg := Assistant(Text("I'm doing well, thank you!"))
 	if assistantMsg.Role() != "assistant" {
 		t.Errorf("Expected role 'assistant', got '%s'", assistantMsg.Role())
 	}
@@ -55,8 +55,8 @@ func TestRequestBuilders(t *testing.T) {
 	// Test WithMessages option
 	req = NewRequest("test-model",
 		WithMessages(
-			System("You are a helpful assistant."),
-			User("Hello!"),
+			System(Text("You are a helpful assistant.")),
+			User(Text("Hello!")),
 		))
 	if len(req.Proto().GetMessages()) != 2 {
 		t.Errorf("Expected 2 messages, got %d", len(req.Proto().GetMessages()))

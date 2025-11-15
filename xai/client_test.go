@@ -4,9 +4,6 @@ import (
 	"context"
 	"testing"
 	"time"
-
-	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/metadata"
-	"google.golang.org/grpc"
 )
 
 func TestNewClient(t *testing.T) {
@@ -37,12 +34,12 @@ func TestNewClient(t *testing.T) {
 
 	t.Run("NilConfig", func(t *testing.T) {
 		client, err := NewClient(nil)
-		
-		if err != nil {
-			t.Errorf("Should not return error for nil config: %v", err)
+
+		if err == nil {
+			t.Error("Should return error for nil config")
 		}
-		if client == nil {
-			t.Error("NewClient should not return nil for nil config")
+		if client != nil {
+			t.Error("Should return nil client for nil config")
 		}
 	})
 

@@ -8,7 +8,6 @@ import (
 	"io"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -128,15 +127,12 @@ type Chunk struct {
 type RequestOption func(*Request)
 
 // ChatServiceClient is an interface for the chat service client.
-type ChatServiceClient interface {
-	CreateChatCompletion(ctx context.Context, req *xaiv1.CreateChatCompletionRequest, opts ...grpc.CallOption) (*xaiv1.CreateChatCompletionResponse, error)
-	StreamChatCompletion(ctx context.Context, req *xaiv1.CreateChatCompletionRequest, opts ...grpc.CallOption) (xaiv1.Chat_StreamChatCompletionClient, error)
-}
+type ChatServiceClient = xaiv1.ChatClient
 
 // Stream represents a streaming chat completion response.
 type Stream struct {
 	stream xaiv1.Chat_StreamChatCompletionClient
-	Err    error
+	err    error
 	current *Chunk
 }
 
@@ -159,30 +155,130 @@ func NewRequest(model string, opts ...RequestOption) *Request {
 // WithTemperature sets the temperature for sampling.
 func WithTemperature(temp float32) RequestOption {
 	return func(r *Request) {
-		r.proto.Temperature = &temp
+		r.proto.Temperature = temp
 	}
 }
 
 // WithMaxTokens sets the maximum number of tokens.
 func WithMaxTokens(maxTokens int32) RequestOption {
 	return func(r *Request) {
-		r.proto.MaxTokens = &maxTokens
+		r.proto.MaxTokens = maxTokens
 	}
 }
 
 // WithSearch adds search parameters to the request.
 func WithSearch(params *SearchParameters) RequestOption {
 	return func(r *Request) {
-		// Note: Search functionality is not yet implemented in proto definitions
-		// r.proto.Search = params.ToJSON()
+		r.proto.Search = params.Proto()
 	}
 }
 
 // WithReasoningEffort adds reasoning effort to the request.
-func WithReasoningEffort(effort *ReasoningEffortOption) RequestOption {
+func WithReasoningEffort(effort ReasoningEffort) RequestOption {
 	return func(r *Request) {
-		// Note: Reasoning functionality is not yet implemented in proto definitions
-		// r.proto.ReasoningEffort = effort.ToJSON()
+		r.proto.ReasoningEffort = string(effort)
+	}
+}
+
+// ReasoningEffort is the reasoning effort setting.
+type ReasoningEffort string
+
+const (
+	// ReasoningEffortDefault is the default reasoning effort.
+	ReasoningEffortDefault ReasoningEffort = "default"
+	// ReasoningEffortLow is the low reasoning effort.
+	ReasoningEffortLow ReasoningEffort = "low"
+	// ReasoningEffortHigh is the high reasoning effort.
+	ReasoningEffortHigh ReasoningEffort = "high"
+)
+
+// SearchParameters defines the search parameters.
+type SearchParameters struct {
+	pb *xaiv1.SearchParameters
+}
+
+// NewSearchParameters creates a new search parameter object.
+func NewSearchParameters() *SearchParameters {
+	return &SearchParameters{
+		pb: &xaiv1.SearchParameters{},
+	}
+}
+
+// WithCount sets the number of search results to return.
+func (p *SearchParameters) WithCount(count int32) *SearchParameters {
+	p.pb.Count = count
+	return p
+}
+
+// WithDomains sets the domains to search.
+func (p *SearchParameters) WithDomains(domains ...string) *SearchParameters {
+	p.pb.Domains = domains
+	return p
+}
+
+// WithRecency sets the recency of the search results.
+func (p *SearchParameters) WithRecency(recency string) *SearchParameters {
+	p.pb.Recency = recency
+	return p
+}
+
+// Proto returns the underlying protobuf message.
+func (p *SearchParameters) Proto() *xaiv1.SearchParameters {
+	if p == nil {
+		return nil
+	}
+	return p.pb
+}
+
+
+// WithTool adds tools to the request.
+func WithTool(tools ...*Tool) RequestOption {
+	return func(r *Request) {
+		// Convert tools to proto format
+		protoTools := make([]*xaiv1.Tool, len(tools))
+		for i, tool := range tools {
+			protoTools[i] = &xaiv1.Tool{
+				Type: "function",
+				// Note: Other fields need to be properly converted to proto format
+				// For now, we'll set a basic structure
+				Function: &xaiv1.Function{
+					Name:        tool.Name(),
+					Description: tool.Description(),
+					// Parameters would need proper JSON schema conversion
+				},
+			}
+		}
+		r.proto.Tools = protoTools
+	}
+}
+
+// WithToolResults adds tool results to the request.
+func WithToolResults(results ...ToolResult) RequestOption {
+	return func(r *Request) {
+		// Note: Tool results would be added as assistant messages with tool role
+		// This is a placeholder until proper tool result handling is implemented
+		for _, result := range results {
+			var content string
+			if result.Error() != nil {
+				content = *result.Error()
+			} else if str, ok := result.Result().(string); ok {
+				content = str
+			} else {
+				// Convert to JSON string if not a string
+				if jsonData, err := json.Marshal(result.Result()); err == nil {
+					content = string(jsonData)
+				} else {
+					content = fmt.Sprintf("%v", result.Result())
+				}
+			}
+
+			msg := &xaiv1.Message{
+				Role:    "tool",
+				Content: content,
+				// Additional tool call info would be added here
+			}
+			r.proto.Messages = append(r.proto.Messages, msg)
+		}
 	}
 }
 
@@ -218,37 +314,37 @@ func (r *Request) AddMessage(msg Message) *Request {
 }
 
 // WithMessages sets all messages for the request as a functional option.
-func WithMessages(messages ...Message) RequestOption {
+func WithMessages(messages ...*Message) RequestOption {
 	return func(r *Request) {
-		r.SetMessages(messages...)
+		r.proto.Messages = make([]*xaiv1.Message, 0, len(messages))
+		for _, msg := range messages {
+			r.proto.Messages = append(r.proto.Messages, msg.Proto())
+		}
 	}
 }
 
 // WithMessage appends a message to the request as a functional option.
-func WithMessage(msg Message) RequestOption {
+func WithMessage(msg *Message) RequestOption {
 	return func(r *Request) {
-		r.AppendMessage(msg)
+		r.proto.Messages = append(r.proto.Messages, msg.Proto())
 	}
 }
 
 // SetTemperature sets the temperature for sampling.
 func (r *Request) SetTemperature(temp float32) *Request {
-	r.proto.Temperature = &temp
+	r.proto.Temperature = temp
 	return r
 }
 
 // SetMaxTokens sets the maximum number of tokens.
 func (r *Request) SetMaxTokens(maxTokens int32) *Request {
-	r.proto.MaxTokens = &maxTokens
+	r.proto.MaxTokens = maxTokens
 	return r
 }
 
 // MaxTokens returns the max tokens setting.
 func (r *Request) MaxTokens() int32 {
-	if r.proto.MaxTokens != nil {
-		return *r.proto.MaxTokens
-	}
-	return 0
+	return r.proto.MaxTokens
 }
 
 // SetTools sets the tools for function calling.
@@ -265,10 +361,12 @@ func (r *Request) SetTools(tools ...Tool) *Request {
 }
 
 // SetToolChoice sets how tools are chosen.
-// Note: Tool functionality is not yet implemented in the proto definitions.
 func (r *Request) SetToolChoice(choice ToolChoice) *Request {
-	// Placeholder implementation until tool choice is properly defined in proto
-	// r.proto.ToolChoice = choice.Proto()
+	r.proto.ToolChoice = &xaiv1.ToolChoice{
+		Choice: &xaiv1.ToolChoice_Auto{
+			Auto: string(choice),
+		},
+	}
 	return r
 }
 
@@ -377,42 +475,134 @@ func (r *Request) Stream(ctx context.Context, client ChatServiceClient) (*Stream
 	return &Stream{stream: stream}, nil
 }
 
-// SetTools sets the tools for the request.
-func (r *Request) SetTools(tools ...Tool) *Request {
-	// Convert tools to JSON format
-	toolSchemas := make([]map[string]interface{}, len(tools))
-	for i, tool := range tools {
-		toolSchemas[i] = map[string]interface{}{
-			"type":     "function",
-			"function": tool.ToJSONSchema(),
+// validate validates the request.
+func (r *Request) validate() error {
+	if r.proto == nil {
+		return fmt.Errorf("request proto is nil")
+	}
+
+	// Validate model
+	if r.proto.Model == "" {
+		return fmt.Errorf("model is required")
+	}
+
+	// Validate temperature if set
+	if r.proto.Temperature != 0 {
+		temp := r.proto.Temperature
+		if temp < 0.0 || temp > 2.0 {
+			return fmt.Errorf("temperature must be between 0.0 and 2.0, got %f", temp)
 		}
 	}
 
-	// Note: This is a placeholder until tools are properly defined in proto
-	// r.proto.Tools = toolSchemas
-	return r
-}
-
-// WithTools adds tools to the request as a functional option.
-func WithTools(tools ...Tool) RequestOption {
-	return func(r *Request) {
-		r.SetTools(tools...)
+	// Validate max_tokens if set
+	if r.proto.MaxTokens != 0 {
+		maxTokens := r.proto.MaxTokens
+		if maxTokens < 1 || maxTokens > 8192 {
+			return fmt.Errorf("max_tokens must be between 1 and 8192, got %d", maxTokens)
+		}
 	}
-}
 
-// SetToolChoice sets how tools should be chosen.
-func (r *Request) SetToolChoice(choice *ToolChoiceOption) *Request {
-	// Note: This is a placeholder until tool choice is properly defined in proto
-	// if choice != nil {
-	// 	r.proto.ToolChoice = choice.ToJSON()
-	// }
-	return r
+	// Validate messages
+	if len(r.proto.Messages) == 0 {
+		return fmt.Errorf("at least one message is required")
+	}
+
+	for i, msg := range r.proto.Messages {
+		if msg == nil {
+			return fmt.Errorf("message at index %d is nil", i)
+		}
+		if msg.Role == "" {
+			return fmt.Errorf("message at index %d has empty role", i)
+		}
+		if msg.Content == "" {
+			return fmt.Errorf("message at index %d has empty content", i)
+		}
+
+		// Validate role
+		validRoles := map[string]bool{
+			"system": true,
+			"user": true,
+			"assistant": true,
+		}
+		if !validRoles[msg.Role] {
+			return fmt.Errorf("invalid role '%s' in message at index %d", msg.Role, i)
+		}
+	}
+
+	return nil
 }
 
 // WithToolChoice adds tool choice to the request as a functional option.
-func WithToolChoice(choice *ToolChoiceOption) RequestOption {
+func WithToolChoice(choice ToolChoice) RequestOption {
 	return func(r *Request) {
 		r.SetToolChoice(choice)
+	}
+}
+
+// ToolChoice is the tool choice setting.
+type ToolChoice string
+
+const (
+	// ToolChoiceAuto is the auto tool choice.
+	ToolChoiceAuto ToolChoice = "auto"
+	// ToolChoiceNone is the none tool choice.
+	ToolChoiceNone ToolChoice = "none"
+	// ToolChoiceRequired is the required tool choice.
+	ToolChoiceRequired ToolChoice = "required"
+)
+
+
+// WithResponseFormat adds response format to the request.
+func WithResponseFormat(format ResponseFormat) RequestOption {
+	return func(r *Request) {
+		// Convert to proto format
+		switch format {
+		case ResponseFormatText:
+			r.proto.ResponseFormat = &xaiv1.ResponseFormat{
+				Format: &xaiv1.ResponseFormat_Text{},
+			}
+		case ResponseFormatJSONObject:
+			r.proto.ResponseFormat = &xaiv1.ResponseFormat{
+				Format: &xaiv1.ResponseFormat_JsonObject{},
+			}
+		case ResponseFormatJSONSchema:
+			// For JSON schema, we need to handle the ResponseFormatOption
+			// This is a simplified implementation
+			r.proto.ResponseFormat = &xaiv1.ResponseFormat{
+				Format: &xaiv1.ResponseFormat_JsonSchema{},
+			}
+		}
+	}
+}
+
+// WithResponseFormatOption adds response format with schema to the request.
+func WithResponseFormatOption(option *ResponseFormatOption) RequestOption {
+	return func(r *Request) {
+		// Convert to proto format
+		switch option.Type {
+		case ResponseFormatText:
+			r.proto.ResponseFormat = &xaiv1.ResponseFormat{
+				Format: &xaiv1.ResponseFormat_Text{},
+			}
+		case ResponseFormatJSONObject:
+			r.proto.ResponseFormat = &xaiv1.ResponseFormat{
+				Format: &xaiv1.ResponseFormat_JsonObject{},
+			}
+		case ResponseFormatJSONSchema:
+			// Create JSON schema proto if schema is provided
+			jsonSchema := &xaiv1.JsonSchema{}
+			if option.Schema != nil {
+				// Convert map[string]interface{} to JSON schema string
+				if schemaData, err := json.Marshal(option.Schema); err == nil {
+					jsonSchema.Schema = string(schemaData)
+				}
+			}
+			r.proto.ResponseFormat = &xaiv1.ResponseFormat{
+				Format: &xaiv1.ResponseFormat_JsonSchema{
+					JsonSchema: jsonSchema,
+				},
+			}
+		}
 	}
 }
 
@@ -616,63 +806,6 @@ func (u *TokenUsage) TotalTokens() int32 {
 	return u.proto.GetTotalTokens()
 }
 
-// validate validates the request.
-func (r *Request) validate() error {
-	if r.proto == nil {
-		return fmt.Errorf("request proto is nil")
-	}
-
-	// Validate model
-	if r.proto.Model == "" {
-		return fmt.Errorf("model is required")
-	}
-
-	// Validate temperature if set
-	if r.proto.Temperature != nil {
-		temp := *r.proto.Temperature
-		if temp < 0.0 || temp > 2.0 {
-			return fmt.Errorf("temperature must be between 0.0 and 2.0, got %f", temp)
-		}
-	}
-
-	// Validate max_tokens if set
-	if r.proto.MaxTokens != nil {
-		maxTokens := *r.proto.MaxTokens
-		if maxTokens < 1 || maxTokens > 8192 {
-			return fmt.Errorf("max_tokens must be between 1 and 8192, got %d", maxTokens)
-		}
-	}
-
-	// Validate messages
-	if len(r.proto.Messages) == 0 {
-		return fmt.Errorf("at least one message is required")
-	}
-
-	for i, msg := range r.proto.Messages {
-		if msg == nil {
-			return fmt.Errorf("message at index %d is nil", i)
-		}
-		if msg.Role == "" {
-			return fmt.Errorf("message at index %d has empty role", i)
-		}
-		if msg.Content == "" {
-			return fmt.Errorf("message at index %d has empty content", i)
-		}
-
-		// Validate role
-		validRoles := map[string]bool{
-			"system": true,
-			"user": true,
-			"assistant": true,
-		}
-		if !validRoles[msg.Role] {
-			return fmt.Errorf("invalid role '%s' in message at index %d", msg.Role, i)
-		}
-	}
-
-	return nil
-}
-
 // validateStream validates the stream state.
 func (s *Stream) validateStream() error {
 	if s == nil {
@@ -681,8 +814,8 @@ func (s *Stream) validateStream() error {
 	if s.stream == nil {
 		return fmt.Errorf("underlying stream is nil")
 	}
-	if s.Err != nil {
-		return fmt.Errorf("stream has error: %w", s.Err)
+	if s.err != nil {
+		return fmt.Errorf("stream has error: %w", s.err)
 	}
 	return nil
 }
@@ -691,12 +824,12 @@ func (s *Stream) validateStream() error {
 func (s *Stream) Next() bool {
 	// Validate stream state
 	if err := s.validateStream(); err != nil {
-		s.Err = err
+		s.err = err
 		return false
 	}
 
 	// Check if we already have an error
-	if s.Err != nil {
+	if s.err != nil {
 		return false
 	}
 
@@ -705,7 +838,7 @@ func (s *Stream) Next() bool {
 	if err != nil {
 		if err == io.EOF {
 			// Normal stream termination
-			s.Err = io.EOF
+			s.err = io.EOF
 			return false
 		}
 
@@ -713,24 +846,24 @@ func (s *Stream) Next() bool {
 		if st, ok := status.FromError(err); ok {
 			switch st.Code() {
 			case codes.Unauthenticated:
-				s.Err = fmt.Errorf("authentication failed: %s", st.Message())
+				s.err = fmt.Errorf("authentication failed: %s", st.Message())
 			case codes.PermissionDenied:
-				s.Err = fmt.Errorf("permission denied: %s", st.Message())
+				s.err = fmt.Errorf("permission denied: %s", st.Message())
 			case codes.InvalidArgument:
-				s.Err = fmt.Errorf("invalid request: %s", st.Message())
+				s.err = fmt.Errorf("invalid request: %s", st.Message())
 			case codes.NotFound:
-				s.Err = fmt.Errorf("model not found: %s", st.Message())
+				s.err = fmt.Errorf("model not found: %s", st.Message())
 			case codes.ResourceExhausted:
-				s.Err = fmt.Errorf("quota exceeded: %s", st.Message())
+				s.err = fmt.Errorf("quota exceeded: %s", st.Message())
 			case codes.Unavailable:
-				s.Err = fmt.Errorf("service unavailable: %s", st.Message())
+				s.err = fmt.Errorf("service unavailable: %s", st.Message())
 			case codes.DeadlineExceeded:
-				s.Err = fmt.Errorf("request timeout: %s", st.Message())
+				s.err = fmt.Errorf("request timeout: %s", st.Message())
 			default:
-				s.Err = fmt.Errorf("stream error (%s): %s", st.Code().String(), st.Message())
+				s.err = fmt.Errorf("stream error (%s): %s", st.Code().String(), st.Message())
 			}
 		} else {
-			s.Err = fmt.Errorf("stream failed: %w", err)
+			s.err = fmt.Errorf("stream failed: %w", err)
 		}
 		return false
 	}
@@ -770,5 +903,5 @@ func (u *TokenUsage) Proto() *xaiv1.Usage {
 
 // Err returns the error that occurred during streaming.
 func (s *Stream) Err() error {
-	return s.Err
+	return s.err
 }

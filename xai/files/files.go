@@ -6,14 +6,10 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
-	"strings"
 	"time"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // File represents a file in the xAI system.
@@ -29,9 +25,9 @@ type File struct {
 // FileServiceClient is an interface for the files service client.
 type FileServiceClient interface {
 	UploadFile(ctx context.Context, req *xaiv1.UploadFileRequest, opts ...grpc.CallOption) (*xaiv1.UploadFileResponse, error)
-	DownloadFile(ctx context.Context, req *xaiv1.DownloadFileRequest, opts ...grpc.CallOption) (*xaiv1.DownloadFileResponse, error)
+	DownloadFile(ctx context.Context, req *xaiv1.DownloadFileRequest, opts ...grpc.CallOption) (xaiv1.Files_DownloadFileClient, error)
 	ListFiles(ctx context.Context, req *xaiv1.ListFilesRequest, opts ...grpc.CallOption) (*xaiv1.ListFilesResponse, error)
-	GetFile(ctx context.Context, req *xaiv1.GetFileRequest, opts ...grpc.CallOption) (*xaiv1.GetFileResponse, error)
+	GetFile(ctx context.Context, req *xaiv1.GetFileRequest, opts ...grpc.CallOption) (*xaiv1.File, error)
 	DeleteFile(ctx context.Context, req *xaiv1.DeleteFileRequest, opts ...grpc.CallOption) (*xaiv1.DeleteFileResponse, error)
 }
 
@@ -91,19 +87,6 @@ func (c *Client) UploadFile(ctx context.Context, req *UploadRequest) (*File, err
 	}
 	defer file.Close()
 
-	// Get file info
-	fileInfo, err := file.Stat()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get file info: %w", err)
-	}
-
-	// Create file reader
-	fileReader := &progressReader{
-		reader:    file,
-		totalSize: fileInfo.Size(),
-		callback:  req.callback,
-	}
-
 	// Create upload request (placeholder until proto is updated)
 	uploadReq := &xaiv1.UploadFileRequest{
 		Filename:    req.filename,
@@ -127,7 +110,7 @@ func (c *Client) UploadFile(ctx context.Context, req *UploadRequest) (*File, err
 		filename:    req.filename,
 		size:        resp.Size, // Use response size instead of placeholder
 		contentType:  resp.ContentType,
-		createdAt:    resp.CreatedAt, // Use response time instead of placeholder
+		createdAt:    time.Unix(resp.CreatedAt, 0), // Convert timestamp to time.Time
 		purpose:     resp.Purpose,
 	}, nil
 }
@@ -146,13 +129,6 @@ func (c *Client) UploadBytes(ctx context.Context, filename string, data []byte, 
 		Filename:    filename,
 		ContentType: contentType,
 		Purpose:     purpose,
-	}
-
-	// Create file reader with progress tracking
-	fileReader := &progressReader{
-		reader:    &dataReader{data: data},
-		totalSize: int64(len(data)),
-		callback:  callback,
 	}
 
 	// Call upload service (placeholder)
@@ -192,13 +168,6 @@ func (c *Client) UploadReader(ctx context.Context, filename string, reader io.Re
 		Purpose:     purpose,
 	}
 
-	// Create file reader with progress tracking
-	fileReader := &progressReader{
-		reader:    reader,
-		totalSize: size,
-		callback:  callback,
-	}
-
 	// Call upload service (placeholder)
 	resp, err := c.grpcClient.UploadFile(ctx, uploadReq)
 	if err != nil {
@@ -231,19 +200,19 @@ func (c *Client) DownloadFile(ctx context.Context, req *DownloadRequest) error {
 		return fmt.Errorf("invalid download request: %w", err)
 	}
 
-	// Create download request (placeholder until proto is updated)
+	// Create download request
 	downloadReq := &xaiv1.DownloadFileRequest{
 		FileId: req.fileID,
 	}
 
-	// Call download service (placeholder)
-	resp, err := c.grpcClient.DownloadFile(ctx, downloadReq)
+	// Call download service (streaming)
+	stream, err := c.grpcClient.DownloadFile(ctx, downloadReq)
 	if err != nil {
 		return fmt.Errorf("file download failed: %w", err)
 	}
 
-	if resp == nil {
-		return fmt.Errorf("received nil download response")
+	if stream == nil {
+		return fmt.Errorf("received nil stream")
 	}
 
 	// Create local file
@@ -253,11 +222,20 @@ func (c *Client) DownloadFile(ctx context.Context, req *DownloadRequest) error {
 	}
 	defer file.Close()
 
-	// Copy data (placeholder - resp should contain file data)
-	// For now, we'll create an empty file as a placeholder
-	_, err = file.WriteString(fmt.Sprintf("Downloaded file %s (placeholder content)", req.fileID))
-	if err != nil {
-		return fmt.Errorf("failed to write file: %w", err)
+	// Receive and write file chunks
+	for {
+		chunk, err := stream.Recv()
+		if err != nil {
+			if err == io.EOF {
+				break // End of stream
+			}
+			return fmt.Errorf("failed to receive chunk: %w", err)
+		}
+
+		// Write chunk data to file
+		if _, err := file.Write(chunk.Data); err != nil {
+			return fmt.Errorf("failed to write chunk: %w", err)
+		}
 	}
 
 	return nil
@@ -275,9 +253,12 @@ func (c *Client) ListFiles(ctx context.Context, req *ListRequest) ([]*File, erro
 	}
 
 	// Create list request (placeholder until proto is updated)
+	var limit *int32
+	if req.limit > 0 {
+		limit = &req.limit
+	}
 	listReq := &xaiv1.ListFilesRequest{
-		Purpose: req.purpose,
-		Limit:   req.limit,
+		Limit: limit,
 	}
 
 	// Call list service (placeholder)
@@ -297,9 +278,7 @@ func (c *Client) ListFiles(ctx context.Context, req *ListRequest) ([]*File, erro
 			id:          fileProto.Id,
 			filename:    fileProto.Filename,
 			size:        fileProto.Size,
-			contentType:  fileProto.ContentType,
-			createdAt:    time.Now(), // placeholder - should use file timestamp
-			purpose:     fileProto.Purpose,
+			createdAt:   time.Unix(fileProto.CreatedAt, 0),
 		})
 	}
 
@@ -318,23 +297,21 @@ func (c *Client) GetFile(ctx context.Context, fileID string) (*File, error) {
 	}
 
 	// Call get service (placeholder)
-	resp, err := c.grpcClient.GetFile(ctx, getReq)
+	fileProto, err := c.grpcClient.GetFile(ctx, getReq)
 	if err != nil {
 		return nil, fmt.Errorf("get file failed: %w", err)
 	}
 
-	if resp == nil {
+	if fileProto == nil {
 		return nil, fmt.Errorf("received nil get response")
 	}
 
 	// Return file info
 	return &File{
-		id:          resp.File.Id,
-		filename:    resp.File.Filename,
-		size:        resp.File.Size,
-		contentType:  resp.File.ContentType,
-		createdAt:    time.Now(), // placeholder - should use file timestamp
-		purpose:     resp.File.Purpose,
+		id:        fileProto.Id,
+		filename:  fileProto.Filename,
+		size:      fileProto.Size,
+		createdAt: time.Unix(fileProto.CreatedAt, 0),
 	}, nil
 }
 
@@ -357,6 +334,10 @@ func (c *Client) DeleteFile(ctx context.Context, fileID string) error {
 
 	if resp == nil {
 		return fmt.Errorf("received nil delete response")
+	}
+
+	if !resp.Deleted {
+		return fmt.Errorf("file deletion failed")
 	}
 
 	return nil

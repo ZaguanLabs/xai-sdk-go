@@ -10,6 +10,9 @@ The official Go SDK for xAI provides a first-class, idiomatic Go interface to xA
 ## ✨ Features
 
 - **🤖 Chat Completions** - Synchronous and streaming chat with message builders
+- **🛠️ Function Calling** - Define and use tools in your chat completions
+- **🧠 Reasoning & Search** - Control reasoning effort and perform searches
+- **📝 Structured Outputs** - Get structured JSON and JSON schema outputs
 - **🔐 Secure Authentication** - API key and Bearer token support with TLS
 - **⚙️ Flexible Configuration** - Environment variables and programmatic config
 - **🔄 Connection Management** - Health checks, retries, and keepalive
@@ -31,40 +34,40 @@ go get github.com/ZaguanLabs/xai-sdk-go
 package main
 
 import (
-    "context"
-    "fmt"
-    "log"
-    "os"
+	"context"
+	"fmt"
+	"log"
+	"os"
 
-    "github.com/ZaguanLabs/xai-sdk-go/xai"
-    "github.com/ZaguanLabs/xai-sdk-go/xai/chat"
+	"github.com/ZaguanLabs/xai-sdk-go/xai"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/chat"
 )
 
 func main() {
-    // Create client with API key from environment
-    client, err := xai.NewClientFromEnvironment()
-    if err != nil {
-        log.Fatalf("Failed to create client: %v", err)
-    }
-    defer client.Close()
+	// Create client with API key from environment
+	client, err := xai.NewClient(&xai.Config{APIKey: os.Getenv("XAI_API_KEY")})
+	if err != nil {
+		log.Fatalf("Failed to create client: %v", err)
+	}
+	defer client.Close()
 
-    // Create chat request
-    req := client.NewChatRequest("grok-beta",
-        chat.WithTemperature(0.7),
-        chat.WithMaxTokens(1000),
-        chat.WithMessages(
-            chat.System("You are a helpful assistant."),
-            chat.User("What is the capital of France?"),
-        ),
-    )
+	// Create chat request
+	req := chat.NewRequest("grok-1.5-flash",
+		chat.WithTemperature(0.7),
+		chat.WithMaxTokens(1000),
+		chat.WithMessages(
+			chat.System(chat.Text("You are a helpful assistant.")),
+			chat.User(chat.Text("What is the capital of France?")),
+		),
+	)
 
-    // Get response
-    resp, err := req.Sample(context.Background(), client.Chat())
-    if err != nil {
-        log.Fatalf("Chat completion failed: %v", err)
-    }
+	// Get response
+	resp, err := req.Sample(context.Background(), client.Chat())
+	if err != nil {
+		log.Fatalf("Chat completion failed: %v", err)
+	}
 
-    fmt.Printf("Response: %s\n", resp.Content())
+	fmt.Printf("Response: %s\n", resp.Content())
 }
 ```
 
@@ -97,9 +100,10 @@ export XAI_API_KEY=your_api_key_here
 Or configure programmatically:
 
 ```go
-config := xai.NewConfigWithAPIKey("your-api-key").
-    WithTimeout(30 * time.Second).
-    WithEnvironment("production")
+config := &xai.Config{
+    APIKey:     "your-api-key",
+    Timeout:    30 * time.Second,
+}
 
 client, err := xai.NewClient(config)
 ```
@@ -132,7 +136,6 @@ The SDK supports flexible configuration through environment variables or program
 | `XAI_TIMEOUT` | Request timeout | `30s` |
 | `XAI_INSECURE` | Disable TLS (for testing) | `false` |
 | `XAI_MAX_RETRIES` | Maximum retry attempts | `3` |
-| `XAI_ENVIRONMENT` | Deployment environment | `production` |
 
 ### Programmatic Configuration
 
@@ -192,8 +195,8 @@ go run examples/chat/streaming.go
 
 The SDK is being developed in phases. Current status:
 
-- ✅ **Phase 0-5**: Foundation, proto, configuration, client, auth, basic chat
-- 🚧 **Phase 6-9**: Advanced chat features (tools, parsing, reasoning)
+- ✅ **Phase 0-8**: Foundation, proto, configuration, client, auth, basic and advanced chat
+- 🚧 **Phase 9**: Deferred and stored chat
 - 📋 **Phase 10-15**: Additional modules (files, image, models, collections)
 - 📋 **Phase 16-17**: Telemetry and observability
 - 📋 **Phase 18-22**: Polish, documentation, testing, release

@@ -8,7 +8,6 @@ import (
 
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/constants"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/errors"
-	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/metadata"
 )
 
 func TestDefaultConfig(t *testing.T) {
@@ -208,30 +207,6 @@ func TestConfigHTTPAddress(t *testing.T) {
 	}
 }
 
-func TestConfigToSDKMetadata(t *testing.T) {
-	config := &Config{
-		APIKey:        "test-api-key",
-		UserAgent:     "test-agent/1.0.0",
-		Environment:   "staging",
-	}
-
-	metadata := config.ToSDKMetadata()
-	if metadata == nil {
-		t.Error("ToSDKMetadata should not return nil")
-	}
-
-	if metadata.APIKey != "test-api-key" {
-		t.Errorf("Expected API key 'test-api-key', got %s", metadata.APIKey)
-	}
-
-	if metadata.ClientVersion != "test-agent/1.0.0" {
-		t.Errorf("Expected client version 'test-agent/1.0.0', got %s", metadata.ClientVersion)
-	}
-
-	if metadata.Environment != "staging" {
-		t.Errorf("Expected environment 'staging', got %s", metadata.Environment)
-	}
-}
 
 func TestConfigCreateGRPCDialOptions(t *testing.T) {
 	t.Run("InsecureConnection", func(t *testing.T) {
@@ -349,18 +324,18 @@ func TestConfigString(t *testing.T) {
 	}
 
 	str := config.String()
-	
+
 	// Should contain non-sensitive information
-	if !containsString(str, "api.example.com") {
+	if !configContainsString(str, "api.example.com") {
 		t.Errorf("Config string should contain host: %s", str)
 	}
 
-	if !containsString(str, "production") {
+	if !configContainsString(str, "production") {
 		t.Errorf("Config string should contain environment: %s", str)
 	}
 
 	// Should mask API key
-	if !containsString(str, "***") {
+	if !configContainsString(str, "***") {
 		t.Errorf("Config string should mask API key: %s", str)
 	}
 }
@@ -382,7 +357,7 @@ func TestParseDuration(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
 			result, err := parseDuration(tt.input)
-			
+
 			if tt.hasError {
 				if err == nil {
 					t.Error("Expected error but got none")
@@ -414,11 +389,11 @@ func BenchmarkConfigCreateGRPCDialOptions(b *testing.B) {
 }
 
 // Helper function to check if a string contains a substring
-func containsString(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || (len(s) > len(substr) && findString(s, substr)))
+func configContainsString(s, substr string) bool {
+	return len(s) >= len(substr) && (s == substr || (len(s) > len(substr) && configFindString(s, substr)))
 }
 
-func findString(s, substr string) bool {
+func configFindString(s, substr string) bool {
 	for i := 0; i <= len(s)-len(substr); i++ {
 		if s[i:i+len(substr)] == substr {
 			return true

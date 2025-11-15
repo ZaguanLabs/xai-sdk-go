@@ -7,7 +7,6 @@ import (
 	"time"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -17,8 +16,11 @@ type DeferredRequest struct {
 	proto *xaiv1.CreateChatCompletionRequest
 }
 
+// DeferredRequestOption represents a functional option for DeferredRequest.
+type DeferredRequestOption func(*DeferredRequest)
+
 // NewDeferredRequest creates a new deferred chat completion request.
-func NewDeferredRequest(model string, opts ...RequestOption) *DeferredRequest {
+func NewDeferredRequest(model string, opts ...DeferredRequestOption) *DeferredRequest {
 	req := &DeferredRequest{
 		proto: &xaiv1.CreateChatCompletionRequest{
 			Model: model,
@@ -82,13 +84,13 @@ func (r *DeferredRequest) SetMessages(messages ...Message) *DeferredRequest {
 
 // WithTemperature sets the temperature for the request.
 func (r *DeferredRequest) WithTemperature(temp float32) *DeferredRequest {
-	r.proto.Temperature = &temp
+	r.proto.Temperature = temp
 	return r
 }
 
 // WithMaxTokens sets the maximum number of tokens for the request.
 func (r *DeferredRequest) WithMaxTokens(maxTokens int32) *DeferredRequest {
-	r.proto.MaxTokens = &maxTokens
+	r.proto.MaxTokens = maxTokens
 	return r
 }
 
@@ -238,7 +240,7 @@ func (r *DeferredRequest) Poll(ctx context.Context, client ChatServiceClient, in
 				return &PollResult{
 					Response: response,
 					Done:     true,
-				}
+				}, nil
 			}
 
 			// Check if we've timed out
@@ -270,9 +272,9 @@ func GetStoredCompletion(ctx context.Context, client ChatServiceClient, completi
 	// Note: This is a placeholder until stored completion retrieval is properly defined in proto
 	// For now, we'll return a mock response
 	return &StoredCompletion{
-		ID:       completionID,
-		Content:   "Stored completion content",
-		CreatedAt: time.Now(),
+		id:        completionID,
+		content:   "Stored completion content",
+		createdAt: time.Now(),
 	}, nil
 }
 
@@ -292,24 +294,24 @@ func DeleteStoredCompletion(ctx context.Context, client ChatServiceClient, compl
 
 // StoredCompletion represents a stored chat completion.
 type StoredCompletion struct {
-	ID        string
-	Content   string
-	CreatedAt time.Time
+	id        string
+	content   string
+	createdAt time.Time
 }
 
 // ID returns the stored completion ID.
 func (sc *StoredCompletion) ID() string {
-	return sc.ID
+	return sc.id
 }
 
 // Content returns the stored completion content.
 func (sc *StoredCompletion) Content() string {
-	return sc.Content
+	return sc.content
 }
 
 // CreatedAt returns the creation time of the stored completion.
 func (sc *StoredCompletion) CreatedAt() time.Time {
-	return sc.CreatedAt
+	return sc.createdAt
 }
 
 // ListStoredCompletions retrieves a list of stored completions.

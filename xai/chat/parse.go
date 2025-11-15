@@ -5,9 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
-	"google.golang.org/grpc"
 )
 
 // ResponseFormat represents the desired response format.
@@ -23,6 +20,24 @@ const (
 	// ResponseFormatJSONSchema indicates JSON schema response.
 	ResponseFormatJSONSchema ResponseFormat = "json_schema"
 )
+
+// NewResponseFormatText creates a text response format.
+func NewResponseFormatText() ResponseFormat {
+	return ResponseFormatText
+}
+
+// NewResponseFormatJSONObject creates a JSON object response format.
+func NewResponseFormatJSONObject() ResponseFormat {
+	return ResponseFormatJSONObject
+}
+
+// NewResponseFormatJSONSchema creates a JSON schema response format with the given schema.
+func NewResponseFormatJSONSchema(schema map[string]interface{}) *ResponseFormatOption {
+	return &ResponseFormatOption{
+		Type:   ResponseFormatJSONSchema,
+		Schema: schema,
+	}
+}
 
 // Parse performs a chat completion request and parses the response into the provided type.
 func (r *Request) Parse(ctx context.Context, client ChatServiceClient, v any) error {
@@ -58,7 +73,7 @@ func (r *Request) Parse(ctx context.Context, client ChatServiceClient, v any) er
 		*target = content
 		return nil
 	case **string:
-		*target = content
+		**target = content
 		return nil
 	case map[string]interface{}:
 		// Try to parse as JSON
@@ -92,26 +107,10 @@ func (r *Request) ParseString(ctx context.Context, client ChatServiceClient) (st
 	return result, nil
 }
 
-// WithResponseFormat sets the desired response format.
-func WithResponseFormat(format ResponseFormat) RequestOption {
-	return func(r *Request) {
-		// Note: Response format is not yet implemented in proto definitions
-		// r.proto.ResponseFormat = format
-	}
-}
-
-// WithJSONSchema sets a JSON schema for structured output.
-func WithJSONSchema(schema map[string]interface{}) RequestOption {
-	return func(r *Request) {
-		// Note: JSON schema is not yet implemented in proto definitions
-		// r.proto.JSONSchema = schema
-	}
-}
-
 // ResponseFormatOption represents a response format configuration.
 type ResponseFormatOption struct {
 	Type ResponseFormat `json:"type"`
-	
+
 	// Optional JSON schema for json_schema format
 	Schema map[string]interface{} `json:"schema,omitempty"`
 }

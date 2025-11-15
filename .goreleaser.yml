@@ -1,0 +1,48 @@
+# .goreleaser.yml
+# Build customization
+builds:
+  - main: .
+    binary: xai-sdk-go
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+# Archives
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - README.md
+      - LICENSE
+
+# Checksum
+checksum:
+  name_template: "checksums.txt"
+
+# Snapshot
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+# Changelog
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+# Release
+release:
+  github:
+    owner: ZaguanLabs
+    name: xai-sdk-go
+  draft: false
+  prerelease: auto

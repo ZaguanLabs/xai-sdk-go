@@ -23,13 +23,21 @@ const (
 
 // Request to create a chat completion
 type CreateChatCompletionRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Model         string                 `protobuf:"bytes,1,opt,name=model,proto3" json:"model,omitempty"`
-	Messages      []*Message             `protobuf:"bytes,2,rep,name=messages,proto3" json:"messages,omitempty"`
-	Temperature   *float32               `protobuf:"fixed32,3,opt,name=temperature,proto3,oneof" json:"temperature,omitempty"`
-	MaxTokens     *int32                 `protobuf:"varint,4,opt,name=max_tokens,json=maxTokens,proto3,oneof" json:"max_tokens,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	Model              string                 `protobuf:"bytes,1,opt,name=model,proto3" json:"model,omitempty"`
+	Messages           []*Message             `protobuf:"bytes,2,rep,name=messages,proto3" json:"messages,omitempty"`
+	Temperature        float32                `protobuf:"fixed32,3,opt,name=temperature,proto3" json:"temperature,omitempty"`
+	MaxTokens          int32                  `protobuf:"varint,4,opt,name=max_tokens,json=maxTokens,proto3" json:"max_tokens,omitempty"`
+	Tools              []*Tool                `protobuf:"bytes,5,rep,name=tools,proto3" json:"tools,omitempty"`
+	ToolChoice         *ToolChoice            `protobuf:"bytes,6,opt,name=tool_choice,json=toolChoice,proto3" json:"tool_choice,omitempty"`
+	ResponseFormat     *ResponseFormat        `protobuf:"bytes,7,opt,name=response_format,json=responseFormat,proto3" json:"response_format,omitempty"`
+	Search             *SearchParameters      `protobuf:"bytes,8,opt,name=search,proto3" json:"search,omitempty"`
+	ReasoningEffort    string                 `protobuf:"bytes,9,opt,name=reasoning_effort,json=reasoningEffort,proto3" json:"reasoning_effort,omitempty"`
+	StoreMessages      bool                   `protobuf:"varint,10,opt,name=store_messages,json=storeMessages,proto3" json:"store_messages,omitempty"`
+	PreviousResponseId string                 `protobuf:"bytes,11,opt,name=previous_response_id,json=previousResponseId,proto3" json:"previous_response_id,omitempty"`
+	EncryptedContent   bool                   `protobuf:"varint,12,opt,name=encrypted_content,json=encryptedContent,proto3" json:"encrypted_content,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *CreateChatCompletionRequest) Reset() {
@@ -77,17 +85,73 @@ func (x *CreateChatCompletionRequest) GetMessages() []*Message {
 }
 
 func (x *CreateChatCompletionRequest) GetTemperature() float32 {
-	if x != nil && x.Temperature != nil {
-		return *x.Temperature
+	if x != nil {
+		return x.Temperature
 	}
 	return 0
 }
 
 func (x *CreateChatCompletionRequest) GetMaxTokens() int32 {
-	if x != nil && x.MaxTokens != nil {
-		return *x.MaxTokens
+	if x != nil {
+		return x.MaxTokens
 	}
 	return 0
+}
+
+func (x *CreateChatCompletionRequest) GetTools() []*Tool {
+	if x != nil {
+		return x.Tools
+	}
+	return nil
+}
+
+func (x *CreateChatCompletionRequest) GetToolChoice() *ToolChoice {
+	if x != nil {
+		return x.ToolChoice
+	}
+	return nil
+}
+
+func (x *CreateChatCompletionRequest) GetResponseFormat() *ResponseFormat {
+	if x != nil {
+		return x.ResponseFormat
+	}
+	return nil
+}
+
+func (x *CreateChatCompletionRequest) GetSearch() *SearchParameters {
+	if x != nil {
+		return x.Search
+	}
+	return nil
+}
+
+func (x *CreateChatCompletionRequest) GetReasoningEffort() string {
+	if x != nil {
+		return x.ReasoningEffort
+	}
+	return ""
+}
+
+func (x *CreateChatCompletionRequest) GetStoreMessages() bool {
+	if x != nil {
+		return x.StoreMessages
+	}
+	return false
+}
+
+func (x *CreateChatCompletionRequest) GetPreviousResponseId() string {
+	if x != nil {
+		return x.PreviousResponseId
+	}
+	return ""
+}
+
+func (x *CreateChatCompletionRequest) GetEncryptedContent() bool {
+	if x != nil {
+		return x.EncryptedContent
+	}
+	return false
 }
 
 // Response from chat completion
@@ -97,6 +161,9 @@ type CreateChatCompletionResponse struct {
 	Model         string                 `protobuf:"bytes,2,opt,name=model,proto3" json:"model,omitempty"`
 	Choices       []*Choice              `protobuf:"bytes,3,rep,name=choices,proto3" json:"choices,omitempty"`
 	Usage         *Usage                 `protobuf:"bytes,4,opt,name=usage,proto3" json:"usage,omitempty"`
+	Status        string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`                              // For deferred responses
+	CreatedAt     string                 `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`       // For deferred responses
+	CompletedAt   string                 `protobuf:"bytes,7,opt,name=completed_at,json=completedAt,proto3" json:"completed_at,omitempty"` // For deferred responses
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -159,6 +226,27 @@ func (x *CreateChatCompletionResponse) GetUsage() *Usage {
 	return nil
 }
 
+func (x *CreateChatCompletionResponse) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *CreateChatCompletionResponse) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *CreateChatCompletionResponse) GetCompletedAt() string {
+	if x != nil {
+		return x.CompletedAt
+	}
+	return ""
+}
+
 // Streaming chunk
 type ChatCompletionChunk struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -217,6 +305,7 @@ type Message struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Role          string                 `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`
 	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+	ToolCalls     []*ToolCall            `protobuf:"bytes,3,rep,name=tool_calls,json=toolCalls,proto3" json:"tool_calls,omitempty"` // For assistant messages with tool calls
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -263,6 +352,13 @@ func (x *Message) GetContent() string {
 		return x.Content
 	}
 	return ""
+}
+
+func (x *Message) GetToolCalls() []*ToolCall {
+	if x != nil {
+		return x.ToolCalls
+	}
+	return nil
 }
 
 // Choice in response
@@ -382,8 +478,9 @@ func (x *ChoiceDelta) GetDelta() *MessageDelta {
 // Message delta
 type MessageDelta struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Role          *string                `protobuf:"bytes,1,opt,name=role,proto3,oneof" json:"role,omitempty"`
-	Content       *string                `protobuf:"bytes,2,opt,name=content,proto3,oneof" json:"content,omitempty"`
+	Role          string                 `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`
+	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+	ToolCalls     []*ToolCall            `protobuf:"bytes,3,rep,name=tool_calls,json=toolCalls,proto3" json:"tool_calls,omitempty"` // For streaming tool calls
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -419,17 +516,24 @@ func (*MessageDelta) Descriptor() ([]byte, []int) {
 }
 
 func (x *MessageDelta) GetRole() string {
-	if x != nil && x.Role != nil {
-		return *x.Role
+	if x != nil {
+		return x.Role
 	}
 	return ""
 }
 
 func (x *MessageDelta) GetContent() string {
-	if x != nil && x.Content != nil {
-		return *x.Content
+	if x != nil {
+		return x.Content
 	}
 	return ""
+}
+
+func (x *MessageDelta) GetToolCalls() []*ToolCall {
+	if x != nil {
+		return x.ToolCalls
+	}
+	return nil
 }
 
 // Token usage information
@@ -493,47 +597,812 @@ func (x *Usage) GetTotalTokens() int32 {
 	return 0
 }
 
+// Tool definition
+type Tool struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	Function      *Function              `protobuf:"bytes,2,opt,name=function,proto3" json:"function,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Tool) Reset() {
+	*x = Tool{}
+	mi := &file_xai_v1_chat_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Tool) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Tool) ProtoMessage() {}
+
+func (x *Tool) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Tool.ProtoReflect.Descriptor instead.
+func (*Tool) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *Tool) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *Tool) GetFunction() *Function {
+	if x != nil {
+		return x.Function
+	}
+	return nil
+}
+
+// Function definition for tools
+type Function struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Parameters    string                 `protobuf:"bytes,3,opt,name=parameters,proto3" json:"parameters,omitempty"` // JSON schema
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Function) Reset() {
+	*x = Function{}
+	mi := &file_xai_v1_chat_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Function) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Function) ProtoMessage() {}
+
+func (x *Function) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Function.ProtoReflect.Descriptor instead.
+func (*Function) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *Function) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Function) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *Function) GetParameters() string {
+	if x != nil {
+		return x.Parameters
+	}
+	return ""
+}
+
+// Function call information
+type FunctionCall struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Arguments     string                 `protobuf:"bytes,2,opt,name=arguments,proto3" json:"arguments,omitempty"` // JSON arguments
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FunctionCall) Reset() {
+	*x = FunctionCall{}
+	mi := &file_xai_v1_chat_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FunctionCall) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FunctionCall) ProtoMessage() {}
+
+func (x *FunctionCall) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FunctionCall.ProtoReflect.Descriptor instead.
+func (*FunctionCall) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *FunctionCall) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *FunctionCall) GetArguments() string {
+	if x != nil {
+		return x.Arguments
+	}
+	return ""
+}
+
+// Tool choice configuration
+type ToolChoice struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Choice:
+	//
+	//	*ToolChoice_None
+	//	*ToolChoice_Auto
+	//	*ToolChoice_Required
+	//	*ToolChoice_Function
+	Choice        isToolChoice_Choice `protobuf_oneof:"choice"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ToolChoice) Reset() {
+	*x = ToolChoice{}
+	mi := &file_xai_v1_chat_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ToolChoice) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ToolChoice) ProtoMessage() {}
+
+func (x *ToolChoice) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ToolChoice.ProtoReflect.Descriptor instead.
+func (*ToolChoice) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *ToolChoice) GetChoice() isToolChoice_Choice {
+	if x != nil {
+		return x.Choice
+	}
+	return nil
+}
+
+func (x *ToolChoice) GetNone() string {
+	if x != nil {
+		if x, ok := x.Choice.(*ToolChoice_None); ok {
+			return x.None
+		}
+	}
+	return ""
+}
+
+func (x *ToolChoice) GetAuto() string {
+	if x != nil {
+		if x, ok := x.Choice.(*ToolChoice_Auto); ok {
+			return x.Auto
+		}
+	}
+	return ""
+}
+
+func (x *ToolChoice) GetRequired() string {
+	if x != nil {
+		if x, ok := x.Choice.(*ToolChoice_Required); ok {
+			return x.Required
+		}
+	}
+	return ""
+}
+
+func (x *ToolChoice) GetFunction() string {
+	if x != nil {
+		if x, ok := x.Choice.(*ToolChoice_Function); ok {
+			return x.Function
+		}
+	}
+	return ""
+}
+
+type isToolChoice_Choice interface {
+	isToolChoice_Choice()
+}
+
+type ToolChoice_None struct {
+	None string `protobuf:"bytes,1,opt,name=none,proto3,oneof"`
+}
+
+type ToolChoice_Auto struct {
+	Auto string `protobuf:"bytes,2,opt,name=auto,proto3,oneof"`
+}
+
+type ToolChoice_Required struct {
+	Required string `protobuf:"bytes,3,opt,name=required,proto3,oneof"`
+}
+
+type ToolChoice_Function struct {
+	Function string `protobuf:"bytes,4,opt,name=function,proto3,oneof"`
+}
+
+func (*ToolChoice_None) isToolChoice_Choice() {}
+
+func (*ToolChoice_Auto) isToolChoice_Choice() {}
+
+func (*ToolChoice_Required) isToolChoice_Choice() {}
+
+func (*ToolChoice_Function) isToolChoice_Choice() {}
+
+// Response format configuration
+type ResponseFormat struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Format:
+	//
+	//	*ResponseFormat_Text
+	//	*ResponseFormat_JsonObject
+	//	*ResponseFormat_JsonSchema
+	Format        isResponseFormat_Format `protobuf_oneof:"format"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResponseFormat) Reset() {
+	*x = ResponseFormat{}
+	mi := &file_xai_v1_chat_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResponseFormat) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResponseFormat) ProtoMessage() {}
+
+func (x *ResponseFormat) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResponseFormat.ProtoReflect.Descriptor instead.
+func (*ResponseFormat) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *ResponseFormat) GetFormat() isResponseFormat_Format {
+	if x != nil {
+		return x.Format
+	}
+	return nil
+}
+
+func (x *ResponseFormat) GetText() string {
+	if x != nil {
+		if x, ok := x.Format.(*ResponseFormat_Text); ok {
+			return x.Text
+		}
+	}
+	return ""
+}
+
+func (x *ResponseFormat) GetJsonObject() string {
+	if x != nil {
+		if x, ok := x.Format.(*ResponseFormat_JsonObject); ok {
+			return x.JsonObject
+		}
+	}
+	return ""
+}
+
+func (x *ResponseFormat) GetJsonSchema() *JsonSchema {
+	if x != nil {
+		if x, ok := x.Format.(*ResponseFormat_JsonSchema); ok {
+			return x.JsonSchema
+		}
+	}
+	return nil
+}
+
+type isResponseFormat_Format interface {
+	isResponseFormat_Format()
+}
+
+type ResponseFormat_Text struct {
+	Text string `protobuf:"bytes,1,opt,name=text,proto3,oneof"`
+}
+
+type ResponseFormat_JsonObject struct {
+	JsonObject string `protobuf:"bytes,2,opt,name=json_object,json=jsonObject,proto3,oneof"`
+}
+
+type ResponseFormat_JsonSchema struct {
+	JsonSchema *JsonSchema `protobuf:"bytes,3,opt,name=json_schema,json=jsonSchema,proto3,oneof"`
+}
+
+func (*ResponseFormat_Text) isResponseFormat_Format() {}
+
+func (*ResponseFormat_JsonObject) isResponseFormat_Format() {}
+
+func (*ResponseFormat_JsonSchema) isResponseFormat_Format() {}
+
+// JSON schema for structured output
+type JsonSchema struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Schema        string                 `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *JsonSchema) Reset() {
+	*x = JsonSchema{}
+	mi := &file_xai_v1_chat_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *JsonSchema) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*JsonSchema) ProtoMessage() {}
+
+func (x *JsonSchema) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use JsonSchema.ProtoReflect.Descriptor instead.
+func (*JsonSchema) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *JsonSchema) GetSchema() string {
+	if x != nil {
+		return x.Schema
+	}
+	return ""
+}
+
+// Search parameters
+type SearchParameters struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Count         int32                  `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
+	Domains       []string               `protobuf:"bytes,2,rep,name=domains,proto3" json:"domains,omitempty"`
+	Recency       string                 `protobuf:"bytes,3,opt,name=recency,proto3" json:"recency,omitempty"` // "default", "day", "week", "month", "year"
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SearchParameters) Reset() {
+	*x = SearchParameters{}
+	mi := &file_xai_v1_chat_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SearchParameters) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchParameters) ProtoMessage() {}
+
+func (x *SearchParameters) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchParameters.ProtoReflect.Descriptor instead.
+func (*SearchParameters) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *SearchParameters) GetCount() int32 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+func (x *SearchParameters) GetDomains() []string {
+	if x != nil {
+		return x.Domains
+	}
+	return nil
+}
+
+func (x *SearchParameters) GetRecency() string {
+	if x != nil {
+		return x.Recency
+	}
+	return ""
+}
+
+// Tool call information
+type ToolCall struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"` // "function"
+	Function      *FunctionCall          `protobuf:"bytes,3,opt,name=function,proto3" json:"function,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ToolCall) Reset() {
+	*x = ToolCall{}
+	mi := &file_xai_v1_chat_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ToolCall) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ToolCall) ProtoMessage() {}
+
+func (x *ToolCall) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ToolCall.ProtoReflect.Descriptor instead.
+func (*ToolCall) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *ToolCall) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ToolCall) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *ToolCall) GetFunction() *FunctionCall {
+	if x != nil {
+		return x.Function
+	}
+	return nil
+}
+
+// File upload request
+type UploadFileRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Filename      string                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"`
+	Content       []byte                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+	ContentType   string                 `protobuf:"bytes,3,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
+	Purpose       string                 `protobuf:"bytes,4,opt,name=purpose,proto3" json:"purpose,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UploadFileRequest) Reset() {
+	*x = UploadFileRequest{}
+	mi := &file_xai_v1_chat_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UploadFileRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadFileRequest) ProtoMessage() {}
+
+func (x *UploadFileRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadFileRequest.ProtoReflect.Descriptor instead.
+func (*UploadFileRequest) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *UploadFileRequest) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
+func (x *UploadFileRequest) GetContent() []byte {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
+func (x *UploadFileRequest) GetContentType() string {
+	if x != nil {
+		return x.ContentType
+	}
+	return ""
+}
+
+func (x *UploadFileRequest) GetPurpose() string {
+	if x != nil {
+		return x.Purpose
+	}
+	return ""
+}
+
+// File upload response
+type UploadFileResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Filename      string                 `protobuf:"bytes,2,opt,name=filename,proto3" json:"filename,omitempty"`
+	Size          int64                  `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty"`
+	ContentType   string                 `protobuf:"bytes,4,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
+	Purpose       string                 `protobuf:"bytes,5,opt,name=purpose,proto3" json:"purpose,omitempty"`
+	CreatedAt     int64                  `protobuf:"varint,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UploadFileResponse) Reset() {
+	*x = UploadFileResponse{}
+	mi := &file_xai_v1_chat_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UploadFileResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadFileResponse) ProtoMessage() {}
+
+func (x *UploadFileResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadFileResponse.ProtoReflect.Descriptor instead.
+func (*UploadFileResponse) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *UploadFileResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UploadFileResponse) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
+func (x *UploadFileResponse) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *UploadFileResponse) GetContentType() string {
+	if x != nil {
+		return x.ContentType
+	}
+	return ""
+}
+
+func (x *UploadFileResponse) GetPurpose() string {
+	if x != nil {
+		return x.Purpose
+	}
+	return ""
+}
+
+func (x *UploadFileResponse) GetCreatedAt() int64 {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return 0
+}
+
 var File_xai_v1_chat_proto protoreflect.FileDescriptor
 
 const file_xai_v1_chat_proto_rawDesc = "" +
 	"\n" +
-	"\x11xai/v1/chat.proto\x12\x06xai.v1\"\xca\x01\n" +
+	"\x11xai/v1/chat.proto\x12\x06xai.v1\"\x9e\x04\n" +
 	"\x1bCreateChatCompletionRequest\x12\x14\n" +
 	"\x05model\x18\x01 \x01(\tR\x05model\x12+\n" +
-	"\bmessages\x18\x02 \x03(\v2\x0f.xai.v1.MessageR\bmessages\x12%\n" +
-	"\vtemperature\x18\x03 \x01(\x02H\x00R\vtemperature\x88\x01\x01\x12\"\n" +
+	"\bmessages\x18\x02 \x03(\v2\x0f.xai.v1.MessageR\bmessages\x12 \n" +
+	"\vtemperature\x18\x03 \x01(\x02R\vtemperature\x12\x1d\n" +
 	"\n" +
-	"max_tokens\x18\x04 \x01(\x05H\x01R\tmaxTokens\x88\x01\x01B\x0e\n" +
-	"\f_temperatureB\r\n" +
-	"\v_max_tokens\"\x93\x01\n" +
+	"max_tokens\x18\x04 \x01(\x05R\tmaxTokens\x12\"\n" +
+	"\x05tools\x18\x05 \x03(\v2\f.xai.v1.ToolR\x05tools\x123\n" +
+	"\vtool_choice\x18\x06 \x01(\v2\x12.xai.v1.ToolChoiceR\n" +
+	"toolChoice\x12?\n" +
+	"\x0fresponse_format\x18\a \x01(\v2\x16.xai.v1.ResponseFormatR\x0eresponseFormat\x120\n" +
+	"\x06search\x18\b \x01(\v2\x18.xai.v1.SearchParametersR\x06search\x12)\n" +
+	"\x10reasoning_effort\x18\t \x01(\tR\x0freasoningEffort\x12%\n" +
+	"\x0estore_messages\x18\n" +
+	" \x01(\bR\rstoreMessages\x120\n" +
+	"\x14previous_response_id\x18\v \x01(\tR\x12previousResponseId\x12+\n" +
+	"\x11encrypted_content\x18\f \x01(\bR\x10encryptedContent\"\xed\x01\n" +
 	"\x1cCreateChatCompletionResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05model\x18\x02 \x01(\tR\x05model\x12(\n" +
 	"\achoices\x18\x03 \x03(\v2\x0e.xai.v1.ChoiceR\achoices\x12#\n" +
-	"\x05usage\x18\x04 \x01(\v2\r.xai.v1.UsageR\x05usage\"T\n" +
+	"\x05usage\x18\x04 \x01(\v2\r.xai.v1.UsageR\x05usage\x12\x16\n" +
+	"\x06status\x18\x05 \x01(\tR\x06status\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x06 \x01(\tR\tcreatedAt\x12!\n" +
+	"\fcompleted_at\x18\a \x01(\tR\vcompletedAt\"T\n" +
 	"\x13ChatCompletionChunk\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12-\n" +
-	"\achoices\x18\x02 \x03(\v2\x13.xai.v1.ChoiceDeltaR\achoices\"7\n" +
+	"\achoices\x18\x02 \x03(\v2\x13.xai.v1.ChoiceDeltaR\achoices\"h\n" +
 	"\aMessage\x12\x12\n" +
 	"\x04role\x18\x01 \x01(\tR\x04role\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent\"n\n" +
+	"\acontent\x18\x02 \x01(\tR\acontent\x12/\n" +
+	"\n" +
+	"tool_calls\x18\x03 \x03(\v2\x10.xai.v1.ToolCallR\ttoolCalls\"n\n" +
 	"\x06Choice\x12\x14\n" +
 	"\x05index\x18\x01 \x01(\x05R\x05index\x12)\n" +
 	"\amessage\x18\x02 \x01(\v2\x0f.xai.v1.MessageR\amessage\x12#\n" +
 	"\rfinish_reason\x18\x03 \x01(\tR\ffinishReason\"O\n" +
 	"\vChoiceDelta\x12\x14\n" +
 	"\x05index\x18\x01 \x01(\x05R\x05index\x12*\n" +
-	"\x05delta\x18\x02 \x01(\v2\x14.xai.v1.MessageDeltaR\x05delta\"[\n" +
-	"\fMessageDelta\x12\x17\n" +
-	"\x04role\x18\x01 \x01(\tH\x00R\x04role\x88\x01\x01\x12\x1d\n" +
-	"\acontent\x18\x02 \x01(\tH\x01R\acontent\x88\x01\x01B\a\n" +
-	"\x05_roleB\n" +
+	"\x05delta\x18\x02 \x01(\v2\x14.xai.v1.MessageDeltaR\x05delta\"m\n" +
+	"\fMessageDelta\x12\x12\n" +
+	"\x04role\x18\x01 \x01(\tR\x04role\x12\x18\n" +
+	"\acontent\x18\x02 \x01(\tR\acontent\x12/\n" +
 	"\n" +
-	"\b_content\"|\n" +
+	"tool_calls\x18\x03 \x03(\v2\x10.xai.v1.ToolCallR\ttoolCalls\"|\n" +
 	"\x05Usage\x12#\n" +
 	"\rprompt_tokens\x18\x01 \x01(\x05R\fpromptTokens\x12+\n" +
 	"\x11completion_tokens\x18\x02 \x01(\x05R\x10completionTokens\x12!\n" +
-	"\ftotal_tokens\x18\x03 \x01(\x05R\vtotalTokens2\xc5\x01\n" +
+	"\ftotal_tokens\x18\x03 \x01(\x05R\vtotalTokens\"H\n" +
+	"\x04Tool\x12\x12\n" +
+	"\x04type\x18\x01 \x01(\tR\x04type\x12,\n" +
+	"\bfunction\x18\x02 \x01(\v2\x10.xai.v1.FunctionR\bfunction\"`\n" +
+	"\bFunction\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1e\n" +
+	"\n" +
+	"parameters\x18\x03 \x01(\tR\n" +
+	"parameters\"@\n" +
+	"\fFunctionCall\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1c\n" +
+	"\targuments\x18\x02 \x01(\tR\targuments\"~\n" +
+	"\n" +
+	"ToolChoice\x12\x14\n" +
+	"\x04none\x18\x01 \x01(\tH\x00R\x04none\x12\x14\n" +
+	"\x04auto\x18\x02 \x01(\tH\x00R\x04auto\x12\x1c\n" +
+	"\brequired\x18\x03 \x01(\tH\x00R\brequired\x12\x1c\n" +
+	"\bfunction\x18\x04 \x01(\tH\x00R\bfunctionB\b\n" +
+	"\x06choice\"\x8a\x01\n" +
+	"\x0eResponseFormat\x12\x14\n" +
+	"\x04text\x18\x01 \x01(\tH\x00R\x04text\x12!\n" +
+	"\vjson_object\x18\x02 \x01(\tH\x00R\n" +
+	"jsonObject\x125\n" +
+	"\vjson_schema\x18\x03 \x01(\v2\x12.xai.v1.JsonSchemaH\x00R\n" +
+	"jsonSchemaB\b\n" +
+	"\x06format\"$\n" +
+	"\n" +
+	"JsonSchema\x12\x16\n" +
+	"\x06schema\x18\x01 \x01(\tR\x06schema\"\\\n" +
+	"\x10SearchParameters\x12\x14\n" +
+	"\x05count\x18\x01 \x01(\x05R\x05count\x12\x18\n" +
+	"\adomains\x18\x02 \x03(\tR\adomains\x12\x18\n" +
+	"\arecency\x18\x03 \x01(\tR\arecency\"`\n" +
+	"\bToolCall\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04type\x18\x02 \x01(\tR\x04type\x120\n" +
+	"\bfunction\x18\x03 \x01(\v2\x14.xai.v1.FunctionCallR\bfunction\"\x86\x01\n" +
+	"\x11UploadFileRequest\x12\x1a\n" +
+	"\bfilename\x18\x01 \x01(\tR\bfilename\x12\x18\n" +
+	"\acontent\x18\x02 \x01(\fR\acontent\x12!\n" +
+	"\fcontent_type\x18\x03 \x01(\tR\vcontentType\x12\x18\n" +
+	"\apurpose\x18\x04 \x01(\tR\apurpose\"\xb0\x01\n" +
+	"\x12UploadFileResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\bfilename\x18\x02 \x01(\tR\bfilename\x12\x12\n" +
+	"\x04size\x18\x03 \x01(\x03R\x04size\x12!\n" +
+	"\fcontent_type\x18\x04 \x01(\tR\vcontentType\x12\x18\n" +
+	"\apurpose\x18\x05 \x01(\tR\apurpose\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x06 \x01(\x03R\tcreatedAt2\xc5\x01\n" +
 	"\x04Chat\x12a\n" +
 	"\x14CreateChatCompletion\x12#.xai.v1.CreateChatCompletionRequest\x1a$.xai.v1.CreateChatCompletionResponse\x12Z\n" +
 	"\x14StreamChatCompletion\x12#.xai.v1.CreateChatCompletionRequest\x1a\x1b.xai.v1.ChatCompletionChunk0\x01B<Z:github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1b\x06proto3"
@@ -550,7 +1419,7 @@ func file_xai_v1_chat_proto_rawDescGZIP() []byte {
 	return file_xai_v1_chat_proto_rawDescData
 }
 
-var file_xai_v1_chat_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_xai_v1_chat_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_xai_v1_chat_proto_goTypes = []any{
 	(*CreateChatCompletionRequest)(nil),  // 0: xai.v1.CreateChatCompletionRequest
 	(*CreateChatCompletionResponse)(nil), // 1: xai.v1.CreateChatCompletionResponse
@@ -560,23 +1429,42 @@ var file_xai_v1_chat_proto_goTypes = []any{
 	(*ChoiceDelta)(nil),                  // 5: xai.v1.ChoiceDelta
 	(*MessageDelta)(nil),                 // 6: xai.v1.MessageDelta
 	(*Usage)(nil),                        // 7: xai.v1.Usage
+	(*Tool)(nil),                         // 8: xai.v1.Tool
+	(*Function)(nil),                     // 9: xai.v1.Function
+	(*FunctionCall)(nil),                 // 10: xai.v1.FunctionCall
+	(*ToolChoice)(nil),                   // 11: xai.v1.ToolChoice
+	(*ResponseFormat)(nil),               // 12: xai.v1.ResponseFormat
+	(*JsonSchema)(nil),                   // 13: xai.v1.JsonSchema
+	(*SearchParameters)(nil),             // 14: xai.v1.SearchParameters
+	(*ToolCall)(nil),                     // 15: xai.v1.ToolCall
+	(*UploadFileRequest)(nil),            // 16: xai.v1.UploadFileRequest
+	(*UploadFileResponse)(nil),           // 17: xai.v1.UploadFileResponse
 }
 var file_xai_v1_chat_proto_depIdxs = []int32{
-	3, // 0: xai.v1.CreateChatCompletionRequest.messages:type_name -> xai.v1.Message
-	4, // 1: xai.v1.CreateChatCompletionResponse.choices:type_name -> xai.v1.Choice
-	7, // 2: xai.v1.CreateChatCompletionResponse.usage:type_name -> xai.v1.Usage
-	5, // 3: xai.v1.ChatCompletionChunk.choices:type_name -> xai.v1.ChoiceDelta
-	3, // 4: xai.v1.Choice.message:type_name -> xai.v1.Message
-	6, // 5: xai.v1.ChoiceDelta.delta:type_name -> xai.v1.MessageDelta
-	0, // 6: xai.v1.Chat.CreateChatCompletion:input_type -> xai.v1.CreateChatCompletionRequest
-	0, // 7: xai.v1.Chat.StreamChatCompletion:input_type -> xai.v1.CreateChatCompletionRequest
-	1, // 8: xai.v1.Chat.CreateChatCompletion:output_type -> xai.v1.CreateChatCompletionResponse
-	2, // 9: xai.v1.Chat.StreamChatCompletion:output_type -> xai.v1.ChatCompletionChunk
-	8, // [8:10] is the sub-list for method output_type
-	6, // [6:8] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	3,  // 0: xai.v1.CreateChatCompletionRequest.messages:type_name -> xai.v1.Message
+	8,  // 1: xai.v1.CreateChatCompletionRequest.tools:type_name -> xai.v1.Tool
+	11, // 2: xai.v1.CreateChatCompletionRequest.tool_choice:type_name -> xai.v1.ToolChoice
+	12, // 3: xai.v1.CreateChatCompletionRequest.response_format:type_name -> xai.v1.ResponseFormat
+	14, // 4: xai.v1.CreateChatCompletionRequest.search:type_name -> xai.v1.SearchParameters
+	4,  // 5: xai.v1.CreateChatCompletionResponse.choices:type_name -> xai.v1.Choice
+	7,  // 6: xai.v1.CreateChatCompletionResponse.usage:type_name -> xai.v1.Usage
+	5,  // 7: xai.v1.ChatCompletionChunk.choices:type_name -> xai.v1.ChoiceDelta
+	15, // 8: xai.v1.Message.tool_calls:type_name -> xai.v1.ToolCall
+	3,  // 9: xai.v1.Choice.message:type_name -> xai.v1.Message
+	6,  // 10: xai.v1.ChoiceDelta.delta:type_name -> xai.v1.MessageDelta
+	15, // 11: xai.v1.MessageDelta.tool_calls:type_name -> xai.v1.ToolCall
+	9,  // 12: xai.v1.Tool.function:type_name -> xai.v1.Function
+	13, // 13: xai.v1.ResponseFormat.json_schema:type_name -> xai.v1.JsonSchema
+	10, // 14: xai.v1.ToolCall.function:type_name -> xai.v1.FunctionCall
+	0,  // 15: xai.v1.Chat.CreateChatCompletion:input_type -> xai.v1.CreateChatCompletionRequest
+	0,  // 16: xai.v1.Chat.StreamChatCompletion:input_type -> xai.v1.CreateChatCompletionRequest
+	1,  // 17: xai.v1.Chat.CreateChatCompletion:output_type -> xai.v1.CreateChatCompletionResponse
+	2,  // 18: xai.v1.Chat.StreamChatCompletion:output_type -> xai.v1.ChatCompletionChunk
+	17, // [17:19] is the sub-list for method output_type
+	15, // [15:17] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_xai_v1_chat_proto_init() }
@@ -584,15 +1472,24 @@ func file_xai_v1_chat_proto_init() {
 	if File_xai_v1_chat_proto != nil {
 		return
 	}
-	file_xai_v1_chat_proto_msgTypes[0].OneofWrappers = []any{}
-	file_xai_v1_chat_proto_msgTypes[6].OneofWrappers = []any{}
+	file_xai_v1_chat_proto_msgTypes[11].OneofWrappers = []any{
+		(*ToolChoice_None)(nil),
+		(*ToolChoice_Auto)(nil),
+		(*ToolChoice_Required)(nil),
+		(*ToolChoice_Function)(nil),
+	}
+	file_xai_v1_chat_proto_msgTypes[12].OneofWrappers = []any{
+		(*ResponseFormat_Text)(nil),
+		(*ResponseFormat_JsonObject)(nil),
+		(*ResponseFormat_JsonSchema)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_xai_v1_chat_proto_rawDesc), len(file_xai_v1_chat_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

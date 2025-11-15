@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package xai.v1;
+
+option go_package = "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1";
+
+// Auth service for authentication and validation
+service Auth {
+  // Validate API key
+  rpc ValidateKey(ValidateKeyRequest) returns (ValidateKeyResponse);
+}
+
+// Validate API key request
+message ValidateKeyRequest {
+  string api_key = 1;
+}
+
+// Validate API key response
+message ValidateKeyResponse {
+  bool valid = 1;
+  string message = 2;
+  string organization = 3;
+  string project = 4;
+}

@@ -7,23 +7,33 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ZaguanLabs/xai-sdk-go/xai/auth"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/chat"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/collections"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/image"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/errors"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/metadata"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/models"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/tokenizer"
 	"github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
 	"google.golang.org/grpc"
 )
 
 // Client represents the main xAI SDK client.
 type Client struct {
-	config      *Config
-	grpcConn    *grpc.ClientConn
-	grpcClient  *grpc.ClientConn // Alias for consistency
-	chatClient  xaiv1.ChatClient
-	mu          sync.RWMutex
-	isClosed    bool
-	createdAt   time.Time
-	metadata    *metadata.SDKMetadata
+	config            *Config
+	grpcConn          *grpc.ClientConn
+	grpcClient        *grpc.ClientConn // Alias for consistency
+	chatClient        xaiv1.ChatClient
+	modelsClient      xaiv1.ModelsClient
+	imagesClient      xaiv1.ImagesClient
+	tokenizerClient   xaiv1.TokenizerClient
+	authClient        xaiv1.AuthClient
+	collectionsClient xaiv1.CollectionsClient
+	mu                sync.RWMutex
+	isClosed          bool
+	createdAt         time.Time
+	metadata          *metadata.SDKMetadata
 }
 
 // NewClient creates a new xAI client with the given configuration.
@@ -102,6 +112,11 @@ func (c *Client) createGRPCConnection() error {
 	c.grpcConn = grpcConn
 	c.grpcClient = grpcConn // Alias for compatibility
 	c.chatClient = xaiv1.NewChatClient(grpcConn)
+	c.modelsClient = xaiv1.NewModelsClient(grpcConn)
+	c.imagesClient = xaiv1.NewImagesClient(grpcConn)
+	c.tokenizerClient = xaiv1.NewTokenizerClient(grpcConn)
+	c.authClient = xaiv1.NewAuthClient(grpcConn)
+	c.collectionsClient = xaiv1.NewCollectionsClient(grpcConn)
 
 	return nil
 }
@@ -401,4 +416,39 @@ func (c *Client) GetHealthStatus() HealthStatus {
 // NewChatRequest creates a new chat request with the specified model.
 func (c *Client) NewChatRequest(model string, opts ...chat.RequestOption) *chat.Request {
 	return chat.NewRequest(model, opts...)
+}
+
+// Models returns the models service client.
+func (c *Client) Models() *models.Client {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return models.NewClient(c.modelsClient)
+}
+
+// Images returns the images service client.
+func (c *Client) Images() *image.Client {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return image.NewClient(c.imagesClient)
+}
+
+// Tokenizer returns the tokenizer service client.
+func (c *Client) Tokenizer() *tokenizer.Client {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return tokenizer.NewClient(c.tokenizerClient)
+}
+
+// Auth returns the auth service client.
+func (c *Client) Auth() *auth.Client {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return auth.NewClient(c.authClient)
+}
+
+// Collections returns the collections service client.
+func (c *Client) Collections() *collections.Client {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return collections.NewClient(c.collectionsClient)
 }
