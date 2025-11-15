@@ -38,7 +38,7 @@ func (c *OutputChunk) FinishReason() string {
 	if c.proto == nil {
 		return ""
 	}
-	return c.proto.FinishReason
+	return c.proto.FinishReason.String()
 }
 
 // Proto returns the underlying protobuf output chunk.
@@ -118,7 +118,7 @@ func (c *Choice) FinishReason() string {
 	if c.proto == nil {
 		return ""
 	}
-	return c.proto.FinishReason
+	return c.proto.FinishReason.String()
 }
 
 // Proto returns the underlying protobuf output.
@@ -671,7 +671,7 @@ func (r *Response) FinishReason() string {
 	if r.proto.Outputs[0] == nil {
 		return ""
 	}
-	return r.proto.Outputs[0].FinishReason
+	return r.proto.Outputs[0].FinishReason.String()
 }
 
 // ID returns the response ID.

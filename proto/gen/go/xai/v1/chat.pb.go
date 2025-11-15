@@ -22,7 +22,119 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Enums
+// FinishReason indicates why the completion finished
+type FinishReason int32
+
+const (
+	FinishReason_REASON_INVALID     FinishReason = 0
+	FinishReason_REASON_MAX_LEN     FinishReason = 1
+	FinishReason_REASON_MAX_CONTEXT FinishReason = 2
+	FinishReason_REASON_STOP        FinishReason = 3
+	FinishReason_REASON_TOOL_CALLS  FinishReason = 4
+	FinishReason_REASON_TIME_LIMIT  FinishReason = 5
+)
+
+// Enum value maps for FinishReason.
+var (
+	FinishReason_name = map[int32]string{
+		0: "REASON_INVALID",
+		1: "REASON_MAX_LEN",
+		2: "REASON_MAX_CONTEXT",
+		3: "REASON_STOP",
+		4: "REASON_TOOL_CALLS",
+		5: "REASON_TIME_LIMIT",
+	}
+	FinishReason_value = map[string]int32{
+		"REASON_INVALID":     0,
+		"REASON_MAX_LEN":     1,
+		"REASON_MAX_CONTEXT": 2,
+		"REASON_STOP":        3,
+		"REASON_TOOL_CALLS":  4,
+		"REASON_TIME_LIMIT":  5,
+	}
+)
+
+func (x FinishReason) Enum() *FinishReason {
+	p := new(FinishReason)
+	*p = x
+	return p
+}
+
+func (x FinishReason) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (FinishReason) Descriptor() protoreflect.EnumDescriptor {
+	return file_xai_v1_chat_proto_enumTypes[0].Descriptor()
+}
+
+func (FinishReason) Type() protoreflect.EnumType {
+	return &file_xai_v1_chat_proto_enumTypes[0]
+}
+
+func (x FinishReason) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use FinishReason.Descriptor instead.
+func (FinishReason) EnumDescriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{0}
+}
+
+// FormatType specifies the format of the response
+type FormatType int32
+
+const (
+	FormatType_FORMAT_TYPE_INVALID     FormatType = 0
+	FormatType_FORMAT_TYPE_TEXT        FormatType = 1
+	FormatType_FORMAT_TYPE_JSON_OBJECT FormatType = 2
+	FormatType_FORMAT_TYPE_JSON_SCHEMA FormatType = 3
+)
+
+// Enum value maps for FormatType.
+var (
+	FormatType_name = map[int32]string{
+		0: "FORMAT_TYPE_INVALID",
+		1: "FORMAT_TYPE_TEXT",
+		2: "FORMAT_TYPE_JSON_OBJECT",
+		3: "FORMAT_TYPE_JSON_SCHEMA",
+	}
+	FormatType_value = map[string]int32{
+		"FORMAT_TYPE_INVALID":     0,
+		"FORMAT_TYPE_TEXT":        1,
+		"FORMAT_TYPE_JSON_OBJECT": 2,
+		"FORMAT_TYPE_JSON_SCHEMA": 3,
+	}
+)
+
+func (x FormatType) Enum() *FormatType {
+	p := new(FormatType)
+	*p = x
+	return p
+}
+
+func (x FormatType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (FormatType) Descriptor() protoreflect.EnumDescriptor {
+	return file_xai_v1_chat_proto_enumTypes[1].Descriptor()
+}
+
+func (FormatType) Type() protoreflect.EnumType {
+	return &file_xai_v1_chat_proto_enumTypes[1]
+}
+
+func (x FormatType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use FormatType.Descriptor instead.
+func (FormatType) EnumDescriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{1}
+}
+
+// MessageRole specifies the role of a message
 type MessageRole int32
 
 const (
@@ -65,11 +177,11 @@ func (x MessageRole) String() string {
 }
 
 func (MessageRole) Descriptor() protoreflect.EnumDescriptor {
-	return file_xai_v1_chat_proto_enumTypes[0].Descriptor()
+	return file_xai_v1_chat_proto_enumTypes[2].Descriptor()
 }
 
 func (MessageRole) Type() protoreflect.EnumType {
-	return &file_xai_v1_chat_proto_enumTypes[0]
+	return &file_xai_v1_chat_proto_enumTypes[2]
 }
 
 func (x MessageRole) Number() protoreflect.EnumNumber {
@@ -78,9 +190,10 @@ func (x MessageRole) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MessageRole.Descriptor instead.
 func (MessageRole) EnumDescriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{0}
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{2}
 }
 
+// ReasoningEffort controls the reasoning effort level
 type ReasoningEffort int32
 
 const (
@@ -117,11 +230,11 @@ func (x ReasoningEffort) String() string {
 }
 
 func (ReasoningEffort) Descriptor() protoreflect.EnumDescriptor {
-	return file_xai_v1_chat_proto_enumTypes[1].Descriptor()
+	return file_xai_v1_chat_proto_enumTypes[3].Descriptor()
 }
 
 func (ReasoningEffort) Type() protoreflect.EnumType {
-	return &file_xai_v1_chat_proto_enumTypes[1]
+	return &file_xai_v1_chat_proto_enumTypes[3]
 }
 
 func (x ReasoningEffort) Number() protoreflect.EnumNumber {
@@ -130,113 +243,63 @@ func (x ReasoningEffort) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ReasoningEffort.Descriptor instead.
 func (ReasoningEffort) EnumDescriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{1}
-}
-
-type ToolMode int32
-
-const (
-	ToolMode_TOOL_MODE_INVALID  ToolMode = 0
-	ToolMode_TOOL_MODE_AUTO     ToolMode = 1
-	ToolMode_TOOL_MODE_NONE     ToolMode = 2
-	ToolMode_TOOL_MODE_REQUIRED ToolMode = 3
-)
-
-// Enum value maps for ToolMode.
-var (
-	ToolMode_name = map[int32]string{
-		0: "TOOL_MODE_INVALID",
-		1: "TOOL_MODE_AUTO",
-		2: "TOOL_MODE_NONE",
-		3: "TOOL_MODE_REQUIRED",
-	}
-	ToolMode_value = map[string]int32{
-		"TOOL_MODE_INVALID":  0,
-		"TOOL_MODE_AUTO":     1,
-		"TOOL_MODE_NONE":     2,
-		"TOOL_MODE_REQUIRED": 3,
-	}
-)
-
-func (x ToolMode) Enum() *ToolMode {
-	p := new(ToolMode)
-	*p = x
-	return p
-}
-
-func (x ToolMode) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ToolMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_xai_v1_chat_proto_enumTypes[2].Descriptor()
-}
-
-func (ToolMode) Type() protoreflect.EnumType {
-	return &file_xai_v1_chat_proto_enumTypes[2]
-}
-
-func (x ToolMode) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use ToolMode.Descriptor instead.
-func (ToolMode) EnumDescriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{2}
-}
-
-type FormatType int32
-
-const (
-	FormatType_FORMAT_TYPE_INVALID     FormatType = 0
-	FormatType_FORMAT_TYPE_TEXT        FormatType = 1
-	FormatType_FORMAT_TYPE_JSON_OBJECT FormatType = 2
-	FormatType_FORMAT_TYPE_JSON_SCHEMA FormatType = 3
-)
-
-// Enum value maps for FormatType.
-var (
-	FormatType_name = map[int32]string{
-		0: "FORMAT_TYPE_INVALID",
-		1: "FORMAT_TYPE_TEXT",
-		2: "FORMAT_TYPE_JSON_OBJECT",
-		3: "FORMAT_TYPE_JSON_SCHEMA",
-	}
-	FormatType_value = map[string]int32{
-		"FORMAT_TYPE_INVALID":     0,
-		"FORMAT_TYPE_TEXT":        1,
-		"FORMAT_TYPE_JSON_OBJECT": 2,
-		"FORMAT_TYPE_JSON_SCHEMA": 3,
-	}
-)
-
-func (x FormatType) Enum() *FormatType {
-	p := new(FormatType)
-	*p = x
-	return p
-}
-
-func (x FormatType) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (FormatType) Descriptor() protoreflect.EnumDescriptor {
-	return file_xai_v1_chat_proto_enumTypes[3].Descriptor()
-}
-
-func (FormatType) Type() protoreflect.EnumType {
-	return &file_xai_v1_chat_proto_enumTypes[3]
-}
-
-func (x FormatType) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use FormatType.Descriptor instead.
-func (FormatType) EnumDescriptor() ([]byte, []int) {
 	return file_xai_v1_chat_proto_rawDescGZIP(), []int{3}
 }
 
+// SearchMode controls search behavior
+type SearchMode int32
+
+const (
+	SearchMode_INVALID_SEARCH_MODE SearchMode = 0
+	SearchMode_OFF_SEARCH_MODE     SearchMode = 1
+	SearchMode_ON_SEARCH_MODE      SearchMode = 2
+	SearchMode_AUTO_SEARCH_MODE    SearchMode = 3
+)
+
+// Enum value maps for SearchMode.
+var (
+	SearchMode_name = map[int32]string{
+		0: "INVALID_SEARCH_MODE",
+		1: "OFF_SEARCH_MODE",
+		2: "ON_SEARCH_MODE",
+		3: "AUTO_SEARCH_MODE",
+	}
+	SearchMode_value = map[string]int32{
+		"INVALID_SEARCH_MODE": 0,
+		"OFF_SEARCH_MODE":     1,
+		"ON_SEARCH_MODE":      2,
+		"AUTO_SEARCH_MODE":    3,
+	}
+)
+
+func (x SearchMode) Enum() *SearchMode {
+	p := new(SearchMode)
+	*p = x
+	return p
+}
+
+func (x SearchMode) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SearchMode) Descriptor() protoreflect.EnumDescriptor {
+	return file_xai_v1_chat_proto_enumTypes[4].Descriptor()
+}
+
+func (SearchMode) Type() protoreflect.EnumType {
+	return &file_xai_v1_chat_proto_enumTypes[4]
+}
+
+func (x SearchMode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SearchMode.Descriptor instead.
+func (SearchMode) EnumDescriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{4}
+}
+
+// ToolCallType specifies the type of tool call
 type ToolCallType int32
 
 const (
@@ -285,11 +348,11 @@ func (x ToolCallType) String() string {
 }
 
 func (ToolCallType) Descriptor() protoreflect.EnumDescriptor {
-	return file_xai_v1_chat_proto_enumTypes[4].Descriptor()
+	return file_xai_v1_chat_proto_enumTypes[5].Descriptor()
 }
 
 func (ToolCallType) Type() protoreflect.EnumType {
-	return &file_xai_v1_chat_proto_enumTypes[4]
+	return &file_xai_v1_chat_proto_enumTypes[5]
 }
 
 func (x ToolCallType) Number() protoreflect.EnumNumber {
@@ -298,104 +361,136 @@ func (x ToolCallType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ToolCallType.Descriptor instead.
 func (ToolCallType) EnumDescriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{4}
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{5}
 }
 
-type SearchMode int32
+// ToolMode controls tool usage behavior
+type ToolMode int32
 
 const (
-	SearchMode_INVALID_SEARCH_MODE SearchMode = 0
-	SearchMode_OFF_SEARCH_MODE     SearchMode = 1
-	SearchMode_ON_SEARCH_MODE      SearchMode = 2
-	SearchMode_AUTO_SEARCH_MODE    SearchMode = 3
+	ToolMode_TOOL_MODE_INVALID  ToolMode = 0
+	ToolMode_TOOL_MODE_AUTO     ToolMode = 1
+	ToolMode_TOOL_MODE_NONE     ToolMode = 2
+	ToolMode_TOOL_MODE_REQUIRED ToolMode = 3
 )
 
-// Enum value maps for SearchMode.
+// Enum value maps for ToolMode.
 var (
-	SearchMode_name = map[int32]string{
-		0: "INVALID_SEARCH_MODE",
-		1: "OFF_SEARCH_MODE",
-		2: "ON_SEARCH_MODE",
-		3: "AUTO_SEARCH_MODE",
+	ToolMode_name = map[int32]string{
+		0: "TOOL_MODE_INVALID",
+		1: "TOOL_MODE_AUTO",
+		2: "TOOL_MODE_NONE",
+		3: "TOOL_MODE_REQUIRED",
 	}
-	SearchMode_value = map[string]int32{
-		"INVALID_SEARCH_MODE": 0,
-		"OFF_SEARCH_MODE":     1,
-		"ON_SEARCH_MODE":      2,
-		"AUTO_SEARCH_MODE":    3,
+	ToolMode_value = map[string]int32{
+		"TOOL_MODE_INVALID":  0,
+		"TOOL_MODE_AUTO":     1,
+		"TOOL_MODE_NONE":     2,
+		"TOOL_MODE_REQUIRED": 3,
 	}
 )
 
-func (x SearchMode) Enum() *SearchMode {
-	p := new(SearchMode)
+func (x ToolMode) Enum() *ToolMode {
+	p := new(ToolMode)
 	*p = x
 	return p
 }
 
-func (x SearchMode) String() string {
+func (x ToolMode) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (SearchMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_xai_v1_chat_proto_enumTypes[5].Descriptor()
+func (ToolMode) Descriptor() protoreflect.EnumDescriptor {
+	return file_xai_v1_chat_proto_enumTypes[6].Descriptor()
 }
 
-func (SearchMode) Type() protoreflect.EnumType {
-	return &file_xai_v1_chat_proto_enumTypes[5]
+func (ToolMode) Type() protoreflect.EnumType {
+	return &file_xai_v1_chat_proto_enumTypes[6]
 }
 
-func (x SearchMode) Number() protoreflect.EnumNumber {
+func (x ToolMode) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use SearchMode.Descriptor instead.
-func (SearchMode) EnumDescriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{5}
+// Deprecated: Use ToolMode.Descriptor instead.
+func (ToolMode) EnumDescriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{6}
 }
 
-// Request message
-type GetCompletionsRequest struct {
-	state               protoimpl.MessageState `protogen:"open.v1"`
-	Messages            []*Message             `protobuf:"bytes,1,rep,name=messages,proto3" json:"messages,omitempty"`
-	Model               string                 `protobuf:"bytes,2,opt,name=model,proto3" json:"model,omitempty"`
-	User                string                 `protobuf:"bytes,3,opt,name=user,proto3" json:"user,omitempty"`
-	N                   int32                  `protobuf:"varint,4,opt,name=n,proto3" json:"n,omitempty"`
-	MaxTokens           int32                  `protobuf:"varint,5,opt,name=max_tokens,json=maxTokens,proto3" json:"max_tokens,omitempty"`
-	Seed                int64                  `protobuf:"varint,6,opt,name=seed,proto3" json:"seed,omitempty"`
-	Stop                []string               `protobuf:"bytes,7,rep,name=stop,proto3" json:"stop,omitempty"`
-	Temperature         float32                `protobuf:"fixed32,8,opt,name=temperature,proto3" json:"temperature,omitempty"`
-	TopP                float32                `protobuf:"fixed32,9,opt,name=top_p,json=topP,proto3" json:"top_p,omitempty"`
-	Logprobs            bool                   `protobuf:"varint,10,opt,name=logprobs,proto3" json:"logprobs,omitempty"`
-	TopLogprobs         int32                  `protobuf:"varint,11,opt,name=top_logprobs,json=topLogprobs,proto3" json:"top_logprobs,omitempty"`
-	Tools               []*Tool                `protobuf:"bytes,12,rep,name=tools,proto3" json:"tools,omitempty"`
-	ToolChoice          *ToolChoice            `protobuf:"bytes,13,opt,name=tool_choice,json=toolChoice,proto3" json:"tool_choice,omitempty"`
-	ResponseFormat      *ResponseFormat        `protobuf:"bytes,14,opt,name=response_format,json=responseFormat,proto3" json:"response_format,omitempty"`
-	FrequencyPenalty    float32                `protobuf:"fixed32,15,opt,name=frequency_penalty,json=frequencyPenalty,proto3" json:"frequency_penalty,omitempty"`
-	PresencePenalty     float32                `protobuf:"fixed32,16,opt,name=presence_penalty,json=presencePenalty,proto3" json:"presence_penalty,omitempty"`
-	ReasoningEffort     ReasoningEffort        `protobuf:"varint,17,opt,name=reasoning_effort,json=reasoningEffort,proto3,enum=xai_api.ReasoningEffort" json:"reasoning_effort,omitempty"`
-	SearchParameters    *SearchParameters      `protobuf:"bytes,18,opt,name=search_parameters,json=searchParameters,proto3" json:"search_parameters,omitempty"`
-	ParallelToolCalls   bool                   `protobuf:"varint,19,opt,name=parallel_tool_calls,json=parallelToolCalls,proto3" json:"parallel_tool_calls,omitempty"`
-	PreviousResponseId  string                 `protobuf:"bytes,20,opt,name=previous_response_id,json=previousResponseId,proto3" json:"previous_response_id,omitempty"`
-	StoreMessages       bool                   `protobuf:"varint,21,opt,name=store_messages,json=storeMessages,proto3" json:"store_messages,omitempty"`
-	UseEncryptedContent bool                   `protobuf:"varint,22,opt,name=use_encrypted_content,json=useEncryptedContent,proto3" json:"use_encrypted_content,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+// DeferredStatus from deferred.proto (imported conceptually)
+type DeferredStatus int32
+
+const (
+	DeferredStatus_INVALID_DEFERRED_STATUS DeferredStatus = 0
+	DeferredStatus_DONE                    DeferredStatus = 1
+	DeferredStatus_EXPIRED                 DeferredStatus = 2
+	DeferredStatus_PENDING                 DeferredStatus = 3
+)
+
+// Enum value maps for DeferredStatus.
+var (
+	DeferredStatus_name = map[int32]string{
+		0: "INVALID_DEFERRED_STATUS",
+		1: "DONE",
+		2: "EXPIRED",
+		3: "PENDING",
+	}
+	DeferredStatus_value = map[string]int32{
+		"INVALID_DEFERRED_STATUS": 0,
+		"DONE":                    1,
+		"EXPIRED":                 2,
+		"PENDING":                 3,
+	}
+)
+
+func (x DeferredStatus) Enum() *DeferredStatus {
+	p := new(DeferredStatus)
+	*p = x
+	return p
 }
 
-func (x *GetCompletionsRequest) Reset() {
-	*x = GetCompletionsRequest{}
+func (x DeferredStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (DeferredStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_xai_v1_chat_proto_enumTypes[7].Descriptor()
+}
+
+func (DeferredStatus) Type() protoreflect.EnumType {
+	return &file_xai_v1_chat_proto_enumTypes[7]
+}
+
+func (x DeferredStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use DeferredStatus.Descriptor instead.
+func (DeferredStatus) EnumDescriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{7}
+}
+
+// CodeExecution enables code execution tool
+type CodeExecution struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CodeExecution) Reset() {
+	*x = CodeExecution{}
 	mi := &file_xai_v1_chat_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetCompletionsRequest) String() string {
+func (x *CodeExecution) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetCompletionsRequest) ProtoMessage() {}
+func (*CodeExecution) ProtoMessage() {}
 
-func (x *GetCompletionsRequest) ProtoReflect() protoreflect.Message {
+func (x *CodeExecution) ProtoReflect() protoreflect.Message {
 	mi := &file_xai_v1_chat_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -407,193 +502,34 @@ func (x *GetCompletionsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetCompletionsRequest.ProtoReflect.Descriptor instead.
-func (*GetCompletionsRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use CodeExecution.ProtoReflect.Descriptor instead.
+func (*CodeExecution) Descriptor() ([]byte, []int) {
 	return file_xai_v1_chat_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GetCompletionsRequest) GetMessages() []*Message {
-	if x != nil {
-		return x.Messages
-	}
-	return nil
+// CollectionsSearch enables search in document collections
+type CollectionsSearch struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CollectionIds []string               `protobuf:"bytes,1,rep,name=collection_ids,json=collectionIds,proto3" json:"collection_ids,omitempty"`
+	Limit         int32                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetCompletionsRequest) GetModel() string {
-	if x != nil {
-		return x.Model
-	}
-	return ""
-}
-
-func (x *GetCompletionsRequest) GetUser() string {
-	if x != nil {
-		return x.User
-	}
-	return ""
-}
-
-func (x *GetCompletionsRequest) GetN() int32 {
-	if x != nil {
-		return x.N
-	}
-	return 0
-}
-
-func (x *GetCompletionsRequest) GetMaxTokens() int32 {
-	if x != nil {
-		return x.MaxTokens
-	}
-	return 0
-}
-
-func (x *GetCompletionsRequest) GetSeed() int64 {
-	if x != nil {
-		return x.Seed
-	}
-	return 0
-}
-
-func (x *GetCompletionsRequest) GetStop() []string {
-	if x != nil {
-		return x.Stop
-	}
-	return nil
-}
-
-func (x *GetCompletionsRequest) GetTemperature() float32 {
-	if x != nil {
-		return x.Temperature
-	}
-	return 0
-}
-
-func (x *GetCompletionsRequest) GetTopP() float32 {
-	if x != nil {
-		return x.TopP
-	}
-	return 0
-}
-
-func (x *GetCompletionsRequest) GetLogprobs() bool {
-	if x != nil {
-		return x.Logprobs
-	}
-	return false
-}
-
-func (x *GetCompletionsRequest) GetTopLogprobs() int32 {
-	if x != nil {
-		return x.TopLogprobs
-	}
-	return 0
-}
-
-func (x *GetCompletionsRequest) GetTools() []*Tool {
-	if x != nil {
-		return x.Tools
-	}
-	return nil
-}
-
-func (x *GetCompletionsRequest) GetToolChoice() *ToolChoice {
-	if x != nil {
-		return x.ToolChoice
-	}
-	return nil
-}
-
-func (x *GetCompletionsRequest) GetResponseFormat() *ResponseFormat {
-	if x != nil {
-		return x.ResponseFormat
-	}
-	return nil
-}
-
-func (x *GetCompletionsRequest) GetFrequencyPenalty() float32 {
-	if x != nil {
-		return x.FrequencyPenalty
-	}
-	return 0
-}
-
-func (x *GetCompletionsRequest) GetPresencePenalty() float32 {
-	if x != nil {
-		return x.PresencePenalty
-	}
-	return 0
-}
-
-func (x *GetCompletionsRequest) GetReasoningEffort() ReasoningEffort {
-	if x != nil {
-		return x.ReasoningEffort
-	}
-	return ReasoningEffort_INVALID_EFFORT
-}
-
-func (x *GetCompletionsRequest) GetSearchParameters() *SearchParameters {
-	if x != nil {
-		return x.SearchParameters
-	}
-	return nil
-}
-
-func (x *GetCompletionsRequest) GetParallelToolCalls() bool {
-	if x != nil {
-		return x.ParallelToolCalls
-	}
-	return false
-}
-
-func (x *GetCompletionsRequest) GetPreviousResponseId() string {
-	if x != nil {
-		return x.PreviousResponseId
-	}
-	return ""
-}
-
-func (x *GetCompletionsRequest) GetStoreMessages() bool {
-	if x != nil {
-		return x.StoreMessages
-	}
-	return false
-}
-
-func (x *GetCompletionsRequest) GetUseEncryptedContent() bool {
-	if x != nil {
-		return x.UseEncryptedContent
-	}
-	return false
-}
-
-// Response messages
-type GetChatCompletionResponse struct {
-	state             protoimpl.MessageState `protogen:"open.v1"`
-	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Outputs           []*CompletionOutput    `protobuf:"bytes,2,rep,name=outputs,proto3" json:"outputs,omitempty"`
-	Created           *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created,proto3" json:"created,omitempty"`
-	Model             string                 `protobuf:"bytes,4,opt,name=model,proto3" json:"model,omitempty"`
-	SystemFingerprint string                 `protobuf:"bytes,5,opt,name=system_fingerprint,json=systemFingerprint,proto3" json:"system_fingerprint,omitempty"`
-	Usage             *SamplingUsage         `protobuf:"bytes,6,opt,name=usage,proto3" json:"usage,omitempty"`
-	Citations         []string               `protobuf:"bytes,7,rep,name=citations,proto3" json:"citations,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
-}
-
-func (x *GetChatCompletionResponse) Reset() {
-	*x = GetChatCompletionResponse{}
+func (x *CollectionsSearch) Reset() {
+	*x = CollectionsSearch{}
 	mi := &file_xai_v1_chat_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetChatCompletionResponse) String() string {
+func (x *CollectionsSearch) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetChatCompletionResponse) ProtoMessage() {}
+func (*CollectionsSearch) ProtoMessage() {}
 
-func (x *GetChatCompletionResponse) ProtoReflect() protoreflect.Message {
+func (x *CollectionsSearch) ProtoReflect() protoreflect.Message {
 	mi := &file_xai_v1_chat_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -605,60 +541,814 @@ func (x *GetChatCompletionResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetChatCompletionResponse.ProtoReflect.Descriptor instead.
-func (*GetChatCompletionResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use CollectionsSearch.ProtoReflect.Descriptor instead.
+func (*CollectionsSearch) Descriptor() ([]byte, []int) {
 	return file_xai_v1_chat_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *GetChatCompletionResponse) GetId() string {
+func (x *CollectionsSearch) GetCollectionIds() []string {
 	if x != nil {
-		return x.Id
+		return x.CollectionIds
+	}
+	return nil
+}
+
+func (x *CollectionsSearch) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+// CompletionMessage is the message in a completion output
+type CompletionMessage struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Content          string                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
+	Role             MessageRole            `protobuf:"varint,2,opt,name=role,proto3,enum=xai_api.MessageRole" json:"role,omitempty"`
+	ToolCalls        []*ToolCall            `protobuf:"bytes,3,rep,name=tool_calls,json=toolCalls,proto3" json:"tool_calls,omitempty"`
+	ReasoningContent string                 `protobuf:"bytes,4,opt,name=reasoning_content,json=reasoningContent,proto3" json:"reasoning_content,omitempty"`
+	EncryptedContent string                 `protobuf:"bytes,5,opt,name=encrypted_content,json=encryptedContent,proto3" json:"encrypted_content,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *CompletionMessage) Reset() {
+	*x = CompletionMessage{}
+	mi := &file_xai_v1_chat_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompletionMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompletionMessage) ProtoMessage() {}
+
+func (x *CompletionMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompletionMessage.ProtoReflect.Descriptor instead.
+func (*CompletionMessage) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *CompletionMessage) GetContent() string {
+	if x != nil {
+		return x.Content
 	}
 	return ""
 }
 
-func (x *GetChatCompletionResponse) GetOutputs() []*CompletionOutput {
+func (x *CompletionMessage) GetRole() MessageRole {
 	if x != nil {
-		return x.Outputs
+		return x.Role
+	}
+	return MessageRole_INVALID_ROLE
+}
+
+func (x *CompletionMessage) GetToolCalls() []*ToolCall {
+	if x != nil {
+		return x.ToolCalls
 	}
 	return nil
 }
 
-func (x *GetChatCompletionResponse) GetCreated() *timestamppb.Timestamp {
+func (x *CompletionMessage) GetReasoningContent() string {
 	if x != nil {
-		return x.Created
-	}
-	return nil
-}
-
-func (x *GetChatCompletionResponse) GetModel() string {
-	if x != nil {
-		return x.Model
+		return x.ReasoningContent
 	}
 	return ""
 }
 
-func (x *GetChatCompletionResponse) GetSystemFingerprint() string {
+func (x *CompletionMessage) GetEncryptedContent() string {
 	if x != nil {
-		return x.SystemFingerprint
+		return x.EncryptedContent
 	}
 	return ""
 }
 
-func (x *GetChatCompletionResponse) GetUsage() *SamplingUsage {
+// CompletionOutput is a single completion output
+type CompletionOutput struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FinishReason  FinishReason           `protobuf:"varint,1,opt,name=finish_reason,json=finishReason,proto3,enum=xai_api.FinishReason" json:"finish_reason,omitempty"`
+	Index         int32                  `protobuf:"varint,2,opt,name=index,proto3" json:"index,omitempty"`
+	Message       *CompletionMessage     `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	Logprobs      *LogProbs              `protobuf:"bytes,4,opt,name=logprobs,proto3" json:"logprobs,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CompletionOutput) Reset() {
+	*x = CompletionOutput{}
+	mi := &file_xai_v1_chat_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompletionOutput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompletionOutput) ProtoMessage() {}
+
+func (x *CompletionOutput) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[3]
 	if x != nil {
-		return x.Usage
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompletionOutput.ProtoReflect.Descriptor instead.
+func (*CompletionOutput) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CompletionOutput) GetFinishReason() FinishReason {
+	if x != nil {
+		return x.FinishReason
+	}
+	return FinishReason_REASON_INVALID
+}
+
+func (x *CompletionOutput) GetIndex() int32 {
+	if x != nil {
+		return x.Index
+	}
+	return 0
+}
+
+func (x *CompletionOutput) GetMessage() *CompletionMessage {
+	if x != nil {
+		return x.Message
 	}
 	return nil
 }
 
-func (x *GetChatCompletionResponse) GetCitations() []string {
+func (x *CompletionOutput) GetLogprobs() *LogProbs {
 	if x != nil {
-		return x.Citations
+		return x.Logprobs
 	}
 	return nil
 }
 
+// CompletionOutputChunk is a chunk of streaming completion output
+type CompletionOutputChunk struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Delta         *Delta                 `protobuf:"bytes,1,opt,name=delta,proto3" json:"delta,omitempty"`
+	Logprobs      *LogProbs              `protobuf:"bytes,2,opt,name=logprobs,proto3" json:"logprobs,omitempty"`
+	FinishReason  FinishReason           `protobuf:"varint,3,opt,name=finish_reason,json=finishReason,proto3,enum=xai_api.FinishReason" json:"finish_reason,omitempty"`
+	Index         int32                  `protobuf:"varint,4,opt,name=index,proto3" json:"index,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CompletionOutputChunk) Reset() {
+	*x = CompletionOutputChunk{}
+	mi := &file_xai_v1_chat_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompletionOutputChunk) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompletionOutputChunk) ProtoMessage() {}
+
+func (x *CompletionOutputChunk) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompletionOutputChunk.ProtoReflect.Descriptor instead.
+func (*CompletionOutputChunk) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *CompletionOutputChunk) GetDelta() *Delta {
+	if x != nil {
+		return x.Delta
+	}
+	return nil
+}
+
+func (x *CompletionOutputChunk) GetLogprobs() *LogProbs {
+	if x != nil {
+		return x.Logprobs
+	}
+	return nil
+}
+
+func (x *CompletionOutputChunk) GetFinishReason() FinishReason {
+	if x != nil {
+		return x.FinishReason
+	}
+	return FinishReason_REASON_INVALID
+}
+
+func (x *CompletionOutputChunk) GetIndex() int32 {
+	if x != nil {
+		return x.Index
+	}
+	return 0
+}
+
+// Content represents message content (text, image, or file)
+type Content struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Text          string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
+	ImageUrl      *ImageUrlContent       `protobuf:"bytes,2,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
+	File          *FileContent           `protobuf:"bytes,3,opt,name=file,proto3" json:"file,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Content) Reset() {
+	*x = Content{}
+	mi := &file_xai_v1_chat_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Content) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Content) ProtoMessage() {}
+
+func (x *Content) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Content.ProtoReflect.Descriptor instead.
+func (*Content) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *Content) GetText() string {
+	if x != nil {
+		return x.Text
+	}
+	return ""
+}
+
+func (x *Content) GetImageUrl() *ImageUrlContent {
+	if x != nil {
+		return x.ImageUrl
+	}
+	return nil
+}
+
+func (x *Content) GetFile() *FileContent {
+	if x != nil {
+		return x.File
+	}
+	return nil
+}
+
+// DebugOutput contains debugging information
+type DebugOutput struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	Attempts             int32                  `protobuf:"varint,1,opt,name=attempts,proto3" json:"attempts,omitempty"`
+	Request              string                 `protobuf:"bytes,2,opt,name=request,proto3" json:"request,omitempty"`
+	Prompt               string                 `protobuf:"bytes,3,opt,name=prompt,proto3" json:"prompt,omitempty"`
+	Responses            []string               `protobuf:"bytes,4,rep,name=responses,proto3" json:"responses,omitempty"`
+	CacheReadCount       uint32                 `protobuf:"varint,5,opt,name=cache_read_count,json=cacheReadCount,proto3" json:"cache_read_count,omitempty"`
+	CacheReadInputBytes  uint64                 `protobuf:"varint,6,opt,name=cache_read_input_bytes,json=cacheReadInputBytes,proto3" json:"cache_read_input_bytes,omitempty"`
+	CacheWriteCount      uint32                 `protobuf:"varint,7,opt,name=cache_write_count,json=cacheWriteCount,proto3" json:"cache_write_count,omitempty"`
+	CacheWriteInputBytes uint64                 `protobuf:"varint,8,opt,name=cache_write_input_bytes,json=cacheWriteInputBytes,proto3" json:"cache_write_input_bytes,omitempty"`
+	EngineRequest        string                 `protobuf:"bytes,9,opt,name=engine_request,json=engineRequest,proto3" json:"engine_request,omitempty"`
+	LbAddress            string                 `protobuf:"bytes,10,opt,name=lb_address,json=lbAddress,proto3" json:"lb_address,omitempty"`
+	SamplerTag           string                 `protobuf:"bytes,11,opt,name=sampler_tag,json=samplerTag,proto3" json:"sampler_tag,omitempty"`
+	Chunks               []string               `protobuf:"bytes,12,rep,name=chunks,proto3" json:"chunks,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *DebugOutput) Reset() {
+	*x = DebugOutput{}
+	mi := &file_xai_v1_chat_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DebugOutput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DebugOutput) ProtoMessage() {}
+
+func (x *DebugOutput) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DebugOutput.ProtoReflect.Descriptor instead.
+func (*DebugOutput) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *DebugOutput) GetAttempts() int32 {
+	if x != nil {
+		return x.Attempts
+	}
+	return 0
+}
+
+func (x *DebugOutput) GetRequest() string {
+	if x != nil {
+		return x.Request
+	}
+	return ""
+}
+
+func (x *DebugOutput) GetPrompt() string {
+	if x != nil {
+		return x.Prompt
+	}
+	return ""
+}
+
+func (x *DebugOutput) GetResponses() []string {
+	if x != nil {
+		return x.Responses
+	}
+	return nil
+}
+
+func (x *DebugOutput) GetCacheReadCount() uint32 {
+	if x != nil {
+		return x.CacheReadCount
+	}
+	return 0
+}
+
+func (x *DebugOutput) GetCacheReadInputBytes() uint64 {
+	if x != nil {
+		return x.CacheReadInputBytes
+	}
+	return 0
+}
+
+func (x *DebugOutput) GetCacheWriteCount() uint32 {
+	if x != nil {
+		return x.CacheWriteCount
+	}
+	return 0
+}
+
+func (x *DebugOutput) GetCacheWriteInputBytes() uint64 {
+	if x != nil {
+		return x.CacheWriteInputBytes
+	}
+	return 0
+}
+
+func (x *DebugOutput) GetEngineRequest() string {
+	if x != nil {
+		return x.EngineRequest
+	}
+	return ""
+}
+
+func (x *DebugOutput) GetLbAddress() string {
+	if x != nil {
+		return x.LbAddress
+	}
+	return ""
+}
+
+func (x *DebugOutput) GetSamplerTag() string {
+	if x != nil {
+		return x.SamplerTag
+	}
+	return ""
+}
+
+func (x *DebugOutput) GetChunks() []string {
+	if x != nil {
+		return x.Chunks
+	}
+	return nil
+}
+
+// DeleteStoredCompletionRequest requests deletion of a stored completion
+type DeleteStoredCompletionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ResponseId    string                 `protobuf:"bytes,1,opt,name=response_id,json=responseId,proto3" json:"response_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteStoredCompletionRequest) Reset() {
+	*x = DeleteStoredCompletionRequest{}
+	mi := &file_xai_v1_chat_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteStoredCompletionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteStoredCompletionRequest) ProtoMessage() {}
+
+func (x *DeleteStoredCompletionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteStoredCompletionRequest.ProtoReflect.Descriptor instead.
+func (*DeleteStoredCompletionRequest) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *DeleteStoredCompletionRequest) GetResponseId() string {
+	if x != nil {
+		return x.ResponseId
+	}
+	return ""
+}
+
+// DeleteStoredCompletionResponse confirms deletion
+type DeleteStoredCompletionResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ResponseId    string                 `protobuf:"bytes,1,opt,name=response_id,json=responseId,proto3" json:"response_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteStoredCompletionResponse) Reset() {
+	*x = DeleteStoredCompletionResponse{}
+	mi := &file_xai_v1_chat_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteStoredCompletionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteStoredCompletionResponse) ProtoMessage() {}
+
+func (x *DeleteStoredCompletionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteStoredCompletionResponse.ProtoReflect.Descriptor instead.
+func (*DeleteStoredCompletionResponse) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *DeleteStoredCompletionResponse) GetResponseId() string {
+	if x != nil {
+		return x.ResponseId
+	}
+	return ""
+}
+
+// Delta represents incremental changes in streaming
+type Delta struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Content          string                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
+	Role             MessageRole            `protobuf:"varint,2,opt,name=role,proto3,enum=xai_api.MessageRole" json:"role,omitempty"`
+	ToolCalls        []*ToolCall            `protobuf:"bytes,3,rep,name=tool_calls,json=toolCalls,proto3" json:"tool_calls,omitempty"`
+	ReasoningContent string                 `protobuf:"bytes,4,opt,name=reasoning_content,json=reasoningContent,proto3" json:"reasoning_content,omitempty"`
+	EncryptedContent string                 `protobuf:"bytes,5,opt,name=encrypted_content,json=encryptedContent,proto3" json:"encrypted_content,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *Delta) Reset() {
+	*x = Delta{}
+	mi := &file_xai_v1_chat_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Delta) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Delta) ProtoMessage() {}
+
+func (x *Delta) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Delta.ProtoReflect.Descriptor instead.
+func (*Delta) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *Delta) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *Delta) GetRole() MessageRole {
+	if x != nil {
+		return x.Role
+	}
+	return MessageRole_INVALID_ROLE
+}
+
+func (x *Delta) GetToolCalls() []*ToolCall {
+	if x != nil {
+		return x.ToolCalls
+	}
+	return nil
+}
+
+func (x *Delta) GetReasoningContent() string {
+	if x != nil {
+		return x.ReasoningContent
+	}
+	return ""
+}
+
+func (x *Delta) GetEncryptedContent() string {
+	if x != nil {
+		return x.EncryptedContent
+	}
+	return ""
+}
+
+// DocumentSearch enables document search tool
+type DocumentSearch struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Limit         int32                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DocumentSearch) Reset() {
+	*x = DocumentSearch{}
+	mi := &file_xai_v1_chat_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DocumentSearch) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DocumentSearch) ProtoMessage() {}
+
+func (x *DocumentSearch) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DocumentSearch.ProtoReflect.Descriptor instead.
+func (*DocumentSearch) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *DocumentSearch) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+// FileContent references a file by ID
+type FileContent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FileId        string                 `protobuf:"bytes,1,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FileContent) Reset() {
+	*x = FileContent{}
+	mi := &file_xai_v1_chat_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FileContent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FileContent) ProtoMessage() {}
+
+func (x *FileContent) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FileContent.ProtoReflect.Descriptor instead.
+func (*FileContent) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *FileContent) GetFileId() string {
+	if x != nil {
+		return x.FileId
+	}
+	return ""
+}
+
+// Function defines a function tool
+type Function struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Strict        bool                   `protobuf:"varint,3,opt,name=strict,proto3" json:"strict,omitempty"`
+	Parameters    string                 `protobuf:"bytes,4,opt,name=parameters,proto3" json:"parameters,omitempty"` // JSON schema
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Function) Reset() {
+	*x = Function{}
+	mi := &file_xai_v1_chat_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Function) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Function) ProtoMessage() {}
+
+func (x *Function) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Function.ProtoReflect.Descriptor instead.
+func (*Function) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *Function) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Function) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *Function) GetStrict() bool {
+	if x != nil {
+		return x.Strict
+	}
+	return false
+}
+
+func (x *Function) GetParameters() string {
+	if x != nil {
+		return x.Parameters
+	}
+	return ""
+}
+
+// FunctionCall represents a function call
+type FunctionCall struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Arguments     string                 `protobuf:"bytes,2,opt,name=arguments,proto3" json:"arguments,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FunctionCall) Reset() {
+	*x = FunctionCall{}
+	mi := &file_xai_v1_chat_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FunctionCall) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FunctionCall) ProtoMessage() {}
+
+func (x *FunctionCall) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FunctionCall.ProtoReflect.Descriptor instead.
+func (*FunctionCall) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *FunctionCall) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *FunctionCall) GetArguments() string {
+	if x != nil {
+		return x.Arguments
+	}
+	return ""
+}
+
+// GetChatCompletionChunk is a streaming response chunk
 type GetChatCompletionChunk struct {
 	state             protoimpl.MessageState   `protogen:"open.v1"`
 	Id                string                   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -674,7 +1364,7 @@ type GetChatCompletionChunk struct {
 
 func (x *GetChatCompletionChunk) Reset() {
 	*x = GetChatCompletionChunk{}
-	mi := &file_xai_v1_chat_proto_msgTypes[2]
+	mi := &file_xai_v1_chat_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -686,7 +1376,7 @@ func (x *GetChatCompletionChunk) String() string {
 func (*GetChatCompletionChunk) ProtoMessage() {}
 
 func (x *GetChatCompletionChunk) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[2]
+	mi := &file_xai_v1_chat_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -699,7 +1389,7 @@ func (x *GetChatCompletionChunk) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetChatCompletionChunk.ProtoReflect.Descriptor instead.
 func (*GetChatCompletionChunk) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{2}
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GetChatCompletionChunk) GetId() string {
@@ -751,7 +1441,626 @@ func (x *GetChatCompletionChunk) GetCitations() []string {
 	return nil
 }
 
-// Supporting messages
+// GetChatCompletionResponse is the complete response
+type GetChatCompletionResponse struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Outputs           []*CompletionOutput    `protobuf:"bytes,2,rep,name=outputs,proto3" json:"outputs,omitempty"`
+	Created           *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created,proto3" json:"created,omitempty"`
+	Model             string                 `protobuf:"bytes,6,opt,name=model,proto3" json:"model,omitempty"`
+	SystemFingerprint string                 `protobuf:"bytes,7,opt,name=system_fingerprint,json=systemFingerprint,proto3" json:"system_fingerprint,omitempty"`
+	Usage             *SamplingUsage         `protobuf:"bytes,9,opt,name=usage,proto3" json:"usage,omitempty"`
+	Citations         []string               `protobuf:"bytes,10,rep,name=citations,proto3" json:"citations,omitempty"`
+	Settings          *RequestSettings       `protobuf:"bytes,11,opt,name=settings,proto3" json:"settings,omitempty"`
+	DebugOutput       *DebugOutput           `protobuf:"bytes,12,opt,name=debug_output,json=debugOutput,proto3" json:"debug_output,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *GetChatCompletionResponse) Reset() {
+	*x = GetChatCompletionResponse{}
+	mi := &file_xai_v1_chat_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetChatCompletionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetChatCompletionResponse) ProtoMessage() {}
+
+func (x *GetChatCompletionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetChatCompletionResponse.ProtoReflect.Descriptor instead.
+func (*GetChatCompletionResponse) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *GetChatCompletionResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *GetChatCompletionResponse) GetOutputs() []*CompletionOutput {
+	if x != nil {
+		return x.Outputs
+	}
+	return nil
+}
+
+func (x *GetChatCompletionResponse) GetCreated() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Created
+	}
+	return nil
+}
+
+func (x *GetChatCompletionResponse) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *GetChatCompletionResponse) GetSystemFingerprint() string {
+	if x != nil {
+		return x.SystemFingerprint
+	}
+	return ""
+}
+
+func (x *GetChatCompletionResponse) GetUsage() *SamplingUsage {
+	if x != nil {
+		return x.Usage
+	}
+	return nil
+}
+
+func (x *GetChatCompletionResponse) GetCitations() []string {
+	if x != nil {
+		return x.Citations
+	}
+	return nil
+}
+
+func (x *GetChatCompletionResponse) GetSettings() *RequestSettings {
+	if x != nil {
+		return x.Settings
+	}
+	return nil
+}
+
+func (x *GetChatCompletionResponse) GetDebugOutput() *DebugOutput {
+	if x != nil {
+		return x.DebugOutput
+	}
+	return nil
+}
+
+// GetCompletionsRequest is the main request for chat completions
+type GetCompletionsRequest struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Messages            []*Message             `protobuf:"bytes,1,rep,name=messages,proto3" json:"messages,omitempty"`
+	Model               string                 `protobuf:"bytes,2,opt,name=model,proto3" json:"model,omitempty"`
+	FrequencyPenalty    float32                `protobuf:"fixed32,3,opt,name=frequency_penalty,json=frequencyPenalty,proto3" json:"frequency_penalty,omitempty"`
+	Logprobs            bool                   `protobuf:"varint,5,opt,name=logprobs,proto3" json:"logprobs,omitempty"`
+	TopLogprobs         int32                  `protobuf:"varint,6,opt,name=top_logprobs,json=topLogprobs,proto3" json:"top_logprobs,omitempty"`
+	MaxTokens           int32                  `protobuf:"varint,7,opt,name=max_tokens,json=maxTokens,proto3" json:"max_tokens,omitempty"`
+	N                   int32                  `protobuf:"varint,8,opt,name=n,proto3" json:"n,omitempty"`
+	PresencePenalty     float32                `protobuf:"fixed32,9,opt,name=presence_penalty,json=presencePenalty,proto3" json:"presence_penalty,omitempty"`
+	ResponseFormat      *ResponseFormat        `protobuf:"bytes,10,opt,name=response_format,json=responseFormat,proto3" json:"response_format,omitempty"`
+	Seed                int32                  `protobuf:"varint,11,opt,name=seed,proto3" json:"seed,omitempty"`
+	Stop                []string               `protobuf:"bytes,12,rep,name=stop,proto3" json:"stop,omitempty"`
+	Temperature         float32                `protobuf:"fixed32,14,opt,name=temperature,proto3" json:"temperature,omitempty"`
+	TopP                float32                `protobuf:"fixed32,15,opt,name=top_p,json=topP,proto3" json:"top_p,omitempty"`
+	User                string                 `protobuf:"bytes,16,opt,name=user,proto3" json:"user,omitempty"`
+	Tools               []*Tool                `protobuf:"bytes,17,rep,name=tools,proto3" json:"tools,omitempty"`
+	ToolChoice          *ToolChoice            `protobuf:"bytes,18,opt,name=tool_choice,json=toolChoice,proto3" json:"tool_choice,omitempty"`
+	ReasoningEffort     ReasoningEffort        `protobuf:"varint,19,opt,name=reasoning_effort,json=reasoningEffort,proto3,enum=xai_api.ReasoningEffort" json:"reasoning_effort,omitempty"`
+	SearchParameters    *SearchParameters      `protobuf:"bytes,20,opt,name=search_parameters,json=searchParameters,proto3" json:"search_parameters,omitempty"`
+	ParallelToolCalls   bool                   `protobuf:"varint,21,opt,name=parallel_tool_calls,json=parallelToolCalls,proto3" json:"parallel_tool_calls,omitempty"`
+	PreviousResponseId  string                 `protobuf:"bytes,22,opt,name=previous_response_id,json=previousResponseId,proto3" json:"previous_response_id,omitempty"`
+	StoreMessages       bool                   `protobuf:"varint,23,opt,name=store_messages,json=storeMessages,proto3" json:"store_messages,omitempty"`
+	UseEncryptedContent bool                   `protobuf:"varint,24,opt,name=use_encrypted_content,json=useEncryptedContent,proto3" json:"use_encrypted_content,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *GetCompletionsRequest) Reset() {
+	*x = GetCompletionsRequest{}
+	mi := &file_xai_v1_chat_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCompletionsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCompletionsRequest) ProtoMessage() {}
+
+func (x *GetCompletionsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCompletionsRequest.ProtoReflect.Descriptor instead.
+func (*GetCompletionsRequest) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *GetCompletionsRequest) GetMessages() []*Message {
+	if x != nil {
+		return x.Messages
+	}
+	return nil
+}
+
+func (x *GetCompletionsRequest) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *GetCompletionsRequest) GetFrequencyPenalty() float32 {
+	if x != nil {
+		return x.FrequencyPenalty
+	}
+	return 0
+}
+
+func (x *GetCompletionsRequest) GetLogprobs() bool {
+	if x != nil {
+		return x.Logprobs
+	}
+	return false
+}
+
+func (x *GetCompletionsRequest) GetTopLogprobs() int32 {
+	if x != nil {
+		return x.TopLogprobs
+	}
+	return 0
+}
+
+func (x *GetCompletionsRequest) GetMaxTokens() int32 {
+	if x != nil {
+		return x.MaxTokens
+	}
+	return 0
+}
+
+func (x *GetCompletionsRequest) GetN() int32 {
+	if x != nil {
+		return x.N
+	}
+	return 0
+}
+
+func (x *GetCompletionsRequest) GetPresencePenalty() float32 {
+	if x != nil {
+		return x.PresencePenalty
+	}
+	return 0
+}
+
+func (x *GetCompletionsRequest) GetResponseFormat() *ResponseFormat {
+	if x != nil {
+		return x.ResponseFormat
+	}
+	return nil
+}
+
+func (x *GetCompletionsRequest) GetSeed() int32 {
+	if x != nil {
+		return x.Seed
+	}
+	return 0
+}
+
+func (x *GetCompletionsRequest) GetStop() []string {
+	if x != nil {
+		return x.Stop
+	}
+	return nil
+}
+
+func (x *GetCompletionsRequest) GetTemperature() float32 {
+	if x != nil {
+		return x.Temperature
+	}
+	return 0
+}
+
+func (x *GetCompletionsRequest) GetTopP() float32 {
+	if x != nil {
+		return x.TopP
+	}
+	return 0
+}
+
+func (x *GetCompletionsRequest) GetUser() string {
+	if x != nil {
+		return x.User
+	}
+	return ""
+}
+
+func (x *GetCompletionsRequest) GetTools() []*Tool {
+	if x != nil {
+		return x.Tools
+	}
+	return nil
+}
+
+func (x *GetCompletionsRequest) GetToolChoice() *ToolChoice {
+	if x != nil {
+		return x.ToolChoice
+	}
+	return nil
+}
+
+func (x *GetCompletionsRequest) GetReasoningEffort() ReasoningEffort {
+	if x != nil {
+		return x.ReasoningEffort
+	}
+	return ReasoningEffort_INVALID_EFFORT
+}
+
+func (x *GetCompletionsRequest) GetSearchParameters() *SearchParameters {
+	if x != nil {
+		return x.SearchParameters
+	}
+	return nil
+}
+
+func (x *GetCompletionsRequest) GetParallelToolCalls() bool {
+	if x != nil {
+		return x.ParallelToolCalls
+	}
+	return false
+}
+
+func (x *GetCompletionsRequest) GetPreviousResponseId() string {
+	if x != nil {
+		return x.PreviousResponseId
+	}
+	return ""
+}
+
+func (x *GetCompletionsRequest) GetStoreMessages() bool {
+	if x != nil {
+		return x.StoreMessages
+	}
+	return false
+}
+
+func (x *GetCompletionsRequest) GetUseEncryptedContent() bool {
+	if x != nil {
+		return x.UseEncryptedContent
+	}
+	return false
+}
+
+// GetDeferredCompletionResponse is response for deferred completions
+type GetDeferredCompletionResponse struct {
+	state         protoimpl.MessageState     `protogen:"open.v1"`
+	Response      *GetChatCompletionResponse `protobuf:"bytes,1,opt,name=response,proto3" json:"response,omitempty"`
+	Status        DeferredStatus             `protobuf:"varint,2,opt,name=status,proto3,enum=xai_api.DeferredStatus" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDeferredCompletionResponse) Reset() {
+	*x = GetDeferredCompletionResponse{}
+	mi := &file_xai_v1_chat_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDeferredCompletionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeferredCompletionResponse) ProtoMessage() {}
+
+func (x *GetDeferredCompletionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeferredCompletionResponse.ProtoReflect.Descriptor instead.
+func (*GetDeferredCompletionResponse) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *GetDeferredCompletionResponse) GetResponse() *GetChatCompletionResponse {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *GetDeferredCompletionResponse) GetStatus() DeferredStatus {
+	if x != nil {
+		return x.Status
+	}
+	return DeferredStatus_INVALID_DEFERRED_STATUS
+}
+
+// GetStoredCompletionRequest requests a stored completion
+type GetStoredCompletionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ResponseId    string                 `protobuf:"bytes,1,opt,name=response_id,json=responseId,proto3" json:"response_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetStoredCompletionRequest) Reset() {
+	*x = GetStoredCompletionRequest{}
+	mi := &file_xai_v1_chat_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetStoredCompletionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetStoredCompletionRequest) ProtoMessage() {}
+
+func (x *GetStoredCompletionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetStoredCompletionRequest.ProtoReflect.Descriptor instead.
+func (*GetStoredCompletionRequest) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GetStoredCompletionRequest) GetResponseId() string {
+	if x != nil {
+		return x.ResponseId
+	}
+	return ""
+}
+
+// LogProb represents log probability for a token
+type LogProb struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	Logprob       float32                `protobuf:"fixed32,2,opt,name=logprob,proto3" json:"logprob,omitempty"`
+	Bytes         []byte                 `protobuf:"bytes,3,opt,name=bytes,proto3" json:"bytes,omitempty"`
+	TopLogprobs   []*TopLogProb          `protobuf:"bytes,4,rep,name=top_logprobs,json=topLogprobs,proto3" json:"top_logprobs,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LogProb) Reset() {
+	*x = LogProb{}
+	mi := &file_xai_v1_chat_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LogProb) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LogProb) ProtoMessage() {}
+
+func (x *LogProb) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LogProb.ProtoReflect.Descriptor instead.
+func (*LogProb) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *LogProb) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+func (x *LogProb) GetLogprob() float32 {
+	if x != nil {
+		return x.Logprob
+	}
+	return 0
+}
+
+func (x *LogProb) GetBytes() []byte {
+	if x != nil {
+		return x.Bytes
+	}
+	return nil
+}
+
+func (x *LogProb) GetTopLogprobs() []*TopLogProb {
+	if x != nil {
+		return x.TopLogprobs
+	}
+	return nil
+}
+
+// LogProbs contains log probabilities
+type LogProbs struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Content       []*LogProb             `protobuf:"bytes,1,rep,name=content,proto3" json:"content,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LogProbs) Reset() {
+	*x = LogProbs{}
+	mi := &file_xai_v1_chat_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LogProbs) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LogProbs) ProtoMessage() {}
+
+func (x *LogProbs) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LogProbs.ProtoReflect.Descriptor instead.
+func (*LogProbs) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *LogProbs) GetContent() []*LogProb {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
+// MCP (Model Context Protocol) configuration
+type MCP struct {
+	state             protoimpl.MessageState   `protogen:"open.v1"`
+	ServerLabel       string                   `protobuf:"bytes,1,opt,name=server_label,json=serverLabel,proto3" json:"server_label,omitempty"`
+	ServerDescription string                   `protobuf:"bytes,2,opt,name=server_description,json=serverDescription,proto3" json:"server_description,omitempty"`
+	ServerUrl         string                   `protobuf:"bytes,3,opt,name=server_url,json=serverUrl,proto3" json:"server_url,omitempty"`
+	AllowedToolNames  []string                 `protobuf:"bytes,4,rep,name=allowed_tool_names,json=allowedToolNames,proto3" json:"allowed_tool_names,omitempty"`
+	Authorization     string                   `protobuf:"bytes,5,opt,name=authorization,proto3" json:"authorization,omitempty"`
+	ExtraHeaders      []*MCP_ExtraHeadersEntry `protobuf:"bytes,6,rep,name=extra_headers,json=extraHeaders,proto3" json:"extra_headers,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *MCP) Reset() {
+	*x = MCP{}
+	mi := &file_xai_v1_chat_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MCP) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MCP) ProtoMessage() {}
+
+func (x *MCP) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MCP.ProtoReflect.Descriptor instead.
+func (*MCP) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *MCP) GetServerLabel() string {
+	if x != nil {
+		return x.ServerLabel
+	}
+	return ""
+}
+
+func (x *MCP) GetServerDescription() string {
+	if x != nil {
+		return x.ServerDescription
+	}
+	return ""
+}
+
+func (x *MCP) GetServerUrl() string {
+	if x != nil {
+		return x.ServerUrl
+	}
+	return ""
+}
+
+func (x *MCP) GetAllowedToolNames() []string {
+	if x != nil {
+		return x.AllowedToolNames
+	}
+	return nil
+}
+
+func (x *MCP) GetAuthorization() string {
+	if x != nil {
+		return x.Authorization
+	}
+	return ""
+}
+
+func (x *MCP) GetExtraHeaders() []*MCP_ExtraHeadersEntry {
+	if x != nil {
+		return x.ExtraHeaders
+	}
+	return nil
+}
+
+// Message represents a chat message
 type Message struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	Content          []*Content             `protobuf:"bytes,1,rep,name=content,proto3" json:"content,omitempty"`
@@ -766,7 +2075,7 @@ type Message struct {
 
 func (x *Message) Reset() {
 	*x = Message{}
-	mi := &file_xai_v1_chat_proto_msgTypes[3]
+	mi := &file_xai_v1_chat_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -778,7 +2087,7 @@ func (x *Message) String() string {
 func (*Message) ProtoMessage() {}
 
 func (x *Message) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[3]
+	mi := &file_xai_v1_chat_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -791,7 +2100,7 @@ func (x *Message) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Message.ProtoReflect.Descriptor instead.
 func (*Message) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{3}
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *Message) GetContent() []*Content {
@@ -836,136 +2145,31 @@ func (x *Message) GetEncryptedContent() string {
 	return ""
 }
 
-type Content struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Text          string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Content) Reset() {
-	*x = Content{}
-	mi := &file_xai_v1_chat_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Content) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Content) ProtoMessage() {}
-
-func (x *Content) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Content.ProtoReflect.Descriptor instead.
-func (*Content) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *Content) GetText() string {
-	if x != nil {
-		return x.Text
-	}
-	return ""
-}
-
-type CompletionOutput struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	FinishReason  string                 `protobuf:"bytes,1,opt,name=finish_reason,json=finishReason,proto3" json:"finish_reason,omitempty"`
-	Index         int32                  `protobuf:"varint,2,opt,name=index,proto3" json:"index,omitempty"`
-	Message       *CompletionMessage     `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CompletionOutput) Reset() {
-	*x = CompletionOutput{}
-	mi := &file_xai_v1_chat_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CompletionOutput) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CompletionOutput) ProtoMessage() {}
-
-func (x *CompletionOutput) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CompletionOutput.ProtoReflect.Descriptor instead.
-func (*CompletionOutput) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *CompletionOutput) GetFinishReason() string {
-	if x != nil {
-		return x.FinishReason
-	}
-	return ""
-}
-
-func (x *CompletionOutput) GetIndex() int32 {
-	if x != nil {
-		return x.Index
-	}
-	return 0
-}
-
-func (x *CompletionOutput) GetMessage() *CompletionMessage {
-	if x != nil {
-		return x.Message
-	}
-	return nil
-}
-
-type CompletionMessage struct {
+// NewsSource configures news search
+type NewsSource struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
-	Content          string                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
-	ReasoningContent string                 `protobuf:"bytes,2,opt,name=reasoning_content,json=reasoningContent,proto3" json:"reasoning_content,omitempty"`
-	Role             MessageRole            `protobuf:"varint,3,opt,name=role,proto3,enum=xai_api.MessageRole" json:"role,omitempty"`
-	ToolCalls        []*ToolCall            `protobuf:"bytes,4,rep,name=tool_calls,json=toolCalls,proto3" json:"tool_calls,omitempty"`
-	EncryptedContent string                 `protobuf:"bytes,5,opt,name=encrypted_content,json=encryptedContent,proto3" json:"encrypted_content,omitempty"`
+	ExcludedWebsites []string               `protobuf:"bytes,2,rep,name=excluded_websites,json=excludedWebsites,proto3" json:"excluded_websites,omitempty"`
+	Country          string                 `protobuf:"bytes,3,opt,name=country,proto3" json:"country,omitempty"`
+	SafeSearch       bool                   `protobuf:"varint,4,opt,name=safe_search,json=safeSearch,proto3" json:"safe_search,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
 
-func (x *CompletionMessage) Reset() {
-	*x = CompletionMessage{}
-	mi := &file_xai_v1_chat_proto_msgTypes[6]
+func (x *NewsSource) Reset() {
+	*x = NewsSource{}
+	mi := &file_xai_v1_chat_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CompletionMessage) String() string {
+func (x *NewsSource) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CompletionMessage) ProtoMessage() {}
+func (*NewsSource) ProtoMessage() {}
 
-func (x *CompletionMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[6]
+func (x *NewsSource) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -976,70 +2180,67 @@ func (x *CompletionMessage) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CompletionMessage.ProtoReflect.Descriptor instead.
-func (*CompletionMessage) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{6}
+// Deprecated: Use NewsSource.ProtoReflect.Descriptor instead.
+func (*NewsSource) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{23}
 }
 
-func (x *CompletionMessage) GetContent() string {
+func (x *NewsSource) GetExcludedWebsites() []string {
 	if x != nil {
-		return x.Content
-	}
-	return ""
-}
-
-func (x *CompletionMessage) GetReasoningContent() string {
-	if x != nil {
-		return x.ReasoningContent
-	}
-	return ""
-}
-
-func (x *CompletionMessage) GetRole() MessageRole {
-	if x != nil {
-		return x.Role
-	}
-	return MessageRole_INVALID_ROLE
-}
-
-func (x *CompletionMessage) GetToolCalls() []*ToolCall {
-	if x != nil {
-		return x.ToolCalls
+		return x.ExcludedWebsites
 	}
 	return nil
 }
 
-func (x *CompletionMessage) GetEncryptedContent() string {
+func (x *NewsSource) GetCountry() string {
 	if x != nil {
-		return x.EncryptedContent
+		return x.Country
 	}
 	return ""
 }
 
-type CompletionOutputChunk struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Delta         *Delta                 `protobuf:"bytes,1,opt,name=delta,proto3" json:"delta,omitempty"`
-	FinishReason  string                 `protobuf:"bytes,3,opt,name=finish_reason,json=finishReason,proto3" json:"finish_reason,omitempty"`
-	Index         int32                  `protobuf:"varint,4,opt,name=index,proto3" json:"index,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+func (x *NewsSource) GetSafeSearch() bool {
+	if x != nil {
+		return x.SafeSearch
+	}
+	return false
 }
 
-func (x *CompletionOutputChunk) Reset() {
-	*x = CompletionOutputChunk{}
-	mi := &file_xai_v1_chat_proto_msgTypes[7]
+// RequestSettings captures the settings used for a request
+type RequestSettings struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	MaxTokens           int32                  `protobuf:"varint,1,opt,name=max_tokens,json=maxTokens,proto3" json:"max_tokens,omitempty"`
+	ParallelToolCalls   bool                   `protobuf:"varint,2,opt,name=parallel_tool_calls,json=parallelToolCalls,proto3" json:"parallel_tool_calls,omitempty"`
+	PreviousResponseId  string                 `protobuf:"bytes,3,opt,name=previous_response_id,json=previousResponseId,proto3" json:"previous_response_id,omitempty"`
+	ReasoningEffort     ReasoningEffort        `protobuf:"varint,4,opt,name=reasoning_effort,json=reasoningEffort,proto3,enum=xai_api.ReasoningEffort" json:"reasoning_effort,omitempty"`
+	Temperature         float32                `protobuf:"fixed32,5,opt,name=temperature,proto3" json:"temperature,omitempty"`
+	ResponseFormat      *ResponseFormat        `protobuf:"bytes,6,opt,name=response_format,json=responseFormat,proto3" json:"response_format,omitempty"`
+	ToolChoice          *ToolChoice            `protobuf:"bytes,7,opt,name=tool_choice,json=toolChoice,proto3" json:"tool_choice,omitempty"`
+	Tools               []*Tool                `protobuf:"bytes,8,rep,name=tools,proto3" json:"tools,omitempty"`
+	TopP                float32                `protobuf:"fixed32,9,opt,name=top_p,json=topP,proto3" json:"top_p,omitempty"`
+	User                string                 `protobuf:"bytes,10,opt,name=user,proto3" json:"user,omitempty"`
+	SearchParameters    *SearchParameters      `protobuf:"bytes,11,opt,name=search_parameters,json=searchParameters,proto3" json:"search_parameters,omitempty"`
+	StoreMessages       bool                   `protobuf:"varint,12,opt,name=store_messages,json=storeMessages,proto3" json:"store_messages,omitempty"`
+	UseEncryptedContent bool                   `protobuf:"varint,13,opt,name=use_encrypted_content,json=useEncryptedContent,proto3" json:"use_encrypted_content,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *RequestSettings) Reset() {
+	*x = RequestSettings{}
+	mi := &file_xai_v1_chat_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CompletionOutputChunk) String() string {
+func (x *RequestSettings) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CompletionOutputChunk) ProtoMessage() {}
+func (*RequestSettings) ProtoMessage() {}
 
-func (x *CompletionOutputChunk) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[7]
+func (x *RequestSettings) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1050,58 +2251,126 @@ func (x *CompletionOutputChunk) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CompletionOutputChunk.ProtoReflect.Descriptor instead.
-func (*CompletionOutputChunk) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{7}
+// Deprecated: Use RequestSettings.ProtoReflect.Descriptor instead.
+func (*RequestSettings) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{24}
 }
 
-func (x *CompletionOutputChunk) GetDelta() *Delta {
+func (x *RequestSettings) GetMaxTokens() int32 {
 	if x != nil {
-		return x.Delta
-	}
-	return nil
-}
-
-func (x *CompletionOutputChunk) GetFinishReason() string {
-	if x != nil {
-		return x.FinishReason
-	}
-	return ""
-}
-
-func (x *CompletionOutputChunk) GetIndex() int32 {
-	if x != nil {
-		return x.Index
+		return x.MaxTokens
 	}
 	return 0
 }
 
-type Delta struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Content          string                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
-	ReasoningContent string                 `protobuf:"bytes,2,opt,name=reasoning_content,json=reasoningContent,proto3" json:"reasoning_content,omitempty"`
-	Role             MessageRole            `protobuf:"varint,3,opt,name=role,proto3,enum=xai_api.MessageRole" json:"role,omitempty"`
-	ToolCalls        []*ToolCall            `protobuf:"bytes,4,rep,name=tool_calls,json=toolCalls,proto3" json:"tool_calls,omitempty"`
-	EncryptedContent string                 `protobuf:"bytes,5,opt,name=encrypted_content,json=encryptedContent,proto3" json:"encrypted_content,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+func (x *RequestSettings) GetParallelToolCalls() bool {
+	if x != nil {
+		return x.ParallelToolCalls
+	}
+	return false
 }
 
-func (x *Delta) Reset() {
-	*x = Delta{}
-	mi := &file_xai_v1_chat_proto_msgTypes[8]
+func (x *RequestSettings) GetPreviousResponseId() string {
+	if x != nil {
+		return x.PreviousResponseId
+	}
+	return ""
+}
+
+func (x *RequestSettings) GetReasoningEffort() ReasoningEffort {
+	if x != nil {
+		return x.ReasoningEffort
+	}
+	return ReasoningEffort_INVALID_EFFORT
+}
+
+func (x *RequestSettings) GetTemperature() float32 {
+	if x != nil {
+		return x.Temperature
+	}
+	return 0
+}
+
+func (x *RequestSettings) GetResponseFormat() *ResponseFormat {
+	if x != nil {
+		return x.ResponseFormat
+	}
+	return nil
+}
+
+func (x *RequestSettings) GetToolChoice() *ToolChoice {
+	if x != nil {
+		return x.ToolChoice
+	}
+	return nil
+}
+
+func (x *RequestSettings) GetTools() []*Tool {
+	if x != nil {
+		return x.Tools
+	}
+	return nil
+}
+
+func (x *RequestSettings) GetTopP() float32 {
+	if x != nil {
+		return x.TopP
+	}
+	return 0
+}
+
+func (x *RequestSettings) GetUser() string {
+	if x != nil {
+		return x.User
+	}
+	return ""
+}
+
+func (x *RequestSettings) GetSearchParameters() *SearchParameters {
+	if x != nil {
+		return x.SearchParameters
+	}
+	return nil
+}
+
+func (x *RequestSettings) GetStoreMessages() bool {
+	if x != nil {
+		return x.StoreMessages
+	}
+	return false
+}
+
+func (x *RequestSettings) GetUseEncryptedContent() bool {
+	if x != nil {
+		return x.UseEncryptedContent
+	}
+	return false
+}
+
+// ResponseFormat specifies the desired response format
+type ResponseFormat struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FormatType    FormatType             `protobuf:"varint,1,opt,name=format_type,json=formatType,proto3,enum=xai_api.FormatType" json:"format_type,omitempty"`
+	Schema        string                 `protobuf:"bytes,2,opt,name=schema,proto3" json:"schema,omitempty"` // JSON schema when format_type is JSON_SCHEMA
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResponseFormat) Reset() {
+	*x = ResponseFormat{}
+	mi := &file_xai_v1_chat_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Delta) String() string {
+func (x *ResponseFormat) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Delta) ProtoMessage() {}
+func (*ResponseFormat) ProtoMessage() {}
 
-func (x *Delta) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[8]
+func (x *ResponseFormat) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1112,56 +2381,241 @@ func (x *Delta) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Delta.ProtoReflect.Descriptor instead.
-func (*Delta) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{8}
+// Deprecated: Use ResponseFormat.ProtoReflect.Descriptor instead.
+func (*ResponseFormat) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{25}
 }
 
-func (x *Delta) GetContent() string {
+func (x *ResponseFormat) GetFormatType() FormatType {
 	if x != nil {
-		return x.Content
+		return x.FormatType
+	}
+	return FormatType_FORMAT_TYPE_INVALID
+}
+
+func (x *ResponseFormat) GetSchema() string {
+	if x != nil {
+		return x.Schema
 	}
 	return ""
 }
 
-func (x *Delta) GetReasoningContent() string {
-	if x != nil {
-		return x.ReasoningContent
-	}
-	return ""
+// RssSource configures RSS feed search
+type RssSource struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Links         []string               `protobuf:"bytes,1,rep,name=links,proto3" json:"links,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Delta) GetRole() MessageRole {
-	if x != nil {
-		return x.Role
-	}
-	return MessageRole_INVALID_ROLE
+func (x *RssSource) Reset() {
+	*x = RssSource{}
+	mi := &file_xai_v1_chat_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
 }
 
-func (x *Delta) GetToolCalls() []*ToolCall {
+func (x *RssSource) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RssSource) ProtoMessage() {}
+
+func (x *RssSource) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[26]
 	if x != nil {
-		return x.ToolCalls
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RssSource.ProtoReflect.Descriptor instead.
+func (*RssSource) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *RssSource) GetLinks() []string {
+	if x != nil {
+		return x.Links
 	}
 	return nil
 }
 
-func (x *Delta) GetEncryptedContent() string {
-	if x != nil {
-		return x.EncryptedContent
-	}
-	return ""
+// SearchParameters configures search behavior
+type SearchParameters struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Mode             SearchMode             `protobuf:"varint,1,opt,name=mode,proto3,enum=xai_api.SearchMode" json:"mode,omitempty"`
+	FromDate         *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=from_date,json=fromDate,proto3" json:"from_date,omitempty"`
+	ToDate           *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=to_date,json=toDate,proto3" json:"to_date,omitempty"`
+	ReturnCitations  bool                   `protobuf:"varint,7,opt,name=return_citations,json=returnCitations,proto3" json:"return_citations,omitempty"`
+	MaxSearchResults int32                  `protobuf:"varint,8,opt,name=max_search_results,json=maxSearchResults,proto3" json:"max_search_results,omitempty"`
+	Sources          []*Source              `protobuf:"bytes,9,rep,name=sources,proto3" json:"sources,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
+func (x *SearchParameters) Reset() {
+	*x = SearchParameters{}
+	mi := &file_xai_v1_chat_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SearchParameters) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchParameters) ProtoMessage() {}
+
+func (x *SearchParameters) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchParameters.ProtoReflect.Descriptor instead.
+func (*SearchParameters) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *SearchParameters) GetMode() SearchMode {
+	if x != nil {
+		return x.Mode
+	}
+	return SearchMode_INVALID_SEARCH_MODE
+}
+
+func (x *SearchParameters) GetFromDate() *timestamppb.Timestamp {
+	if x != nil {
+		return x.FromDate
+	}
+	return nil
+}
+
+func (x *SearchParameters) GetToDate() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ToDate
+	}
+	return nil
+}
+
+func (x *SearchParameters) GetReturnCitations() bool {
+	if x != nil {
+		return x.ReturnCitations
+	}
+	return false
+}
+
+func (x *SearchParameters) GetMaxSearchResults() int32 {
+	if x != nil {
+		return x.MaxSearchResults
+	}
+	return 0
+}
+
+func (x *SearchParameters) GetSources() []*Source {
+	if x != nil {
+		return x.Sources
+	}
+	return nil
+}
+
+// Source specifies search sources
+type Source struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Web           *WebSource             `protobuf:"bytes,1,opt,name=web,proto3" json:"web,omitempty"`
+	News          *NewsSource            `protobuf:"bytes,2,opt,name=news,proto3" json:"news,omitempty"`
+	X             *XSource               `protobuf:"bytes,3,opt,name=x,proto3" json:"x,omitempty"`
+	Rss           *RssSource             `protobuf:"bytes,4,opt,name=rss,proto3" json:"rss,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Source) Reset() {
+	*x = Source{}
+	mi := &file_xai_v1_chat_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Source) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Source) ProtoMessage() {}
+
+func (x *Source) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Source.ProtoReflect.Descriptor instead.
+func (*Source) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *Source) GetWeb() *WebSource {
+	if x != nil {
+		return x.Web
+	}
+	return nil
+}
+
+func (x *Source) GetNews() *NewsSource {
+	if x != nil {
+		return x.News
+	}
+	return nil
+}
+
+func (x *Source) GetX() *XSource {
+	if x != nil {
+		return x.X
+	}
+	return nil
+}
+
+func (x *Source) GetRss() *RssSource {
+	if x != nil {
+		return x.Rss
+	}
+	return nil
+}
+
+// Tool defines available tools
 type Tool struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Function      *Function              `protobuf:"bytes,1,opt,name=function,proto3" json:"function,omitempty"` // Other tool types simplified for now
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Function          *Function              `protobuf:"bytes,1,opt,name=function,proto3" json:"function,omitempty"`
+	WebSearch         *WebSearch             `protobuf:"bytes,3,opt,name=web_search,json=webSearch,proto3" json:"web_search,omitempty"`
+	XSearch           *XSearch               `protobuf:"bytes,4,opt,name=x_search,json=xSearch,proto3" json:"x_search,omitempty"`
+	CodeExecution     *CodeExecution         `protobuf:"bytes,5,opt,name=code_execution,json=codeExecution,proto3" json:"code_execution,omitempty"`
+	CollectionsSearch *CollectionsSearch     `protobuf:"bytes,6,opt,name=collections_search,json=collectionsSearch,proto3" json:"collections_search,omitempty"`
+	Mcp               *MCP                   `protobuf:"bytes,7,opt,name=mcp,proto3" json:"mcp,omitempty"`
+	DocumentSearch    *DocumentSearch        `protobuf:"bytes,8,opt,name=document_search,json=documentSearch,proto3" json:"document_search,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *Tool) Reset() {
 	*x = Tool{}
-	mi := &file_xai_v1_chat_proto_msgTypes[9]
+	mi := &file_xai_v1_chat_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1173,7 +2627,7 @@ func (x *Tool) String() string {
 func (*Tool) ProtoMessage() {}
 
 func (x *Tool) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[9]
+	mi := &file_xai_v1_chat_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1186,7 +2640,7 @@ func (x *Tool) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Tool.ProtoReflect.Descriptor instead.
 func (*Tool) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{9}
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *Tool) GetFunction() *Function {
@@ -1196,86 +2650,61 @@ func (x *Tool) GetFunction() *Function {
 	return nil
 }
 
-type Function struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Strict        bool                   `protobuf:"varint,3,opt,name=strict,proto3" json:"strict,omitempty"`
-	Parameters    string                 `protobuf:"bytes,4,opt,name=parameters,proto3" json:"parameters,omitempty"` // JSON schema
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Function) Reset() {
-	*x = Function{}
-	mi := &file_xai_v1_chat_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Function) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Function) ProtoMessage() {}
-
-func (x *Function) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[10]
+func (x *Tool) GetWebSearch() *WebSearch {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
+		return x.WebSearch
 	}
-	return mi.MessageOf(x)
+	return nil
 }
 
-// Deprecated: Use Function.ProtoReflect.Descriptor instead.
-func (*Function) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *Function) GetName() string {
+func (x *Tool) GetXSearch() *XSearch {
 	if x != nil {
-		return x.Name
+		return x.XSearch
 	}
-	return ""
+	return nil
 }
 
-func (x *Function) GetDescription() string {
+func (x *Tool) GetCodeExecution() *CodeExecution {
 	if x != nil {
-		return x.Description
+		return x.CodeExecution
 	}
-	return ""
+	return nil
 }
 
-func (x *Function) GetStrict() bool {
+func (x *Tool) GetCollectionsSearch() *CollectionsSearch {
 	if x != nil {
-		return x.Strict
+		return x.CollectionsSearch
 	}
-	return false
+	return nil
 }
 
-func (x *Function) GetParameters() string {
+func (x *Tool) GetMcp() *MCP {
 	if x != nil {
-		return x.Parameters
+		return x.Mcp
 	}
-	return ""
+	return nil
 }
 
+func (x *Tool) GetDocumentSearch() *DocumentSearch {
+	if x != nil {
+		return x.DocumentSearch
+	}
+	return nil
+}
+
+// ToolCall represents a tool invocation
 type ToolCall struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Type          ToolCallType           `protobuf:"varint,2,opt,name=type,proto3,enum=xai_api.ToolCallType" json:"type,omitempty"`
-	Function      *FunctionCall          `protobuf:"bytes,3,opt,name=function,proto3" json:"function,omitempty"`
+	Function      *FunctionCall          `protobuf:"bytes,10,opt,name=function,proto3" json:"function,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ToolCall) Reset() {
 	*x = ToolCall{}
-	mi := &file_xai_v1_chat_proto_msgTypes[11]
+	mi := &file_xai_v1_chat_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1287,7 +2716,7 @@ func (x *ToolCall) String() string {
 func (*ToolCall) ProtoMessage() {}
 
 func (x *ToolCall) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[11]
+	mi := &file_xai_v1_chat_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1300,7 +2729,7 @@ func (x *ToolCall) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ToolCall.ProtoReflect.Descriptor instead.
 func (*ToolCall) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{11}
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *ToolCall) GetId() string {
@@ -1324,58 +2753,7 @@ func (x *ToolCall) GetFunction() *FunctionCall {
 	return nil
 }
 
-type FunctionCall struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Arguments     string                 `protobuf:"bytes,2,opt,name=arguments,proto3" json:"arguments,omitempty"` // JSON
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *FunctionCall) Reset() {
-	*x = FunctionCall{}
-	mi := &file_xai_v1_chat_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *FunctionCall) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*FunctionCall) ProtoMessage() {}
-
-func (x *FunctionCall) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use FunctionCall.ProtoReflect.Descriptor instead.
-func (*FunctionCall) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{12}
-}
-
-func (x *FunctionCall) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *FunctionCall) GetArguments() string {
-	if x != nil {
-		return x.Arguments
-	}
-	return ""
-}
-
+// ToolChoice controls tool selection
 type ToolChoice struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Mode          ToolMode               `protobuf:"varint,1,opt,name=mode,proto3,enum=xai_api.ToolMode" json:"mode,omitempty"`
@@ -1386,7 +2764,7 @@ type ToolChoice struct {
 
 func (x *ToolChoice) Reset() {
 	*x = ToolChoice{}
-	mi := &file_xai_v1_chat_proto_msgTypes[13]
+	mi := &file_xai_v1_chat_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1398,7 +2776,7 @@ func (x *ToolChoice) String() string {
 func (*ToolChoice) ProtoMessage() {}
 
 func (x *ToolChoice) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[13]
+	mi := &file_xai_v1_chat_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1411,7 +2789,7 @@ func (x *ToolChoice) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ToolChoice.ProtoReflect.Descriptor instead.
 func (*ToolChoice) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{13}
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *ToolChoice) GetMode() ToolMode {
@@ -1428,29 +2806,31 @@ func (x *ToolChoice) GetFunctionName() string {
 	return ""
 }
 
-type ResponseFormat struct {
+// TopLogProb represents top log probabilities
+type TopLogProb struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	FormatType    FormatType             `protobuf:"varint,1,opt,name=format_type,json=formatType,proto3,enum=xai_api.FormatType" json:"format_type,omitempty"`
-	Schema        string                 `protobuf:"bytes,2,opt,name=schema,proto3" json:"schema,omitempty"` // JSON schema
+	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	Logprob       float32                `protobuf:"fixed32,2,opt,name=logprob,proto3" json:"logprob,omitempty"`
+	Bytes         []byte                 `protobuf:"bytes,3,opt,name=bytes,proto3" json:"bytes,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ResponseFormat) Reset() {
-	*x = ResponseFormat{}
-	mi := &file_xai_v1_chat_proto_msgTypes[14]
+func (x *TopLogProb) Reset() {
+	*x = TopLogProb{}
+	mi := &file_xai_v1_chat_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ResponseFormat) String() string {
+func (x *TopLogProb) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ResponseFormat) ProtoMessage() {}
+func (*TopLogProb) ProtoMessage() {}
 
-func (x *ResponseFormat) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[14]
+func (x *TopLogProb) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1461,49 +2841,57 @@ func (x *ResponseFormat) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ResponseFormat.ProtoReflect.Descriptor instead.
-func (*ResponseFormat) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{14}
+// Deprecated: Use TopLogProb.ProtoReflect.Descriptor instead.
+func (*TopLogProb) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{32}
 }
 
-func (x *ResponseFormat) GetFormatType() FormatType {
+func (x *TopLogProb) GetToken() string {
 	if x != nil {
-		return x.FormatType
-	}
-	return FormatType_FORMAT_TYPE_INVALID
-}
-
-func (x *ResponseFormat) GetSchema() string {
-	if x != nil {
-		return x.Schema
+		return x.Token
 	}
 	return ""
 }
 
-type SearchParameters struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Mode             SearchMode             `protobuf:"varint,1,opt,name=mode,proto3,enum=xai_api.SearchMode" json:"mode,omitempty"`
-	ReturnCitations  bool                   `protobuf:"varint,5,opt,name=return_citations,json=returnCitations,proto3" json:"return_citations,omitempty"`
-	MaxSearchResults int32                  `protobuf:"varint,6,opt,name=max_search_results,json=maxSearchResults,proto3" json:"max_search_results,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+func (x *TopLogProb) GetLogprob() float32 {
+	if x != nil {
+		return x.Logprob
+	}
+	return 0
 }
 
-func (x *SearchParameters) Reset() {
-	*x = SearchParameters{}
-	mi := &file_xai_v1_chat_proto_msgTypes[15]
+func (x *TopLogProb) GetBytes() []byte {
+	if x != nil {
+		return x.Bytes
+	}
+	return nil
+}
+
+// WebSearch configures web search tool
+type WebSearch struct {
+	state                    protoimpl.MessageState `protogen:"open.v1"`
+	ExcludedDomains          []string               `protobuf:"bytes,1,rep,name=excluded_domains,json=excludedDomains,proto3" json:"excluded_domains,omitempty"`
+	AllowedDomains           []string               `protobuf:"bytes,2,rep,name=allowed_domains,json=allowedDomains,proto3" json:"allowed_domains,omitempty"`
+	EnableImageUnderstanding bool                   `protobuf:"varint,3,opt,name=enable_image_understanding,json=enableImageUnderstanding,proto3" json:"enable_image_understanding,omitempty"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
+}
+
+func (x *WebSearch) Reset() {
+	*x = WebSearch{}
+	mi := &file_xai_v1_chat_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SearchParameters) String() string {
+func (x *WebSearch) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SearchParameters) ProtoMessage() {}
+func (*WebSearch) ProtoMessage() {}
 
-func (x *SearchParameters) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_chat_proto_msgTypes[15]
+func (x *WebSearch) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1514,71 +2902,380 @@ func (x *SearchParameters) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SearchParameters.ProtoReflect.Descriptor instead.
-func (*SearchParameters) Descriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{15}
+// Deprecated: Use WebSearch.ProtoReflect.Descriptor instead.
+func (*WebSearch) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{33}
 }
 
-func (x *SearchParameters) GetMode() SearchMode {
+func (x *WebSearch) GetExcludedDomains() []string {
 	if x != nil {
-		return x.Mode
+		return x.ExcludedDomains
 	}
-	return SearchMode_INVALID_SEARCH_MODE
+	return nil
 }
 
-func (x *SearchParameters) GetReturnCitations() bool {
+func (x *WebSearch) GetAllowedDomains() []string {
 	if x != nil {
-		return x.ReturnCitations
+		return x.AllowedDomains
+	}
+	return nil
+}
+
+func (x *WebSearch) GetEnableImageUnderstanding() bool {
+	if x != nil {
+		return x.EnableImageUnderstanding
 	}
 	return false
 }
 
-func (x *SearchParameters) GetMaxSearchResults() int32 {
+// WebSource configures web search source
+type WebSource struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	ExcludedWebsites []string               `protobuf:"bytes,2,rep,name=excluded_websites,json=excludedWebsites,proto3" json:"excluded_websites,omitempty"`
+	Country          string                 `protobuf:"bytes,3,opt,name=country,proto3" json:"country,omitempty"`
+	SafeSearch       bool                   `protobuf:"varint,4,opt,name=safe_search,json=safeSearch,proto3" json:"safe_search,omitempty"`
+	AllowedWebsites  []string               `protobuf:"bytes,5,rep,name=allowed_websites,json=allowedWebsites,proto3" json:"allowed_websites,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *WebSource) Reset() {
+	*x = WebSource{}
+	mi := &file_xai_v1_chat_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WebSource) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WebSource) ProtoMessage() {}
+
+func (x *WebSource) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[34]
 	if x != nil {
-		return x.MaxSearchResults
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WebSource.ProtoReflect.Descriptor instead.
+func (*WebSource) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *WebSource) GetExcludedWebsites() []string {
+	if x != nil {
+		return x.ExcludedWebsites
+	}
+	return nil
+}
+
+func (x *WebSource) GetCountry() string {
+	if x != nil {
+		return x.Country
+	}
+	return ""
+}
+
+func (x *WebSource) GetSafeSearch() bool {
+	if x != nil {
+		return x.SafeSearch
+	}
+	return false
+}
+
+func (x *WebSource) GetAllowedWebsites() []string {
+	if x != nil {
+		return x.AllowedWebsites
+	}
+	return nil
+}
+
+// XSearch configures X (Twitter) search tool
+type XSearch struct {
+	state                    protoimpl.MessageState `protogen:"open.v1"`
+	FromDate                 *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=from_date,json=fromDate,proto3" json:"from_date,omitempty"`
+	ToDate                   *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=to_date,json=toDate,proto3" json:"to_date,omitempty"`
+	AllowedXHandles          []string               `protobuf:"bytes,3,rep,name=allowed_x_handles,json=allowedXHandles,proto3" json:"allowed_x_handles,omitempty"`
+	ExcludedXHandles         []string               `protobuf:"bytes,4,rep,name=excluded_x_handles,json=excludedXHandles,proto3" json:"excluded_x_handles,omitempty"`
+	EnableImageUnderstanding bool                   `protobuf:"varint,5,opt,name=enable_image_understanding,json=enableImageUnderstanding,proto3" json:"enable_image_understanding,omitempty"`
+	EnableVideoUnderstanding bool                   `protobuf:"varint,6,opt,name=enable_video_understanding,json=enableVideoUnderstanding,proto3" json:"enable_video_understanding,omitempty"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
+}
+
+func (x *XSearch) Reset() {
+	*x = XSearch{}
+	mi := &file_xai_v1_chat_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *XSearch) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*XSearch) ProtoMessage() {}
+
+func (x *XSearch) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use XSearch.ProtoReflect.Descriptor instead.
+func (*XSearch) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *XSearch) GetFromDate() *timestamppb.Timestamp {
+	if x != nil {
+		return x.FromDate
+	}
+	return nil
+}
+
+func (x *XSearch) GetToDate() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ToDate
+	}
+	return nil
+}
+
+func (x *XSearch) GetAllowedXHandles() []string {
+	if x != nil {
+		return x.AllowedXHandles
+	}
+	return nil
+}
+
+func (x *XSearch) GetExcludedXHandles() []string {
+	if x != nil {
+		return x.ExcludedXHandles
+	}
+	return nil
+}
+
+func (x *XSearch) GetEnableImageUnderstanding() bool {
+	if x != nil {
+		return x.EnableImageUnderstanding
+	}
+	return false
+}
+
+func (x *XSearch) GetEnableVideoUnderstanding() bool {
+	if x != nil {
+		return x.EnableVideoUnderstanding
+	}
+	return false
+}
+
+// XSource configures X (Twitter) search source
+type XSource struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	IncludedXHandles  []string               `protobuf:"bytes,7,rep,name=included_x_handles,json=includedXHandles,proto3" json:"included_x_handles,omitempty"`
+	ExcludedXHandles  []string               `protobuf:"bytes,8,rep,name=excluded_x_handles,json=excludedXHandles,proto3" json:"excluded_x_handles,omitempty"`
+	PostFavoriteCount int32                  `protobuf:"varint,9,opt,name=post_favorite_count,json=postFavoriteCount,proto3" json:"post_favorite_count,omitempty"`
+	PostViewCount     int32                  `protobuf:"varint,10,opt,name=post_view_count,json=postViewCount,proto3" json:"post_view_count,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *XSource) Reset() {
+	*x = XSource{}
+	mi := &file_xai_v1_chat_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *XSource) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*XSource) ProtoMessage() {}
+
+func (x *XSource) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use XSource.ProtoReflect.Descriptor instead.
+func (*XSource) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *XSource) GetIncludedXHandles() []string {
+	if x != nil {
+		return x.IncludedXHandles
+	}
+	return nil
+}
+
+func (x *XSource) GetExcludedXHandles() []string {
+	if x != nil {
+		return x.ExcludedXHandles
+	}
+	return nil
+}
+
+func (x *XSource) GetPostFavoriteCount() int32 {
+	if x != nil {
+		return x.PostFavoriteCount
 	}
 	return 0
+}
+
+func (x *XSource) GetPostViewCount() int32 {
+	if x != nil {
+		return x.PostViewCount
+	}
+	return 0
+}
+
+type MCP_ExtraHeadersEntry struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Key           string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Value         string                 `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MCP_ExtraHeadersEntry) Reset() {
+	*x = MCP_ExtraHeadersEntry{}
+	mi := &file_xai_v1_chat_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MCP_ExtraHeadersEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MCP_ExtraHeadersEntry) ProtoMessage() {}
+
+func (x *MCP_ExtraHeadersEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_v1_chat_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MCP_ExtraHeadersEntry.ProtoReflect.Descriptor instead.
+func (*MCP_ExtraHeadersEntry) Descriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{21, 0}
+}
+
+func (x *MCP_ExtraHeadersEntry) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *MCP_ExtraHeadersEntry) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	return ""
 }
 
 var File_xai_v1_chat_proto protoreflect.FileDescriptor
 
 const file_xai_v1_chat_proto_rawDesc = "" +
 	"\n" +
-	"\x11xai/v1/chat.proto\x12\axai_api\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x12xai/v1/usage.proto\"\xf9\x06\n" +
-	"\x15GetCompletionsRequest\x12,\n" +
-	"\bmessages\x18\x01 \x03(\v2\x10.xai_api.MessageR\bmessages\x12\x14\n" +
-	"\x05model\x18\x02 \x01(\tR\x05model\x12\x12\n" +
-	"\x04user\x18\x03 \x01(\tR\x04user\x12\f\n" +
-	"\x01n\x18\x04 \x01(\x05R\x01n\x12\x1d\n" +
+	"\x11xai/v1/chat.proto\x12\axai_api\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x12xai/v1/usage.proto\x1a\x12xai/v1/image.proto\"\x0f\n" +
+	"\rCodeExecution\"P\n" +
+	"\x11CollectionsSearch\x12%\n" +
+	"\x0ecollection_ids\x18\x01 \x03(\tR\rcollectionIds\x12\x14\n" +
+	"\x05limit\x18\x02 \x01(\x05R\x05limit\"\xe3\x01\n" +
+	"\x11CompletionMessage\x12\x18\n" +
+	"\acontent\x18\x01 \x01(\tR\acontent\x12(\n" +
+	"\x04role\x18\x02 \x01(\x0e2\x14.xai_api.MessageRoleR\x04role\x120\n" +
 	"\n" +
-	"max_tokens\x18\x05 \x01(\x05R\tmaxTokens\x12\x12\n" +
-	"\x04seed\x18\x06 \x01(\x03R\x04seed\x12\x12\n" +
-	"\x04stop\x18\a \x03(\tR\x04stop\x12 \n" +
-	"\vtemperature\x18\b \x01(\x02R\vtemperature\x12\x13\n" +
-	"\x05top_p\x18\t \x01(\x02R\x04topP\x12\x1a\n" +
-	"\blogprobs\x18\n" +
-	" \x01(\bR\blogprobs\x12!\n" +
-	"\ftop_logprobs\x18\v \x01(\x05R\vtopLogprobs\x12#\n" +
-	"\x05tools\x18\f \x03(\v2\r.xai_api.ToolR\x05tools\x124\n" +
-	"\vtool_choice\x18\r \x01(\v2\x13.xai_api.ToolChoiceR\n" +
-	"toolChoice\x12@\n" +
-	"\x0fresponse_format\x18\x0e \x01(\v2\x17.xai_api.ResponseFormatR\x0eresponseFormat\x12+\n" +
-	"\x11frequency_penalty\x18\x0f \x01(\x02R\x10frequencyPenalty\x12)\n" +
-	"\x10presence_penalty\x18\x10 \x01(\x02R\x0fpresencePenalty\x12C\n" +
-	"\x10reasoning_effort\x18\x11 \x01(\x0e2\x18.xai_api.ReasoningEffortR\x0freasoningEffort\x12F\n" +
-	"\x11search_parameters\x18\x12 \x01(\v2\x19.xai_api.SearchParametersR\x10searchParameters\x12.\n" +
-	"\x13parallel_tool_calls\x18\x13 \x01(\bR\x11parallelToolCalls\x120\n" +
-	"\x14previous_response_id\x18\x14 \x01(\tR\x12previousResponseId\x12%\n" +
-	"\x0estore_messages\x18\x15 \x01(\bR\rstoreMessages\x122\n" +
-	"\x15use_encrypted_content\x18\x16 \x01(\bR\x13useEncryptedContent\"\xa7\x02\n" +
-	"\x19GetChatCompletionResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x123\n" +
-	"\aoutputs\x18\x02 \x03(\v2\x19.xai_api.CompletionOutputR\aoutputs\x124\n" +
-	"\acreated\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\acreated\x12\x14\n" +
-	"\x05model\x18\x04 \x01(\tR\x05model\x12-\n" +
-	"\x12system_fingerprint\x18\x05 \x01(\tR\x11systemFingerprint\x12,\n" +
-	"\x05usage\x18\x06 \x01(\v2\x16.xai_api.SamplingUsageR\x05usage\x12\x1c\n" +
-	"\tcitations\x18\a \x03(\tR\tcitations\"\xa9\x02\n" +
+	"tool_calls\x18\x03 \x03(\v2\x11.xai_api.ToolCallR\ttoolCalls\x12+\n" +
+	"\x11reasoning_content\x18\x04 \x01(\tR\x10reasoningContent\x12+\n" +
+	"\x11encrypted_content\x18\x05 \x01(\tR\x10encryptedContent\"\xc9\x01\n" +
+	"\x10CompletionOutput\x12:\n" +
+	"\rfinish_reason\x18\x01 \x01(\x0e2\x15.xai_api.FinishReasonR\ffinishReason\x12\x14\n" +
+	"\x05index\x18\x02 \x01(\x05R\x05index\x124\n" +
+	"\amessage\x18\x03 \x01(\v2\x1a.xai_api.CompletionMessageR\amessage\x12-\n" +
+	"\blogprobs\x18\x04 \x01(\v2\x11.xai_api.LogProbsR\blogprobs\"\xbe\x01\n" +
+	"\x15CompletionOutputChunk\x12$\n" +
+	"\x05delta\x18\x01 \x01(\v2\x0e.xai_api.DeltaR\x05delta\x12-\n" +
+	"\blogprobs\x18\x02 \x01(\v2\x11.xai_api.LogProbsR\blogprobs\x12:\n" +
+	"\rfinish_reason\x18\x03 \x01(\x0e2\x15.xai_api.FinishReasonR\ffinishReason\x12\x14\n" +
+	"\x05index\x18\x04 \x01(\x05R\x05index\"~\n" +
+	"\aContent\x12\x12\n" +
+	"\x04text\x18\x01 \x01(\tR\x04text\x125\n" +
+	"\timage_url\x18\x02 \x01(\v2\x18.xai_api.ImageUrlContentR\bimageUrl\x12(\n" +
+	"\x04file\x18\x03 \x01(\v2\x14.xai_api.FileContentR\x04file\"\xba\x03\n" +
+	"\vDebugOutput\x12\x1a\n" +
+	"\battempts\x18\x01 \x01(\x05R\battempts\x12\x18\n" +
+	"\arequest\x18\x02 \x01(\tR\arequest\x12\x16\n" +
+	"\x06prompt\x18\x03 \x01(\tR\x06prompt\x12\x1c\n" +
+	"\tresponses\x18\x04 \x03(\tR\tresponses\x12(\n" +
+	"\x10cache_read_count\x18\x05 \x01(\rR\x0ecacheReadCount\x123\n" +
+	"\x16cache_read_input_bytes\x18\x06 \x01(\x04R\x13cacheReadInputBytes\x12*\n" +
+	"\x11cache_write_count\x18\a \x01(\rR\x0fcacheWriteCount\x125\n" +
+	"\x17cache_write_input_bytes\x18\b \x01(\x04R\x14cacheWriteInputBytes\x12%\n" +
+	"\x0eengine_request\x18\t \x01(\tR\rengineRequest\x12\x1d\n" +
+	"\n" +
+	"lb_address\x18\n" +
+	" \x01(\tR\tlbAddress\x12\x1f\n" +
+	"\vsampler_tag\x18\v \x01(\tR\n" +
+	"samplerTag\x12\x16\n" +
+	"\x06chunks\x18\f \x03(\tR\x06chunks\"@\n" +
+	"\x1dDeleteStoredCompletionRequest\x12\x1f\n" +
+	"\vresponse_id\x18\x01 \x01(\tR\n" +
+	"responseId\"A\n" +
+	"\x1eDeleteStoredCompletionResponse\x12\x1f\n" +
+	"\vresponse_id\x18\x01 \x01(\tR\n" +
+	"responseId\"\xd7\x01\n" +
+	"\x05Delta\x12\x18\n" +
+	"\acontent\x18\x01 \x01(\tR\acontent\x12(\n" +
+	"\x04role\x18\x02 \x01(\x0e2\x14.xai_api.MessageRoleR\x04role\x120\n" +
+	"\n" +
+	"tool_calls\x18\x03 \x03(\v2\x11.xai_api.ToolCallR\ttoolCalls\x12+\n" +
+	"\x11reasoning_content\x18\x04 \x01(\tR\x10reasoningContent\x12+\n" +
+	"\x11encrypted_content\x18\x05 \x01(\tR\x10encryptedContent\"&\n" +
+	"\x0eDocumentSearch\x12\x14\n" +
+	"\x05limit\x18\x02 \x01(\x05R\x05limit\"&\n" +
+	"\vFileContent\x12\x17\n" +
+	"\afile_id\x18\x01 \x01(\tR\x06fileId\"x\n" +
+	"\bFunction\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x16\n" +
+	"\x06strict\x18\x03 \x01(\bR\x06strict\x12\x1e\n" +
+	"\n" +
+	"parameters\x18\x04 \x01(\tR\n" +
+	"parameters\"@\n" +
+	"\fFunctionCall\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1c\n" +
+	"\targuments\x18\x02 \x01(\tR\targuments\"\xa9\x02\n" +
 	"\x16GetChatCompletionChunk\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x128\n" +
 	"\aoutputs\x18\x02 \x03(\v2\x1e.xai_api.CompletionOutputChunkR\aoutputs\x124\n" +
@@ -1586,7 +3283,68 @@ const file_xai_v1_chat_proto_rawDesc = "" +
 	"\x05model\x18\x04 \x01(\tR\x05model\x12-\n" +
 	"\x12system_fingerprint\x18\x05 \x01(\tR\x11systemFingerprint\x12,\n" +
 	"\x05usage\x18\x06 \x01(\v2\x16.xai_api.SamplingUsageR\x05usage\x12\x1c\n" +
-	"\tcitations\x18\a \x03(\tR\tcitations\"\xff\x01\n" +
+	"\tcitations\x18\a \x03(\tR\tcitations\"\x96\x03\n" +
+	"\x19GetChatCompletionResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x123\n" +
+	"\aoutputs\x18\x02 \x03(\v2\x19.xai_api.CompletionOutputR\aoutputs\x124\n" +
+	"\acreated\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\acreated\x12\x14\n" +
+	"\x05model\x18\x06 \x01(\tR\x05model\x12-\n" +
+	"\x12system_fingerprint\x18\a \x01(\tR\x11systemFingerprint\x12,\n" +
+	"\x05usage\x18\t \x01(\v2\x16.xai_api.SamplingUsageR\x05usage\x12\x1c\n" +
+	"\tcitations\x18\n" +
+	" \x03(\tR\tcitations\x124\n" +
+	"\bsettings\x18\v \x01(\v2\x18.xai_api.RequestSettingsR\bsettings\x127\n" +
+	"\fdebug_output\x18\f \x01(\v2\x14.xai_api.DebugOutputR\vdebugOutput\"\xf9\x06\n" +
+	"\x15GetCompletionsRequest\x12,\n" +
+	"\bmessages\x18\x01 \x03(\v2\x10.xai_api.MessageR\bmessages\x12\x14\n" +
+	"\x05model\x18\x02 \x01(\tR\x05model\x12+\n" +
+	"\x11frequency_penalty\x18\x03 \x01(\x02R\x10frequencyPenalty\x12\x1a\n" +
+	"\blogprobs\x18\x05 \x01(\bR\blogprobs\x12!\n" +
+	"\ftop_logprobs\x18\x06 \x01(\x05R\vtopLogprobs\x12\x1d\n" +
+	"\n" +
+	"max_tokens\x18\a \x01(\x05R\tmaxTokens\x12\f\n" +
+	"\x01n\x18\b \x01(\x05R\x01n\x12)\n" +
+	"\x10presence_penalty\x18\t \x01(\x02R\x0fpresencePenalty\x12@\n" +
+	"\x0fresponse_format\x18\n" +
+	" \x01(\v2\x17.xai_api.ResponseFormatR\x0eresponseFormat\x12\x12\n" +
+	"\x04seed\x18\v \x01(\x05R\x04seed\x12\x12\n" +
+	"\x04stop\x18\f \x03(\tR\x04stop\x12 \n" +
+	"\vtemperature\x18\x0e \x01(\x02R\vtemperature\x12\x13\n" +
+	"\x05top_p\x18\x0f \x01(\x02R\x04topP\x12\x12\n" +
+	"\x04user\x18\x10 \x01(\tR\x04user\x12#\n" +
+	"\x05tools\x18\x11 \x03(\v2\r.xai_api.ToolR\x05tools\x124\n" +
+	"\vtool_choice\x18\x12 \x01(\v2\x13.xai_api.ToolChoiceR\n" +
+	"toolChoice\x12C\n" +
+	"\x10reasoning_effort\x18\x13 \x01(\x0e2\x18.xai_api.ReasoningEffortR\x0freasoningEffort\x12F\n" +
+	"\x11search_parameters\x18\x14 \x01(\v2\x19.xai_api.SearchParametersR\x10searchParameters\x12.\n" +
+	"\x13parallel_tool_calls\x18\x15 \x01(\bR\x11parallelToolCalls\x120\n" +
+	"\x14previous_response_id\x18\x16 \x01(\tR\x12previousResponseId\x12%\n" +
+	"\x0estore_messages\x18\x17 \x01(\bR\rstoreMessages\x122\n" +
+	"\x15use_encrypted_content\x18\x18 \x01(\bR\x13useEncryptedContent\"\x90\x01\n" +
+	"\x1dGetDeferredCompletionResponse\x12>\n" +
+	"\bresponse\x18\x01 \x01(\v2\".xai_api.GetChatCompletionResponseR\bresponse\x12/\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x17.xai_api.DeferredStatusR\x06status\"=\n" +
+	"\x1aGetStoredCompletionRequest\x12\x1f\n" +
+	"\vresponse_id\x18\x01 \x01(\tR\n" +
+	"responseId\"\x87\x01\n" +
+	"\aLogProb\x12\x14\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\x12\x18\n" +
+	"\alogprob\x18\x02 \x01(\x02R\alogprob\x12\x14\n" +
+	"\x05bytes\x18\x03 \x01(\fR\x05bytes\x126\n" +
+	"\ftop_logprobs\x18\x04 \x03(\v2\x13.xai_api.TopLogProbR\vtopLogprobs\"6\n" +
+	"\bLogProbs\x12*\n" +
+	"\acontent\x18\x01 \x03(\v2\x10.xai_api.LogProbR\acontent\"\xcc\x02\n" +
+	"\x03MCP\x12!\n" +
+	"\fserver_label\x18\x01 \x01(\tR\vserverLabel\x12-\n" +
+	"\x12server_description\x18\x02 \x01(\tR\x11serverDescription\x12\x1d\n" +
+	"\n" +
+	"server_url\x18\x03 \x01(\tR\tserverUrl\x12,\n" +
+	"\x12allowed_tool_names\x18\x04 \x03(\tR\x10allowedToolNames\x12$\n" +
+	"\rauthorization\x18\x05 \x01(\tR\rauthorization\x12C\n" +
+	"\rextra_headers\x18\x06 \x03(\v2\x1e.xai_api.MCP.ExtraHeadersEntryR\fextraHeaders\x1a;\n" +
+	"\x11ExtraHeadersEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value\"\xff\x01\n" +
 	"\aMessage\x12*\n" +
 	"\acontent\x18\x01 \x03(\v2\x10.xai_api.ContentR\acontent\x12(\n" +
 	"\x04role\x18\x02 \x01(\x0e2\x14.xai_api.MessageRoleR\x04role\x12\x12\n" +
@@ -1594,59 +3352,107 @@ const file_xai_v1_chat_proto_rawDesc = "" +
 	"\n" +
 	"tool_calls\x18\x04 \x03(\v2\x11.xai_api.ToolCallR\ttoolCalls\x12+\n" +
 	"\x11reasoning_content\x18\x05 \x01(\tR\x10reasoningContent\x12+\n" +
-	"\x11encrypted_content\x18\x06 \x01(\tR\x10encryptedContent\"\x1d\n" +
-	"\aContent\x12\x12\n" +
-	"\x04text\x18\x01 \x01(\tR\x04text\"\x83\x01\n" +
-	"\x10CompletionOutput\x12#\n" +
-	"\rfinish_reason\x18\x01 \x01(\tR\ffinishReason\x12\x14\n" +
-	"\x05index\x18\x02 \x01(\x05R\x05index\x124\n" +
-	"\amessage\x18\x03 \x01(\v2\x1a.xai_api.CompletionMessageR\amessage\"\xe3\x01\n" +
-	"\x11CompletionMessage\x12\x18\n" +
-	"\acontent\x18\x01 \x01(\tR\acontent\x12+\n" +
-	"\x11reasoning_content\x18\x02 \x01(\tR\x10reasoningContent\x12(\n" +
-	"\x04role\x18\x03 \x01(\x0e2\x14.xai_api.MessageRoleR\x04role\x120\n" +
+	"\x11encrypted_content\x18\x06 \x01(\tR\x10encryptedContent\"t\n" +
 	"\n" +
-	"tool_calls\x18\x04 \x03(\v2\x11.xai_api.ToolCallR\ttoolCalls\x12+\n" +
-	"\x11encrypted_content\x18\x05 \x01(\tR\x10encryptedContent\"x\n" +
-	"\x15CompletionOutputChunk\x12$\n" +
-	"\x05delta\x18\x01 \x01(\v2\x0e.xai_api.DeltaR\x05delta\x12#\n" +
-	"\rfinish_reason\x18\x03 \x01(\tR\ffinishReason\x12\x14\n" +
-	"\x05index\x18\x04 \x01(\x05R\x05index\"\xd7\x01\n" +
-	"\x05Delta\x12\x18\n" +
-	"\acontent\x18\x01 \x01(\tR\acontent\x12+\n" +
-	"\x11reasoning_content\x18\x02 \x01(\tR\x10reasoningContent\x12(\n" +
-	"\x04role\x18\x03 \x01(\x0e2\x14.xai_api.MessageRoleR\x04role\x120\n" +
+	"NewsSource\x12+\n" +
+	"\x11excluded_websites\x18\x02 \x03(\tR\x10excludedWebsites\x12\x18\n" +
+	"\acountry\x18\x03 \x01(\tR\acountry\x12\x1f\n" +
+	"\vsafe_search\x18\x04 \x01(\bR\n" +
+	"safeSearch\"\xe2\x04\n" +
+	"\x0fRequestSettings\x12\x1d\n" +
 	"\n" +
-	"tool_calls\x18\x04 \x03(\v2\x11.xai_api.ToolCallR\ttoolCalls\x12+\n" +
-	"\x11encrypted_content\x18\x05 \x01(\tR\x10encryptedContent\"5\n" +
-	"\x04Tool\x12-\n" +
-	"\bfunction\x18\x01 \x01(\v2\x11.xai_api.FunctionR\bfunction\"x\n" +
-	"\bFunction\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
-	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x16\n" +
-	"\x06strict\x18\x03 \x01(\bR\x06strict\x12\x1e\n" +
-	"\n" +
-	"parameters\x18\x04 \x01(\tR\n" +
-	"parameters\"x\n" +
-	"\bToolCall\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12)\n" +
-	"\x04type\x18\x02 \x01(\x0e2\x15.xai_api.ToolCallTypeR\x04type\x121\n" +
-	"\bfunction\x18\x03 \x01(\v2\x15.xai_api.FunctionCallR\bfunction\"@\n" +
-	"\fFunctionCall\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1c\n" +
-	"\targuments\x18\x02 \x01(\tR\targuments\"X\n" +
-	"\n" +
-	"ToolChoice\x12%\n" +
-	"\x04mode\x18\x01 \x01(\x0e2\x11.xai_api.ToolModeR\x04mode\x12#\n" +
-	"\rfunction_name\x18\x02 \x01(\tR\ffunctionName\"^\n" +
+	"max_tokens\x18\x01 \x01(\x05R\tmaxTokens\x12.\n" +
+	"\x13parallel_tool_calls\x18\x02 \x01(\bR\x11parallelToolCalls\x120\n" +
+	"\x14previous_response_id\x18\x03 \x01(\tR\x12previousResponseId\x12C\n" +
+	"\x10reasoning_effort\x18\x04 \x01(\x0e2\x18.xai_api.ReasoningEffortR\x0freasoningEffort\x12 \n" +
+	"\vtemperature\x18\x05 \x01(\x02R\vtemperature\x12@\n" +
+	"\x0fresponse_format\x18\x06 \x01(\v2\x17.xai_api.ResponseFormatR\x0eresponseFormat\x124\n" +
+	"\vtool_choice\x18\a \x01(\v2\x13.xai_api.ToolChoiceR\n" +
+	"toolChoice\x12#\n" +
+	"\x05tools\x18\b \x03(\v2\r.xai_api.ToolR\x05tools\x12\x13\n" +
+	"\x05top_p\x18\t \x01(\x02R\x04topP\x12\x12\n" +
+	"\x04user\x18\n" +
+	" \x01(\tR\x04user\x12F\n" +
+	"\x11search_parameters\x18\v \x01(\v2\x19.xai_api.SearchParametersR\x10searchParameters\x12%\n" +
+	"\x0estore_messages\x18\f \x01(\bR\rstoreMessages\x122\n" +
+	"\x15use_encrypted_content\x18\r \x01(\bR\x13useEncryptedContent\"^\n" +
 	"\x0eResponseFormat\x124\n" +
 	"\vformat_type\x18\x01 \x01(\x0e2\x13.xai_api.FormatTypeR\n" +
 	"formatType\x12\x16\n" +
-	"\x06schema\x18\x02 \x01(\tR\x06schema\"\x94\x01\n" +
+	"\x06schema\x18\x02 \x01(\tR\x06schema\"!\n" +
+	"\tRssSource\x12\x14\n" +
+	"\x05links\x18\x01 \x03(\tR\x05links\"\xad\x02\n" +
 	"\x10SearchParameters\x12'\n" +
-	"\x04mode\x18\x01 \x01(\x0e2\x13.xai_api.SearchModeR\x04mode\x12)\n" +
-	"\x10return_citations\x18\x05 \x01(\bR\x0freturnCitations\x12,\n" +
-	"\x12max_search_results\x18\x06 \x01(\x05R\x10maxSearchResults*u\n" +
+	"\x04mode\x18\x01 \x01(\x0e2\x13.xai_api.SearchModeR\x04mode\x127\n" +
+	"\tfrom_date\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\bfromDate\x123\n" +
+	"\ato_date\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\x06toDate\x12)\n" +
+	"\x10return_citations\x18\a \x01(\bR\x0freturnCitations\x12,\n" +
+	"\x12max_search_results\x18\b \x01(\x05R\x10maxSearchResults\x12)\n" +
+	"\asources\x18\t \x03(\v2\x0f.xai_api.SourceR\asources\"\x9d\x01\n" +
+	"\x06Source\x12$\n" +
+	"\x03web\x18\x01 \x01(\v2\x12.xai_api.WebSourceR\x03web\x12'\n" +
+	"\x04news\x18\x02 \x01(\v2\x13.xai_api.NewsSourceR\x04news\x12\x1e\n" +
+	"\x01x\x18\x03 \x01(\v2\x10.xai_api.XSourceR\x01x\x12$\n" +
+	"\x03rss\x18\x04 \x01(\v2\x12.xai_api.RssSourceR\x03rss\"\x81\x03\n" +
+	"\x04Tool\x12-\n" +
+	"\bfunction\x18\x01 \x01(\v2\x11.xai_api.FunctionR\bfunction\x121\n" +
+	"\n" +
+	"web_search\x18\x03 \x01(\v2\x12.xai_api.WebSearchR\twebSearch\x12+\n" +
+	"\bx_search\x18\x04 \x01(\v2\x10.xai_api.XSearchR\axSearch\x12=\n" +
+	"\x0ecode_execution\x18\x05 \x01(\v2\x16.xai_api.CodeExecutionR\rcodeExecution\x12I\n" +
+	"\x12collections_search\x18\x06 \x01(\v2\x1a.xai_api.CollectionsSearchR\x11collectionsSearch\x12\x1e\n" +
+	"\x03mcp\x18\a \x01(\v2\f.xai_api.MCPR\x03mcp\x12@\n" +
+	"\x0fdocument_search\x18\b \x01(\v2\x17.xai_api.DocumentSearchR\x0edocumentSearch\"x\n" +
+	"\bToolCall\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12)\n" +
+	"\x04type\x18\x02 \x01(\x0e2\x15.xai_api.ToolCallTypeR\x04type\x121\n" +
+	"\bfunction\x18\n" +
+	" \x01(\v2\x15.xai_api.FunctionCallR\bfunction\"X\n" +
+	"\n" +
+	"ToolChoice\x12%\n" +
+	"\x04mode\x18\x01 \x01(\x0e2\x11.xai_api.ToolModeR\x04mode\x12#\n" +
+	"\rfunction_name\x18\x02 \x01(\tR\ffunctionName\"R\n" +
+	"\n" +
+	"TopLogProb\x12\x14\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\x12\x18\n" +
+	"\alogprob\x18\x02 \x01(\x02R\alogprob\x12\x14\n" +
+	"\x05bytes\x18\x03 \x01(\fR\x05bytes\"\x9d\x01\n" +
+	"\tWebSearch\x12)\n" +
+	"\x10excluded_domains\x18\x01 \x03(\tR\x0fexcludedDomains\x12'\n" +
+	"\x0fallowed_domains\x18\x02 \x03(\tR\x0eallowedDomains\x12<\n" +
+	"\x1aenable_image_understanding\x18\x03 \x01(\bR\x18enableImageUnderstanding\"\x9e\x01\n" +
+	"\tWebSource\x12+\n" +
+	"\x11excluded_websites\x18\x02 \x03(\tR\x10excludedWebsites\x12\x18\n" +
+	"\acountry\x18\x03 \x01(\tR\acountry\x12\x1f\n" +
+	"\vsafe_search\x18\x04 \x01(\bR\n" +
+	"safeSearch\x12)\n" +
+	"\x10allowed_websites\x18\x05 \x03(\tR\x0fallowedWebsites\"\xcd\x02\n" +
+	"\aXSearch\x127\n" +
+	"\tfrom_date\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\bfromDate\x123\n" +
+	"\ato_date\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\x06toDate\x12*\n" +
+	"\x11allowed_x_handles\x18\x03 \x03(\tR\x0fallowedXHandles\x12,\n" +
+	"\x12excluded_x_handles\x18\x04 \x03(\tR\x10excludedXHandles\x12<\n" +
+	"\x1aenable_image_understanding\x18\x05 \x01(\bR\x18enableImageUnderstanding\x12<\n" +
+	"\x1aenable_video_understanding\x18\x06 \x01(\bR\x18enableVideoUnderstanding\"\xbd\x01\n" +
+	"\aXSource\x12,\n" +
+	"\x12included_x_handles\x18\a \x03(\tR\x10includedXHandles\x12,\n" +
+	"\x12excluded_x_handles\x18\b \x03(\tR\x10excludedXHandles\x12.\n" +
+	"\x13post_favorite_count\x18\t \x01(\x05R\x11postFavoriteCount\x12&\n" +
+	"\x0fpost_view_count\x18\n" +
+	" \x01(\x05R\rpostViewCount*\x8d\x01\n" +
+	"\fFinishReason\x12\x12\n" +
+	"\x0eREASON_INVALID\x10\x00\x12\x12\n" +
+	"\x0eREASON_MAX_LEN\x10\x01\x12\x16\n" +
+	"\x12REASON_MAX_CONTEXT\x10\x02\x12\x0f\n" +
+	"\vREASON_STOP\x10\x03\x12\x15\n" +
+	"\x11REASON_TOOL_CALLS\x10\x04\x12\x15\n" +
+	"\x11REASON_TIME_LIMIT\x10\x05*u\n" +
+	"\n" +
+	"FormatType\x12\x17\n" +
+	"\x13FORMAT_TYPE_INVALID\x10\x00\x12\x14\n" +
+	"\x10FORMAT_TYPE_TEXT\x10\x01\x12\x1b\n" +
+	"\x17FORMAT_TYPE_JSON_OBJECT\x10\x02\x12\x1b\n" +
+	"\x17FORMAT_TYPE_JSON_SCHEMA\x10\x03*u\n" +
 	"\vMessageRole\x12\x10\n" +
 	"\fINVALID_ROLE\x10\x00\x12\r\n" +
 	"\tROLE_USER\x10\x01\x12\x12\n" +
@@ -1659,18 +3465,13 @@ const file_xai_v1_chat_proto_rawDesc = "" +
 	"\n" +
 	"EFFORT_LOW\x10\x01\x12\x11\n" +
 	"\rEFFORT_MEDIUM\x10\x02\x12\x0f\n" +
-	"\vEFFORT_HIGH\x10\x03*a\n" +
-	"\bToolMode\x12\x15\n" +
-	"\x11TOOL_MODE_INVALID\x10\x00\x12\x12\n" +
-	"\x0eTOOL_MODE_AUTO\x10\x01\x12\x12\n" +
-	"\x0eTOOL_MODE_NONE\x10\x02\x12\x16\n" +
-	"\x12TOOL_MODE_REQUIRED\x10\x03*u\n" +
+	"\vEFFORT_HIGH\x10\x03*d\n" +
 	"\n" +
-	"FormatType\x12\x17\n" +
-	"\x13FORMAT_TYPE_INVALID\x10\x00\x12\x14\n" +
-	"\x10FORMAT_TYPE_TEXT\x10\x01\x12\x1b\n" +
-	"\x17FORMAT_TYPE_JSON_OBJECT\x10\x02\x12\x1b\n" +
-	"\x17FORMAT_TYPE_JSON_SCHEMA\x10\x03*\xaf\x02\n" +
+	"SearchMode\x12\x17\n" +
+	"\x13INVALID_SEARCH_MODE\x10\x00\x12\x13\n" +
+	"\x0fOFF_SEARCH_MODE\x10\x01\x12\x12\n" +
+	"\x0eON_SEARCH_MODE\x10\x02\x12\x14\n" +
+	"\x10AUTO_SEARCH_MODE\x10\x03*\xaf\x02\n" +
 	"\fToolCallType\x12\x1a\n" +
 	"\x16TOOL_CALL_TYPE_INVALID\x10\x00\x12#\n" +
 	"\x1fTOOL_CALL_TYPE_CLIENT_SIDE_TOOL\x10\x01\x12\"\n" +
@@ -1679,13 +3480,17 @@ const file_xai_v1_chat_proto_rawDesc = "" +
 	"\"TOOL_CALL_TYPE_CODE_EXECUTION_TOOL\x10\x04\x12*\n" +
 	"&TOOL_CALL_TYPE_COLLECTIONS_SEARCH_TOOL\x10\x05\x12\x1b\n" +
 	"\x17TOOL_CALL_TYPE_MCP_TOOL\x10\x06\x12'\n" +
-	"#TOOL_CALL_TYPE_DOCUMENT_SEARCH_TOOL\x10\a*d\n" +
-	"\n" +
-	"SearchMode\x12\x17\n" +
-	"\x13INVALID_SEARCH_MODE\x10\x00\x12\x13\n" +
-	"\x0fOFF_SEARCH_MODE\x10\x01\x12\x12\n" +
-	"\x0eON_SEARCH_MODE\x10\x02\x12\x14\n" +
-	"\x10AUTO_SEARCH_MODE\x10\x032\xb4\x01\n" +
+	"#TOOL_CALL_TYPE_DOCUMENT_SEARCH_TOOL\x10\a*a\n" +
+	"\bToolMode\x12\x15\n" +
+	"\x11TOOL_MODE_INVALID\x10\x00\x12\x12\n" +
+	"\x0eTOOL_MODE_AUTO\x10\x01\x12\x12\n" +
+	"\x0eTOOL_MODE_NONE\x10\x02\x12\x16\n" +
+	"\x12TOOL_MODE_REQUIRED\x10\x03*Q\n" +
+	"\x0eDeferredStatus\x12\x1b\n" +
+	"\x17INVALID_DEFERRED_STATUS\x10\x00\x12\b\n" +
+	"\x04DONE\x10\x01\x12\v\n" +
+	"\aEXPIRED\x10\x02\x12\v\n" +
+	"\aPENDING\x10\x032\xb4\x01\n" +
 	"\x04Chat\x12S\n" +
 	"\rGetCompletion\x12\x1e.xai_api.GetCompletionsRequest\x1a\".xai_api.GetChatCompletionResponse\x12W\n" +
 	"\x12GetCompletionChunk\x12\x1e.xai_api.GetCompletionsRequest\x1a\x1f.xai_api.GetChatCompletionChunk0\x01B<Z:github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1b\x06proto3"
@@ -1702,71 +3507,129 @@ func file_xai_v1_chat_proto_rawDescGZIP() []byte {
 	return file_xai_v1_chat_proto_rawDescData
 }
 
-var file_xai_v1_chat_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_xai_v1_chat_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
+var file_xai_v1_chat_proto_enumTypes = make([]protoimpl.EnumInfo, 8)
+var file_xai_v1_chat_proto_msgTypes = make([]protoimpl.MessageInfo, 38)
 var file_xai_v1_chat_proto_goTypes = []any{
-	(MessageRole)(0),                  // 0: xai_api.MessageRole
-	(ReasoningEffort)(0),              // 1: xai_api.ReasoningEffort
-	(ToolMode)(0),                     // 2: xai_api.ToolMode
-	(FormatType)(0),                   // 3: xai_api.FormatType
-	(ToolCallType)(0),                 // 4: xai_api.ToolCallType
-	(SearchMode)(0),                   // 5: xai_api.SearchMode
-	(*GetCompletionsRequest)(nil),     // 6: xai_api.GetCompletionsRequest
-	(*GetChatCompletionResponse)(nil), // 7: xai_api.GetChatCompletionResponse
-	(*GetChatCompletionChunk)(nil),    // 8: xai_api.GetChatCompletionChunk
-	(*Message)(nil),                   // 9: xai_api.Message
-	(*Content)(nil),                   // 10: xai_api.Content
-	(*CompletionOutput)(nil),          // 11: xai_api.CompletionOutput
-	(*CompletionMessage)(nil),         // 12: xai_api.CompletionMessage
-	(*CompletionOutputChunk)(nil),     // 13: xai_api.CompletionOutputChunk
-	(*Delta)(nil),                     // 14: xai_api.Delta
-	(*Tool)(nil),                      // 15: xai_api.Tool
-	(*Function)(nil),                  // 16: xai_api.Function
-	(*ToolCall)(nil),                  // 17: xai_api.ToolCall
-	(*FunctionCall)(nil),              // 18: xai_api.FunctionCall
-	(*ToolChoice)(nil),                // 19: xai_api.ToolChoice
-	(*ResponseFormat)(nil),            // 20: xai_api.ResponseFormat
-	(*SearchParameters)(nil),          // 21: xai_api.SearchParameters
-	(*timestamppb.Timestamp)(nil),     // 22: google.protobuf.Timestamp
-	(*SamplingUsage)(nil),             // 23: xai_api.SamplingUsage
+	(FinishReason)(0),                      // 0: xai_api.FinishReason
+	(FormatType)(0),                        // 1: xai_api.FormatType
+	(MessageRole)(0),                       // 2: xai_api.MessageRole
+	(ReasoningEffort)(0),                   // 3: xai_api.ReasoningEffort
+	(SearchMode)(0),                        // 4: xai_api.SearchMode
+	(ToolCallType)(0),                      // 5: xai_api.ToolCallType
+	(ToolMode)(0),                          // 6: xai_api.ToolMode
+	(DeferredStatus)(0),                    // 7: xai_api.DeferredStatus
+	(*CodeExecution)(nil),                  // 8: xai_api.CodeExecution
+	(*CollectionsSearch)(nil),              // 9: xai_api.CollectionsSearch
+	(*CompletionMessage)(nil),              // 10: xai_api.CompletionMessage
+	(*CompletionOutput)(nil),               // 11: xai_api.CompletionOutput
+	(*CompletionOutputChunk)(nil),          // 12: xai_api.CompletionOutputChunk
+	(*Content)(nil),                        // 13: xai_api.Content
+	(*DebugOutput)(nil),                    // 14: xai_api.DebugOutput
+	(*DeleteStoredCompletionRequest)(nil),  // 15: xai_api.DeleteStoredCompletionRequest
+	(*DeleteStoredCompletionResponse)(nil), // 16: xai_api.DeleteStoredCompletionResponse
+	(*Delta)(nil),                          // 17: xai_api.Delta
+	(*DocumentSearch)(nil),                 // 18: xai_api.DocumentSearch
+	(*FileContent)(nil),                    // 19: xai_api.FileContent
+	(*Function)(nil),                       // 20: xai_api.Function
+	(*FunctionCall)(nil),                   // 21: xai_api.FunctionCall
+	(*GetChatCompletionChunk)(nil),         // 22: xai_api.GetChatCompletionChunk
+	(*GetChatCompletionResponse)(nil),      // 23: xai_api.GetChatCompletionResponse
+	(*GetCompletionsRequest)(nil),          // 24: xai_api.GetCompletionsRequest
+	(*GetDeferredCompletionResponse)(nil),  // 25: xai_api.GetDeferredCompletionResponse
+	(*GetStoredCompletionRequest)(nil),     // 26: xai_api.GetStoredCompletionRequest
+	(*LogProb)(nil),                        // 27: xai_api.LogProb
+	(*LogProbs)(nil),                       // 28: xai_api.LogProbs
+	(*MCP)(nil),                            // 29: xai_api.MCP
+	(*Message)(nil),                        // 30: xai_api.Message
+	(*NewsSource)(nil),                     // 31: xai_api.NewsSource
+	(*RequestSettings)(nil),                // 32: xai_api.RequestSettings
+	(*ResponseFormat)(nil),                 // 33: xai_api.ResponseFormat
+	(*RssSource)(nil),                      // 34: xai_api.RssSource
+	(*SearchParameters)(nil),               // 35: xai_api.SearchParameters
+	(*Source)(nil),                         // 36: xai_api.Source
+	(*Tool)(nil),                           // 37: xai_api.Tool
+	(*ToolCall)(nil),                       // 38: xai_api.ToolCall
+	(*ToolChoice)(nil),                     // 39: xai_api.ToolChoice
+	(*TopLogProb)(nil),                     // 40: xai_api.TopLogProb
+	(*WebSearch)(nil),                      // 41: xai_api.WebSearch
+	(*WebSource)(nil),                      // 42: xai_api.WebSource
+	(*XSearch)(nil),                        // 43: xai_api.XSearch
+	(*XSource)(nil),                        // 44: xai_api.XSource
+	(*MCP_ExtraHeadersEntry)(nil),          // 45: xai_api.MCP.ExtraHeadersEntry
+	(*ImageUrlContent)(nil),                // 46: xai_api.ImageUrlContent
+	(*timestamppb.Timestamp)(nil),          // 47: google.protobuf.Timestamp
+	(*SamplingUsage)(nil),                  // 48: xai_api.SamplingUsage
 }
 var file_xai_v1_chat_proto_depIdxs = []int32{
-	9,  // 0: xai_api.GetCompletionsRequest.messages:type_name -> xai_api.Message
-	15, // 1: xai_api.GetCompletionsRequest.tools:type_name -> xai_api.Tool
-	19, // 2: xai_api.GetCompletionsRequest.tool_choice:type_name -> xai_api.ToolChoice
-	20, // 3: xai_api.GetCompletionsRequest.response_format:type_name -> xai_api.ResponseFormat
-	1,  // 4: xai_api.GetCompletionsRequest.reasoning_effort:type_name -> xai_api.ReasoningEffort
-	21, // 5: xai_api.GetCompletionsRequest.search_parameters:type_name -> xai_api.SearchParameters
-	11, // 6: xai_api.GetChatCompletionResponse.outputs:type_name -> xai_api.CompletionOutput
-	22, // 7: xai_api.GetChatCompletionResponse.created:type_name -> google.protobuf.Timestamp
-	23, // 8: xai_api.GetChatCompletionResponse.usage:type_name -> xai_api.SamplingUsage
-	13, // 9: xai_api.GetChatCompletionChunk.outputs:type_name -> xai_api.CompletionOutputChunk
-	22, // 10: xai_api.GetChatCompletionChunk.created:type_name -> google.protobuf.Timestamp
-	23, // 11: xai_api.GetChatCompletionChunk.usage:type_name -> xai_api.SamplingUsage
-	10, // 12: xai_api.Message.content:type_name -> xai_api.Content
-	0,  // 13: xai_api.Message.role:type_name -> xai_api.MessageRole
-	17, // 14: xai_api.Message.tool_calls:type_name -> xai_api.ToolCall
-	12, // 15: xai_api.CompletionOutput.message:type_name -> xai_api.CompletionMessage
-	0,  // 16: xai_api.CompletionMessage.role:type_name -> xai_api.MessageRole
-	17, // 17: xai_api.CompletionMessage.tool_calls:type_name -> xai_api.ToolCall
-	14, // 18: xai_api.CompletionOutputChunk.delta:type_name -> xai_api.Delta
-	0,  // 19: xai_api.Delta.role:type_name -> xai_api.MessageRole
-	17, // 20: xai_api.Delta.tool_calls:type_name -> xai_api.ToolCall
-	16, // 21: xai_api.Tool.function:type_name -> xai_api.Function
-	4,  // 22: xai_api.ToolCall.type:type_name -> xai_api.ToolCallType
-	18, // 23: xai_api.ToolCall.function:type_name -> xai_api.FunctionCall
-	2,  // 24: xai_api.ToolChoice.mode:type_name -> xai_api.ToolMode
-	3,  // 25: xai_api.ResponseFormat.format_type:type_name -> xai_api.FormatType
-	5,  // 26: xai_api.SearchParameters.mode:type_name -> xai_api.SearchMode
-	6,  // 27: xai_api.Chat.GetCompletion:input_type -> xai_api.GetCompletionsRequest
-	6,  // 28: xai_api.Chat.GetCompletionChunk:input_type -> xai_api.GetCompletionsRequest
-	7,  // 29: xai_api.Chat.GetCompletion:output_type -> xai_api.GetChatCompletionResponse
-	8,  // 30: xai_api.Chat.GetCompletionChunk:output_type -> xai_api.GetChatCompletionChunk
-	29, // [29:31] is the sub-list for method output_type
-	27, // [27:29] is the sub-list for method input_type
-	27, // [27:27] is the sub-list for extension type_name
-	27, // [27:27] is the sub-list for extension extendee
-	0,  // [0:27] is the sub-list for field type_name
+	2,  // 0: xai_api.CompletionMessage.role:type_name -> xai_api.MessageRole
+	38, // 1: xai_api.CompletionMessage.tool_calls:type_name -> xai_api.ToolCall
+	0,  // 2: xai_api.CompletionOutput.finish_reason:type_name -> xai_api.FinishReason
+	10, // 3: xai_api.CompletionOutput.message:type_name -> xai_api.CompletionMessage
+	28, // 4: xai_api.CompletionOutput.logprobs:type_name -> xai_api.LogProbs
+	17, // 5: xai_api.CompletionOutputChunk.delta:type_name -> xai_api.Delta
+	28, // 6: xai_api.CompletionOutputChunk.logprobs:type_name -> xai_api.LogProbs
+	0,  // 7: xai_api.CompletionOutputChunk.finish_reason:type_name -> xai_api.FinishReason
+	46, // 8: xai_api.Content.image_url:type_name -> xai_api.ImageUrlContent
+	19, // 9: xai_api.Content.file:type_name -> xai_api.FileContent
+	2,  // 10: xai_api.Delta.role:type_name -> xai_api.MessageRole
+	38, // 11: xai_api.Delta.tool_calls:type_name -> xai_api.ToolCall
+	12, // 12: xai_api.GetChatCompletionChunk.outputs:type_name -> xai_api.CompletionOutputChunk
+	47, // 13: xai_api.GetChatCompletionChunk.created:type_name -> google.protobuf.Timestamp
+	48, // 14: xai_api.GetChatCompletionChunk.usage:type_name -> xai_api.SamplingUsage
+	11, // 15: xai_api.GetChatCompletionResponse.outputs:type_name -> xai_api.CompletionOutput
+	47, // 16: xai_api.GetChatCompletionResponse.created:type_name -> google.protobuf.Timestamp
+	48, // 17: xai_api.GetChatCompletionResponse.usage:type_name -> xai_api.SamplingUsage
+	32, // 18: xai_api.GetChatCompletionResponse.settings:type_name -> xai_api.RequestSettings
+	14, // 19: xai_api.GetChatCompletionResponse.debug_output:type_name -> xai_api.DebugOutput
+	30, // 20: xai_api.GetCompletionsRequest.messages:type_name -> xai_api.Message
+	33, // 21: xai_api.GetCompletionsRequest.response_format:type_name -> xai_api.ResponseFormat
+	37, // 22: xai_api.GetCompletionsRequest.tools:type_name -> xai_api.Tool
+	39, // 23: xai_api.GetCompletionsRequest.tool_choice:type_name -> xai_api.ToolChoice
+	3,  // 24: xai_api.GetCompletionsRequest.reasoning_effort:type_name -> xai_api.ReasoningEffort
+	35, // 25: xai_api.GetCompletionsRequest.search_parameters:type_name -> xai_api.SearchParameters
+	23, // 26: xai_api.GetDeferredCompletionResponse.response:type_name -> xai_api.GetChatCompletionResponse
+	7,  // 27: xai_api.GetDeferredCompletionResponse.status:type_name -> xai_api.DeferredStatus
+	40, // 28: xai_api.LogProb.top_logprobs:type_name -> xai_api.TopLogProb
+	27, // 29: xai_api.LogProbs.content:type_name -> xai_api.LogProb
+	45, // 30: xai_api.MCP.extra_headers:type_name -> xai_api.MCP.ExtraHeadersEntry
+	13, // 31: xai_api.Message.content:type_name -> xai_api.Content
+	2,  // 32: xai_api.Message.role:type_name -> xai_api.MessageRole
+	38, // 33: xai_api.Message.tool_calls:type_name -> xai_api.ToolCall
+	3,  // 34: xai_api.RequestSettings.reasoning_effort:type_name -> xai_api.ReasoningEffort
+	33, // 35: xai_api.RequestSettings.response_format:type_name -> xai_api.ResponseFormat
+	39, // 36: xai_api.RequestSettings.tool_choice:type_name -> xai_api.ToolChoice
+	37, // 37: xai_api.RequestSettings.tools:type_name -> xai_api.Tool
+	35, // 38: xai_api.RequestSettings.search_parameters:type_name -> xai_api.SearchParameters
+	1,  // 39: xai_api.ResponseFormat.format_type:type_name -> xai_api.FormatType
+	4,  // 40: xai_api.SearchParameters.mode:type_name -> xai_api.SearchMode
+	47, // 41: xai_api.SearchParameters.from_date:type_name -> google.protobuf.Timestamp
+	47, // 42: xai_api.SearchParameters.to_date:type_name -> google.protobuf.Timestamp
+	36, // 43: xai_api.SearchParameters.sources:type_name -> xai_api.Source
+	42, // 44: xai_api.Source.web:type_name -> xai_api.WebSource
+	31, // 45: xai_api.Source.news:type_name -> xai_api.NewsSource
+	44, // 46: xai_api.Source.x:type_name -> xai_api.XSource
+	34, // 47: xai_api.Source.rss:type_name -> xai_api.RssSource
+	20, // 48: xai_api.Tool.function:type_name -> xai_api.Function
+	41, // 49: xai_api.Tool.web_search:type_name -> xai_api.WebSearch
+	43, // 50: xai_api.Tool.x_search:type_name -> xai_api.XSearch
+	8,  // 51: xai_api.Tool.code_execution:type_name -> xai_api.CodeExecution
+	9,  // 52: xai_api.Tool.collections_search:type_name -> xai_api.CollectionsSearch
+	29, // 53: xai_api.Tool.mcp:type_name -> xai_api.MCP
+	18, // 54: xai_api.Tool.document_search:type_name -> xai_api.DocumentSearch
+	5,  // 55: xai_api.ToolCall.type:type_name -> xai_api.ToolCallType
+	21, // 56: xai_api.ToolCall.function:type_name -> xai_api.FunctionCall
+	6,  // 57: xai_api.ToolChoice.mode:type_name -> xai_api.ToolMode
+	47, // 58: xai_api.XSearch.from_date:type_name -> google.protobuf.Timestamp
+	47, // 59: xai_api.XSearch.to_date:type_name -> google.protobuf.Timestamp
+	24, // 60: xai_api.Chat.GetCompletion:input_type -> xai_api.GetCompletionsRequest
+	24, // 61: xai_api.Chat.GetCompletionChunk:input_type -> xai_api.GetCompletionsRequest
+	23, // 62: xai_api.Chat.GetCompletion:output_type -> xai_api.GetChatCompletionResponse
+	22, // 63: xai_api.Chat.GetCompletionChunk:output_type -> xai_api.GetChatCompletionChunk
+	62, // [62:64] is the sub-list for method output_type
+	60, // [60:62] is the sub-list for method input_type
+	60, // [60:60] is the sub-list for extension type_name
+	60, // [60:60] is the sub-list for extension extendee
+	0,  // [0:60] is the sub-list for field type_name
 }
 
 func init() { file_xai_v1_chat_proto_init() }
@@ -1775,13 +3638,14 @@ func file_xai_v1_chat_proto_init() {
 		return
 	}
 	file_xai_v1_usage_proto_init()
+	file_xai_v1_image_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_xai_v1_chat_proto_rawDesc), len(file_xai_v1_chat_proto_rawDesc)),
-			NumEnums:      6,
-			NumMessages:   16,
+			NumEnums:      8,
+			NumMessages:   38,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

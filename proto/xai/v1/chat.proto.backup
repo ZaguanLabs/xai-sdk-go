@@ -1,0 +1,196 @@
+syntax = "proto3";
+
+package xai_api;
+
+import "google/protobuf/timestamp.proto";
+import "xai/v1/usage.proto";
+
+option go_package = "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1";
+
+// Chat service for conversational AI interactions
+service Chat {
+  // Get a chat completion
+  rpc GetCompletion(GetCompletionsRequest) returns (GetChatCompletionResponse);
+
+  // Stream chat completion chunks
+  rpc GetCompletionChunk(GetCompletionsRequest) returns (stream GetChatCompletionChunk);
+}
+
+// Enums
+enum MessageRole {
+  INVALID_ROLE = 0;
+  ROLE_USER = 1;
+  ROLE_ASSISTANT = 2;
+  ROLE_SYSTEM = 3;
+  ROLE_FUNCTION = 4;
+  ROLE_TOOL = 5;
+}
+
+enum ReasoningEffort {
+  INVALID_EFFORT = 0;
+  EFFORT_LOW = 1;
+  EFFORT_MEDIUM = 2;
+  EFFORT_HIGH = 3;
+}
+
+enum ToolMode {
+  TOOL_MODE_INVALID = 0;
+  TOOL_MODE_AUTO = 1;
+  TOOL_MODE_NONE = 2;
+  TOOL_MODE_REQUIRED = 3;
+}
+
+enum FormatType {
+  FORMAT_TYPE_INVALID = 0;
+  FORMAT_TYPE_TEXT = 1;
+  FORMAT_TYPE_JSON_OBJECT = 2;
+  FORMAT_TYPE_JSON_SCHEMA = 3;
+}
+
+enum ToolCallType {
+  TOOL_CALL_TYPE_INVALID = 0;
+  TOOL_CALL_TYPE_CLIENT_SIDE_TOOL = 1;
+  TOOL_CALL_TYPE_WEB_SEARCH_TOOL = 2;
+  TOOL_CALL_TYPE_X_SEARCH_TOOL = 3;
+  TOOL_CALL_TYPE_CODE_EXECUTION_TOOL = 4;
+  TOOL_CALL_TYPE_COLLECTIONS_SEARCH_TOOL = 5;
+  TOOL_CALL_TYPE_MCP_TOOL = 6;
+  TOOL_CALL_TYPE_DOCUMENT_SEARCH_TOOL = 7;
+}
+
+enum SearchMode {
+  INVALID_SEARCH_MODE = 0;
+  OFF_SEARCH_MODE = 1;
+  ON_SEARCH_MODE = 2;
+  AUTO_SEARCH_MODE = 3;
+}
+
+// Request message
+message GetCompletionsRequest {
+  repeated Message messages = 1;
+  string model = 2;
+  string user = 3;
+  int32 n = 4;
+  int32 max_tokens = 5;
+  int64 seed = 6;
+  repeated string stop = 7;
+  float temperature = 8;
+  float top_p = 9;
+  bool logprobs = 10;
+  int32 top_logprobs = 11;
+  repeated Tool tools = 12;
+  ToolChoice tool_choice = 13;
+  ResponseFormat response_format = 14;
+  float frequency_penalty = 15;
+  float presence_penalty = 16;
+  ReasoningEffort reasoning_effort = 17;
+  SearchParameters search_parameters = 18;
+  bool parallel_tool_calls = 19;
+  string previous_response_id = 20;
+  bool store_messages = 21;
+  bool use_encrypted_content = 22;
+}
+
+// Response messages
+message GetChatCompletionResponse {
+  string id = 1;
+  repeated CompletionOutput outputs = 2;
+  google.protobuf.Timestamp created = 3;
+  string model = 4;
+  string system_fingerprint = 5;
+  SamplingUsage usage = 6;
+  repeated string citations = 7;
+}
+
+message GetChatCompletionChunk {
+  string id = 1;
+  repeated CompletionOutputChunk outputs = 2;
+  google.protobuf.Timestamp created = 3;
+  string model = 4;
+  string system_fingerprint = 5;
+  SamplingUsage usage = 6;
+  repeated string citations = 7;
+}
+
+// Supporting messages
+message Message {
+  repeated Content content = 1;
+  MessageRole role = 2;
+  string name = 3;
+  repeated ToolCall tool_calls = 4;
+  string reasoning_content = 5;
+  string encrypted_content = 6;
+}
+
+message Content {
+  string text = 1;
+  // ImageUrlContent image_url = 2;  // Simplified for now
+  // FileContent file = 3;  // Simplified for now
+}
+
+message CompletionOutput {
+  string finish_reason = 1;
+  int32 index = 2;
+  CompletionMessage message = 3;
+}
+
+message CompletionMessage {
+  string content = 1;
+  string reasoning_content = 2;
+  MessageRole role = 3;
+  repeated ToolCall tool_calls = 4;
+  string encrypted_content = 5;
+}
+
+message CompletionOutputChunk {
+  Delta delta = 1;
+  string finish_reason = 3;
+  int32 index = 4;
+}
+
+message Delta {
+  string content = 1;
+  string reasoning_content = 2;
+  MessageRole role = 3;
+  repeated ToolCall tool_calls = 4;
+  string encrypted_content = 5;
+}
+
+message Tool {
+  Function function = 1;
+  // Other tool types simplified for now
+}
+
+message Function {
+  string name = 1;
+  string description = 2;
+  bool strict = 3;
+  string parameters = 4;  // JSON schema
+}
+
+message ToolCall {
+  string id = 1;
+  ToolCallType type = 2;
+  FunctionCall function = 3;
+}
+
+message FunctionCall {
+  string name = 1;
+  string arguments = 2;  // JSON
+}
+
+message ToolChoice {
+  ToolMode mode = 1;
+  string function_name = 2;
+}
+
+message ResponseFormat {
+  FormatType format_type = 1;
+  string schema = 2;  // JSON schema
+}
+
+message SearchParameters {
+  SearchMode mode = 1;
+  bool return_citations = 5;
+  int32 max_search_results = 6;
+}
