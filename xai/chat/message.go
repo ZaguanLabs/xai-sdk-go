@@ -15,16 +15,18 @@ type Message struct {
 
 // NewMessage creates a new message with the given role and content parts.
 func NewMessage(role string, parts ...Part) *Message {
-	// Concatenate all parts into a single content string
-	var content strings.Builder
+	// Convert parts to Content array
+	contents := make([]*xaiv1.Content, 0, len(parts))
 	for _, p := range parts {
-		content.WriteString(p.Content())
+		contents = append(contents, &xaiv1.Content{
+			Text: p.Content(),
+		})
 	}
 
 	return &Message{
 		proto: &xaiv1.Message{
 			Role:    roleToProto(role),
-			Content: content.String(),
+			Content: contents,
 		},
 		parts: parts,
 	}
@@ -57,7 +59,15 @@ func (m *Message) Role() string {
 
 // Content returns the content of the message as a single string.
 func (m *Message) Content() string {
-	return m.proto.GetContent()
+	if len(m.proto.Content) == 0 {
+		return ""
+	}
+	// Concatenate all text content
+	var result strings.Builder
+	for _, c := range m.proto.Content {
+		result.WriteString(c.Text)
+	}
+	return result.String()
 }
 
 // WithRole sets the role of the message.

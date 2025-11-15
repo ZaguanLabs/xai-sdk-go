@@ -754,11 +754,11 @@ func (x *GetChatCompletionChunk) GetCitations() []string {
 // Supporting messages
 type Message struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
-	Role             MessageRole            `protobuf:"varint,1,opt,name=role,proto3,enum=xai_api.MessageRole" json:"role,omitempty"`
-	Content          string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	ReasoningContent string                 `protobuf:"bytes,3,opt,name=reasoning_content,json=reasoningContent,proto3" json:"reasoning_content,omitempty"`
-	Name             string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	ToolCalls        []*ToolCall            `protobuf:"bytes,5,rep,name=tool_calls,json=toolCalls,proto3" json:"tool_calls,omitempty"`
+	Content          []*Content             `protobuf:"bytes,1,rep,name=content,proto3" json:"content,omitempty"`
+	Role             MessageRole            `protobuf:"varint,2,opt,name=role,proto3,enum=xai_api.MessageRole" json:"role,omitempty"`
+	Name             string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	ToolCalls        []*ToolCall            `protobuf:"bytes,4,rep,name=tool_calls,json=toolCalls,proto3" json:"tool_calls,omitempty"`
+	ReasoningContent string                 `protobuf:"bytes,5,opt,name=reasoning_content,json=reasoningContent,proto3" json:"reasoning_content,omitempty"`
 	EncryptedContent string                 `protobuf:"bytes,6,opt,name=encrypted_content,json=encryptedContent,proto3" json:"encrypted_content,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
@@ -794,25 +794,18 @@ func (*Message) Descriptor() ([]byte, []int) {
 	return file_xai_v1_chat_proto_rawDescGZIP(), []int{3}
 }
 
+func (x *Message) GetContent() []*Content {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
 func (x *Message) GetRole() MessageRole {
 	if x != nil {
 		return x.Role
 	}
 	return MessageRole_INVALID_ROLE
-}
-
-func (x *Message) GetContent() string {
-	if x != nil {
-		return x.Content
-	}
-	return ""
-}
-
-func (x *Message) GetReasoningContent() string {
-	if x != nil {
-		return x.ReasoningContent
-	}
-	return ""
 }
 
 func (x *Message) GetName() string {
@@ -827,6 +820,13 @@ func (x *Message) GetToolCalls() []*ToolCall {
 		return x.ToolCalls
 	}
 	return nil
+}
+
+func (x *Message) GetReasoningContent() string {
+	if x != nil {
+		return x.ReasoningContent
+	}
+	return ""
 }
 
 func (x *Message) GetEncryptedContent() string {
@@ -1646,14 +1646,14 @@ const file_xai_v1_chat_proto_rawDesc = "" +
 	"\x05model\x18\x04 \x01(\tR\x05model\x12-\n" +
 	"\x12system_fingerprint\x18\x05 \x01(\tR\x11systemFingerprint\x12,\n" +
 	"\x05usage\x18\x06 \x01(\v2\x16.xai_api.SamplingUsageR\x05usage\x12\x1c\n" +
-	"\tcitations\x18\a \x03(\tR\tcitations\"\xed\x01\n" +
-	"\aMessage\x12(\n" +
-	"\x04role\x18\x01 \x01(\x0e2\x14.xai_api.MessageRoleR\x04role\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent\x12+\n" +
-	"\x11reasoning_content\x18\x03 \x01(\tR\x10reasoningContent\x12\x12\n" +
-	"\x04name\x18\x04 \x01(\tR\x04name\x120\n" +
+	"\tcitations\x18\a \x03(\tR\tcitations\"\xff\x01\n" +
+	"\aMessage\x12*\n" +
+	"\acontent\x18\x01 \x03(\v2\x10.xai_api.ContentR\acontent\x12(\n" +
+	"\x04role\x18\x02 \x01(\x0e2\x14.xai_api.MessageRoleR\x04role\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x120\n" +
 	"\n" +
-	"tool_calls\x18\x05 \x03(\v2\x11.xai_api.ToolCallR\ttoolCalls\x12+\n" +
+	"tool_calls\x18\x04 \x03(\v2\x11.xai_api.ToolCallR\ttoolCalls\x12+\n" +
+	"\x11reasoning_content\x18\x05 \x01(\tR\x10reasoningContent\x12+\n" +
 	"\x11encrypted_content\x18\x06 \x01(\tR\x10encryptedContent\"\x1d\n" +
 	"\aContent\x12\x12\n" +
 	"\x04text\x18\x01 \x01(\tR\x04text\"\x83\x01\n" +
@@ -1807,29 +1807,30 @@ var file_xai_v1_chat_proto_depIdxs = []int32{
 	13, // 9: xai_api.GetChatCompletionChunk.outputs:type_name -> xai_api.CompletionOutputChunk
 	23, // 10: xai_api.GetChatCompletionChunk.created:type_name -> google.protobuf.Timestamp
 	15, // 11: xai_api.GetChatCompletionChunk.usage:type_name -> xai_api.SamplingUsage
-	0,  // 12: xai_api.Message.role:type_name -> xai_api.MessageRole
-	18, // 13: xai_api.Message.tool_calls:type_name -> xai_api.ToolCall
-	12, // 14: xai_api.CompletionOutput.message:type_name -> xai_api.CompletionMessage
-	0,  // 15: xai_api.CompletionMessage.role:type_name -> xai_api.MessageRole
-	18, // 16: xai_api.CompletionMessage.tool_calls:type_name -> xai_api.ToolCall
-	14, // 17: xai_api.CompletionOutputChunk.delta:type_name -> xai_api.Delta
-	0,  // 18: xai_api.Delta.role:type_name -> xai_api.MessageRole
-	18, // 19: xai_api.Delta.tool_calls:type_name -> xai_api.ToolCall
-	17, // 20: xai_api.Tool.function:type_name -> xai_api.Function
-	4,  // 21: xai_api.ToolCall.type:type_name -> xai_api.ToolCallType
-	19, // 22: xai_api.ToolCall.function:type_name -> xai_api.FunctionCall
-	2,  // 23: xai_api.ToolChoice.mode:type_name -> xai_api.ToolMode
-	3,  // 24: xai_api.ResponseFormat.format_type:type_name -> xai_api.FormatType
-	5,  // 25: xai_api.SearchParameters.mode:type_name -> xai_api.SearchMode
-	6,  // 26: xai_api.Chat.GetCompletion:input_type -> xai_api.GetCompletionsRequest
-	6,  // 27: xai_api.Chat.GetCompletionChunk:input_type -> xai_api.GetCompletionsRequest
-	7,  // 28: xai_api.Chat.GetCompletion:output_type -> xai_api.GetChatCompletionResponse
-	8,  // 29: xai_api.Chat.GetCompletionChunk:output_type -> xai_api.GetChatCompletionChunk
-	28, // [28:30] is the sub-list for method output_type
-	26, // [26:28] is the sub-list for method input_type
-	26, // [26:26] is the sub-list for extension type_name
-	26, // [26:26] is the sub-list for extension extendee
-	0,  // [0:26] is the sub-list for field type_name
+	10, // 12: xai_api.Message.content:type_name -> xai_api.Content
+	0,  // 13: xai_api.Message.role:type_name -> xai_api.MessageRole
+	18, // 14: xai_api.Message.tool_calls:type_name -> xai_api.ToolCall
+	12, // 15: xai_api.CompletionOutput.message:type_name -> xai_api.CompletionMessage
+	0,  // 16: xai_api.CompletionMessage.role:type_name -> xai_api.MessageRole
+	18, // 17: xai_api.CompletionMessage.tool_calls:type_name -> xai_api.ToolCall
+	14, // 18: xai_api.CompletionOutputChunk.delta:type_name -> xai_api.Delta
+	0,  // 19: xai_api.Delta.role:type_name -> xai_api.MessageRole
+	18, // 20: xai_api.Delta.tool_calls:type_name -> xai_api.ToolCall
+	17, // 21: xai_api.Tool.function:type_name -> xai_api.Function
+	4,  // 22: xai_api.ToolCall.type:type_name -> xai_api.ToolCallType
+	19, // 23: xai_api.ToolCall.function:type_name -> xai_api.FunctionCall
+	2,  // 24: xai_api.ToolChoice.mode:type_name -> xai_api.ToolMode
+	3,  // 25: xai_api.ResponseFormat.format_type:type_name -> xai_api.FormatType
+	5,  // 26: xai_api.SearchParameters.mode:type_name -> xai_api.SearchMode
+	6,  // 27: xai_api.Chat.GetCompletion:input_type -> xai_api.GetCompletionsRequest
+	6,  // 28: xai_api.Chat.GetCompletionChunk:input_type -> xai_api.GetCompletionsRequest
+	7,  // 29: xai_api.Chat.GetCompletion:output_type -> xai_api.GetChatCompletionResponse
+	8,  // 30: xai_api.Chat.GetCompletionChunk:output_type -> xai_api.GetChatCompletionChunk
+	29, // [29:31] is the sub-list for method output_type
+	27, // [27:29] is the sub-list for method input_type
+	27, // [27:27] is the sub-list for extension type_name
+	27, // [27:27] is the sub-list for extension extendee
+	0,  // [0:27] is the sub-list for field type_name
 }
 
 func init() { file_xai_v1_chat_proto_init() }
