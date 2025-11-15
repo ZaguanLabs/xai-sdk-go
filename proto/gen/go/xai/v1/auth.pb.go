@@ -9,6 +9,7 @@ package xaiv1
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -21,28 +22,39 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Validate API key request
-type ValidateKeyRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ApiKey        string                 `protobuf:"bytes,1,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+// ApiKey represents an API key with metadata
+type ApiKey struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	RedactedApiKey string                 `protobuf:"bytes,1,opt,name=redacted_api_key,json=redactedApiKey,proto3" json:"redacted_api_key,omitempty"`
+	UserId         string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Name           string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	CreateTime     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
+	TeamId         string                 `protobuf:"bytes,6,opt,name=team_id,json=teamId,proto3" json:"team_id,omitempty"`
+	Acls           []string               `protobuf:"bytes,7,rep,name=acls,proto3" json:"acls,omitempty"`
+	ApiKeyId       string                 `protobuf:"bytes,8,opt,name=api_key_id,json=apiKeyId,proto3" json:"api_key_id,omitempty"`
+	ModifyTime     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=modify_time,json=modifyTime,proto3" json:"modify_time,omitempty"`
+	ApiKeyBlocked  bool                   `protobuf:"varint,10,opt,name=api_key_blocked,json=apiKeyBlocked,proto3" json:"api_key_blocked,omitempty"`
+	ModifiedBy     string                 `protobuf:"bytes,11,opt,name=modified_by,json=modifiedBy,proto3" json:"modified_by,omitempty"`
+	Disabled       bool                   `protobuf:"varint,12,opt,name=disabled,proto3" json:"disabled,omitempty"`
+	TeamBlocked    bool                   `protobuf:"varint,13,opt,name=team_blocked,json=teamBlocked,proto3" json:"team_blocked,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
-func (x *ValidateKeyRequest) Reset() {
-	*x = ValidateKeyRequest{}
+func (x *ApiKey) Reset() {
+	*x = ApiKey{}
 	mi := &file_xai_v1_auth_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ValidateKeyRequest) String() string {
+func (x *ApiKey) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ValidateKeyRequest) ProtoMessage() {}
+func (*ApiKey) ProtoMessage() {}
 
-func (x *ValidateKeyRequest) ProtoReflect() protoreflect.Message {
+func (x *ApiKey) ProtoReflect() protoreflect.Message {
 	mi := &file_xai_v1_auth_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -54,101 +66,118 @@ func (x *ValidateKeyRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ValidateKeyRequest.ProtoReflect.Descriptor instead.
-func (*ValidateKeyRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use ApiKey.ProtoReflect.Descriptor instead.
+func (*ApiKey) Descriptor() ([]byte, []int) {
 	return file_xai_v1_auth_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ValidateKeyRequest) GetApiKey() string {
+func (x *ApiKey) GetRedactedApiKey() string {
 	if x != nil {
-		return x.ApiKey
+		return x.RedactedApiKey
 	}
 	return ""
 }
 
-// Validate API key response
-type ValidateKeyResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Valid         bool                   `protobuf:"varint,1,opt,name=valid,proto3" json:"valid,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	Organization  string                 `protobuf:"bytes,3,opt,name=organization,proto3" json:"organization,omitempty"`
-	Project       string                 `protobuf:"bytes,4,opt,name=project,proto3" json:"project,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ValidateKeyResponse) Reset() {
-	*x = ValidateKeyResponse{}
-	mi := &file_xai_v1_auth_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ValidateKeyResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ValidateKeyResponse) ProtoMessage() {}
-
-func (x *ValidateKeyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_v1_auth_proto_msgTypes[1]
+func (x *ApiKey) GetUserId() string {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
+		return x.UserId
 	}
-	return mi.MessageOf(x)
+	return ""
 }
 
-// Deprecated: Use ValidateKeyResponse.ProtoReflect.Descriptor instead.
-func (*ValidateKeyResponse) Descriptor() ([]byte, []int) {
-	return file_xai_v1_auth_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *ValidateKeyResponse) GetValid() bool {
+func (x *ApiKey) GetName() string {
 	if x != nil {
-		return x.Valid
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ApiKey) GetCreateTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreateTime
+	}
+	return nil
+}
+
+func (x *ApiKey) GetTeamId() string {
+	if x != nil {
+		return x.TeamId
+	}
+	return ""
+}
+
+func (x *ApiKey) GetAcls() []string {
+	if x != nil {
+		return x.Acls
+	}
+	return nil
+}
+
+func (x *ApiKey) GetApiKeyId() string {
+	if x != nil {
+		return x.ApiKeyId
+	}
+	return ""
+}
+
+func (x *ApiKey) GetModifyTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ModifyTime
+	}
+	return nil
+}
+
+func (x *ApiKey) GetApiKeyBlocked() bool {
+	if x != nil {
+		return x.ApiKeyBlocked
 	}
 	return false
 }
 
-func (x *ValidateKeyResponse) GetMessage() string {
+func (x *ApiKey) GetModifiedBy() string {
 	if x != nil {
-		return x.Message
+		return x.ModifiedBy
 	}
 	return ""
 }
 
-func (x *ValidateKeyResponse) GetOrganization() string {
+func (x *ApiKey) GetDisabled() bool {
 	if x != nil {
-		return x.Organization
+		return x.Disabled
 	}
-	return ""
+	return false
 }
 
-func (x *ValidateKeyResponse) GetProject() string {
+func (x *ApiKey) GetTeamBlocked() bool {
 	if x != nil {
-		return x.Project
+		return x.TeamBlocked
 	}
-	return ""
+	return false
 }
 
 var File_xai_v1_auth_proto protoreflect.FileDescriptor
 
 const file_xai_v1_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x11xai/v1/auth.proto\x12\x06xai.v1\"-\n" +
-	"\x12ValidateKeyRequest\x12\x17\n" +
-	"\aapi_key\x18\x01 \x01(\tR\x06apiKey\"\x83\x01\n" +
-	"\x13ValidateKeyResponse\x12\x14\n" +
-	"\x05valid\x18\x01 \x01(\bR\x05valid\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\x12\"\n" +
-	"\forganization\x18\x03 \x01(\tR\forganization\x12\x18\n" +
-	"\aproject\x18\x04 \x01(\tR\aproject2N\n" +
-	"\x04Auth\x12F\n" +
-	"\vValidateKey\x12\x1a.xai.v1.ValidateKeyRequest\x1a\x1b.xai.v1.ValidateKeyResponseB<Z:github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1b\x06proto3"
+	"\x11xai/v1/auth.proto\x12\axai_api\x1a\x1fgoogle/protobuf/timestamp.proto\"\xac\x03\n" +
+	"\x06ApiKey\x12(\n" +
+	"\x10redacted_api_key\x18\x01 \x01(\tR\x0eredactedApiKey\x12\x17\n" +
+	"\auser_id\x18\x03 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04name\x18\x04 \x01(\tR\x04name\x12;\n" +
+	"\vcreate_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"createTime\x12\x17\n" +
+	"\ateam_id\x18\x06 \x01(\tR\x06teamId\x12\x12\n" +
+	"\x04acls\x18\a \x03(\tR\x04acls\x12\x1c\n" +
+	"\n" +
+	"api_key_id\x18\b \x01(\tR\bapiKeyId\x12;\n" +
+	"\vmodify_time\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"modifyTime\x12&\n" +
+	"\x0fapi_key_blocked\x18\n" +
+	" \x01(\bR\rapiKeyBlocked\x12\x1f\n" +
+	"\vmodified_by\x18\v \x01(\tR\n" +
+	"modifiedBy\x12\x1a\n" +
+	"\bdisabled\x18\f \x01(\bR\bdisabled\x12!\n" +
+	"\fteam_blocked\x18\r \x01(\bR\vteamBlockedB<Z:github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1b\x06proto3"
 
 var (
 	file_xai_v1_auth_proto_rawDescOnce sync.Once
@@ -162,19 +191,19 @@ func file_xai_v1_auth_proto_rawDescGZIP() []byte {
 	return file_xai_v1_auth_proto_rawDescData
 }
 
-var file_xai_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_xai_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_xai_v1_auth_proto_goTypes = []any{
-	(*ValidateKeyRequest)(nil),  // 0: xai.v1.ValidateKeyRequest
-	(*ValidateKeyResponse)(nil), // 1: xai.v1.ValidateKeyResponse
+	(*ApiKey)(nil),                // 0: xai_api.ApiKey
+	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
 }
 var file_xai_v1_auth_proto_depIdxs = []int32{
-	0, // 0: xai.v1.Auth.ValidateKey:input_type -> xai.v1.ValidateKeyRequest
-	1, // 1: xai.v1.Auth.ValidateKey:output_type -> xai.v1.ValidateKeyResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: xai_api.ApiKey.create_time:type_name -> google.protobuf.Timestamp
+	1, // 1: xai_api.ApiKey.modify_time:type_name -> google.protobuf.Timestamp
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_xai_v1_auth_proto_init() }
@@ -188,9 +217,9 @@ func file_xai_v1_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_xai_v1_auth_proto_rawDesc), len(file_xai_v1_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   1,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   0,
 		},
 		GoTypes:           file_xai_v1_auth_proto_goTypes,
 		DependencyIndexes: file_xai_v1_auth_proto_depIdxs,

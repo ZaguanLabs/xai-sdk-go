@@ -1,24 +1,23 @@
 syntax = "proto3";
 
-package xai.v1;
+package xai_api;
 
 option go_package = "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1";
 
-// Auth service for authentication and validation
-service Auth {
-  // Validate API key
-  rpc ValidateKey(ValidateKeyRequest) returns (ValidateKeyResponse);
-}
+import "google/protobuf/timestamp.proto";
 
-// Validate API key request
-message ValidateKeyRequest {
-  string api_key = 1;
-}
-
-// Validate API key response
-message ValidateKeyResponse {
-  bool valid = 1;
-  string message = 2;
-  string organization = 3;
-  string project = 4;
+// ApiKey represents an API key with metadata
+message ApiKey {
+  string redacted_api_key = 1;
+  string user_id = 3;
+  string name = 4;
+  google.protobuf.Timestamp create_time = 5;
+  string team_id = 6;
+  repeated string acls = 7;
+  string api_key_id = 8;
+  google.protobuf.Timestamp modify_time = 9;
+  bool api_key_blocked = 10;
+  string modified_by = 11;
+  bool disabled = 12;
+  bool team_blocked = 13;
 }

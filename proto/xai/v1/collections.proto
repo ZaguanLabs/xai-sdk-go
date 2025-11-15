@@ -1,128 +1,206 @@
 syntax = "proto3";
 
-package xai.v1;
+package xai_api;
 
 option go_package = "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1";
 
-// Collections service for document collections
-service Collections {
-  // List collections
-  rpc ListCollections(ListCollectionsRequest) returns (ListCollectionsResponse);
+import "google/protobuf/timestamp.proto";
+import "xai/v1/shared.proto";  // For Ordering
+import "xai/v1/types.proto";   // For IndexConfiguration, ChunkConfiguration
 
-  // Get collection information
-  rpc GetCollection(GetCollectionRequest) returns (Collection);
-
-  // Create a new collection
-  rpc CreateCollection(CreateCollectionRequest) returns (Collection);
-
-  // Delete a collection
-  rpc DeleteCollection(DeleteCollectionRequest) returns (DeleteCollectionResponse);
-
-  // List documents in a collection
-  rpc ListDocuments(ListDocumentsRequest) returns (ListDocumentsResponse);
-
-  // Get a document
-  rpc GetDocument(GetDocumentRequest) returns (Document);
-
-  // Add a document to a collection
-  rpc AddDocument(AddDocumentRequest) returns (Document);
-
-  // Delete a document from a collection
-  rpc DeleteDocument(DeleteDocumentRequest) returns (DeleteDocumentResponse);
+// CollectionsSortBy specifies how to sort collections
+enum CollectionsSortBy {
+  COLLECTIONS_SORT_BY_NAME = 0;
+  COLLECTIONS_SORT_BY_AGE = 1;
 }
 
-// Collection information
-message Collection {
-  string id = 1;
-  string name = 2;
-  string description = 3;
-  int64 created_at = 4;
-  int64 updated_at = 5;
-  int32 document_count = 6;
-  int64 total_size = 7;
+// DocumentStatus indicates the processing status of a document
+enum DocumentStatus {
+  DOCUMENT_STATUS_UNKNOWN = 0;
+  DOCUMENT_STATUS_PROCESSING = 1;
+  DOCUMENT_STATUS_PROCESSED = 2;
+  DOCUMENT_STATUS_FAILED = 3;
 }
 
-// List collections request
-message ListCollectionsRequest {
-  string purpose = 1;
-  int32 limit = 2;
-  string sort_by = 3;
-  string sort_order = 4;
+// DocumentsSortBy specifies how to sort documents
+enum DocumentsSortBy {
+  DOCUMENTS_SORT_BY_NAME = 0;
+  DOCUMENTS_SORT_BY_SIZE = 1;
+  DOCUMENTS_SORT_BY_AGE = 2;
 }
 
-// List collections response
-message ListCollectionsResponse {
-  repeated Collection collections = 1;
+// FieldsEntry represents a key-value pair for document fields
+message FieldsEntry {
+  string key = 1;
+  string value = 2;
 }
 
-// Get collection request
-message GetCollectionRequest {
+// AddDocumentToCollectionRequest adds a document to a collection
+message AddDocumentToCollectionRequest {
+  string file_id = 1;
+  string team_id = 2;
+  string collection_id = 3;
+  repeated FieldsEntry fields = 5;
+}
+
+// BatchGetDocumentsRequest requests multiple documents
+message BatchGetDocumentsRequest {
+  string team_id = 1;
+  string collection_id = 2;
+  repeated string file_ids = 3;
+}
+
+// BatchGetDocumentsResponse contains multiple documents
+message BatchGetDocumentsResponse {
+  repeated DocumentMetadata documents = 1;
+}
+
+// CollectionMetadata contains collection metadata
+message CollectionMetadata {
   string collection_id = 1;
+  string collection_name = 2;
+  google.protobuf.Timestamp created_at = 3;
+  IndexConfiguration index_configuration = 4;
+  ChunkConfiguration chunk_configuration = 5;
+  int32 documents_count = 6;
 }
 
-// Create collection request
+// CreateCollectionRequest creates a new collection
 message CreateCollectionRequest {
-  string name = 1;
-  string description = 2;
-  bool encrypted = 3;
+  string team_id = 1;
+  string collection_name = 2;
+  IndexConfiguration index_configuration = 4;
+  ChunkConfiguration chunk_configuration = 5;
 }
 
-// Delete collection request
+// DeleteCollectionRequest deletes a collection
 message DeleteCollectionRequest {
-  string collection_id = 1;
-}
-
-// Delete collection response
-message DeleteCollectionResponse {
-  bool success = 1;
-}
-
-// Document information
-message Document {
-  string id = 1;
-  string collection_id = 2;
-  string title = 3;
-  string content = 4;
-  string content_type = 5;
-  int64 size = 6;
-  int64 created_at = 7;
-  int64 updated_at = 8;
-}
-
-// List documents request
-message ListDocumentsRequest {
-  string collection_id = 1;
-  int32 limit = 2;
-  string sort_by = 3;
-  string sort_order = 4;
-}
-
-// List documents response
-message ListDocumentsResponse {
-  repeated Document documents = 1;
-}
-
-// Get document request
-message GetDocumentRequest {
-  string document_id = 1;
+  string team_id = 1;
   string collection_id = 2;
 }
 
-// Add document request
-message AddDocumentRequest {
-  string collection_id = 1;
-  string title = 2;
-  string content = 3;
+// DocumentMetadata contains document metadata
+message DocumentMetadata {
+  FileMetadata file_metadata = 1;
+  repeated FieldsEntry fields = 2;
+  DocumentStatus status = 3;
+  string error_message = 4;
+}
+
+// FileMetadata contains file metadata
+message FileMetadata {
+  string file_id = 1;
+  string name = 2;
+  int64 size_bytes = 3;
   string content_type = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp expires_at = 6;
+  string hash = 7;
 }
 
-// Delete document request
-message DeleteDocumentRequest {
-  string document_id = 1;
+// GetCollectionMetadataRequest requests collection metadata
+message GetCollectionMetadataRequest {
+  string team_id = 1;
   string collection_id = 2;
 }
 
-// Delete document response
-message DeleteDocumentResponse {
-  bool success = 1;
+// GetDocumentMetadataRequest requests document metadata
+message GetDocumentMetadataRequest {
+  string file_id = 1;
+  string team_id = 2;
+  string collection_id = 3;
+}
+
+// ListAvailableEmbeddingModelsRequest requests available embedding models
+message ListAvailableEmbeddingModelsRequest {
+  string team_id = 1;
+}
+
+// ListAvailableEmbeddingModelsResponse contains available embedding models
+message ListAvailableEmbeddingModelsResponse {
+  repeated string embedding_models = 1;
+}
+
+// ListAvailableTokenEncodingsRequest requests available token encodings
+message ListAvailableTokenEncodingsRequest {
+  string team_id = 1;
+}
+
+// ListAvailableTokenEncodingsResponse contains available token encodings
+message ListAvailableTokenEncodingsResponse {
+  repeated string encodings = 1;
+}
+
+// ListCollectionsRequest requests a list of collections
+message ListCollectionsRequest {
+  string team_id = 1;
+  int32 limit = 2;
+  Ordering order = 3;
+  CollectionsSortBy sort_by = 4;
+  string pagination_token = 5;
+}
+
+// ListCollectionsResponse contains a list of collections
+message ListCollectionsResponse {
+  repeated CollectionMetadata collections = 1;
+  string pagination_token = 2;
+}
+
+// ListDocumentsRequest requests a list of documents
+message ListDocumentsRequest {
+  string team_id = 1;
+  string collection_id = 2;
+  int32 limit = 3;
+  Ordering order = 4;
+  DocumentsSortBy sort_by = 5;
+  string pagination_token = 6;
+}
+
+// ListDocumentsResponse contains a list of documents
+message ListDocumentsResponse {
+  repeated DocumentMetadata documents = 1;
+  string pagination_token = 2;
+}
+
+// ReIndexDocumentRequest requests document re-indexing
+message ReIndexDocumentRequest {
+  string team_id = 1;
+  string collection_id = 2;
+  string file_id = 3;
+}
+
+// RemoveDocumentFromCollectionRequest removes a document from a collection
+message RemoveDocumentFromCollectionRequest {
+  string file_id = 1;
+  string team_id = 2;
+  string collection_id = 3;
+}
+
+// UpdateCollectionRequest updates a collection
+message UpdateCollectionRequest {
+  string team_id = 1;
+  string collection_id = 2;
+  string collection_name = 3;
+  ChunkConfiguration chunk_configuration = 4;
+}
+
+// UpdateDocumentRequest updates a document
+message UpdateDocumentRequest {
+  string team_id = 1;
+  string collection_id = 2;
+  string file_id = 3;
+  string name = 4;
+  bytes data = 5;
+  string content_type = 6;
+  repeated FieldsEntry fields = 7;
+}
+
+// UploadDocumentRequest uploads a new document
+message UploadDocumentRequest {
+  string team_id = 1;
+  string collection_id = 2;
+  string name = 3;
+  bytes data = 4;
+  string content_type = 5;
+  repeated FieldsEntry fields = 7;
 }

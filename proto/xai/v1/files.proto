@@ -1,81 +1,92 @@
 syntax = "proto3";
 
-package xai.v1;
+package xai_api;
 
 option go_package = "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1";
 
-// Files service for file management
-service Files {
-  // Upload a file
-  rpc UploadFile(stream UploadFileChunk) returns (File);
-  
-  // Download a file
-  rpc DownloadFile(DownloadFileRequest) returns (stream FileChunk);
-  
-  // List files
-  rpc ListFiles(ListFilesRequest) returns (ListFilesResponse);
-  
-  // Get file metadata
-  rpc GetFile(GetFileRequest) returns (File);
-  
-  // Delete a file
-  rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse);
+import "google/protobuf/timestamp.proto";
+
+// FilesSortBy specifies how to sort files
+enum FilesSortBy {
+  FILES_SORT_BY_CREATED_AT = 0;
+  FILES_SORT_BY_FILENAME = 1;
+  FILES_SORT_BY_SIZE = 2;
 }
 
-// File metadata
-message File {
-  string id = 1;
-  string filename = 2;
-  int64 size = 3;
-  int64 created_at = 4;
+// FilesOrdering specifies sort order for files (renamed to avoid conflict with shared.Ordering)
+enum FilesOrdering {
+  FILES_ORDERING_ASCENDING = 0;
+  FILES_ORDERING_DESCENDING = 1;
 }
 
-// Upload chunk
-message UploadFileChunk {
-  oneof data {
-    UploadFileInit init = 1;
-    bytes chunk = 2;
-  }
-}
-
-// Upload initialization
-message UploadFileInit {
-  string filename = 1;
-}
-
-// Download request
-message DownloadFileRequest {
-  string file_id = 1;
-}
-
-// File chunk
-message FileChunk {
-  bytes data = 1;
-}
-
-// List files request
-message ListFilesRequest {
-  optional int32 limit = 1;
-  optional string after = 2;
-}
-
-// List files response
-message ListFilesResponse {
-  repeated File files = 1;
-  bool has_more = 2;
-}
-
-// Get file request
-message GetFileRequest {
-  string file_id = 1;
-}
-
-// Delete file request
+// DeleteFileRequest requests deletion of a file
 message DeleteFileRequest {
   string file_id = 1;
 }
 
-// Delete file response
+// DeleteFileResponse confirms file deletion
 message DeleteFileResponse {
-  bool deleted = 1;
+  string id = 1;
+  bool deleted = 2;
+}
+
+// File represents a file with metadata
+message File {
+  int64 size = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp expires_at = 3;
+  string filename = 4;
+  string id = 5;
+  string team_id = 6;
+}
+
+// FileContentChunk contains a chunk of file content
+message FileContentChunk {
+  bytes data = 1;
+}
+
+// ListFilesRequest requests a list of files
+message ListFilesRequest {
+  int32 limit = 1;
+  FilesOrdering order = 2;
+  string pagination_token = 3;
+  FilesSortBy sort_by = 4;
+}
+
+// ListFilesResponse contains a list of files
+message ListFilesResponse {
+  repeated File data = 1;
+  string pagination_token = 2;
+}
+
+// RetrieveFileContentRequest requests file content
+message RetrieveFileContentRequest {
+  string file_id = 1;
+}
+
+// RetrieveFileRequest requests file metadata
+message RetrieveFileRequest {
+  string file_id = 1;
+}
+
+// RetrieveFileURLRequest requests a file URL
+message RetrieveFileURLRequest {
+  string file_id = 1;
+}
+
+// RetrieveFileURLResponse contains a file URL
+message RetrieveFileURLResponse {
+  string url = 1;
+}
+
+// UploadFileChunk contains file upload data
+message UploadFileChunk {
+  UploadFileInit init = 1;
+  bytes data = 2;
+}
+
+// UploadFileInit initializes a file upload
+message UploadFileInit {
+  string name = 1;
+  string purpose = 2;
 }
