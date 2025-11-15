@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/auth"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/chat"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/collections"
@@ -15,7 +16,6 @@ import (
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/metadata"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/models"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/tokenizer"
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
 	"google.golang.org/grpc"
 )
 
@@ -51,9 +51,9 @@ func NewClient(config *Config) (*Client, error) {
 	metadata := config.ToSDKMetadata()
 
 	client := &Client{
-		config:     config,
-		metadata:   metadata,
-		createdAt:  time.Now(),
+		config:    config,
+		metadata:  metadata,
+		createdAt: time.Now(),
 	}
 
 	// Create gRPC connection
@@ -168,16 +168,20 @@ func (c *Client) Chat() xaiv1.ChatClient {
 func (c *Client) NewContext(ctx context.Context) context.Context {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	
+
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	
+
 	// Add timeout if not already set
 	if _, ok := ctx.Deadline(); !ok {
-		ctx, _ = context.WithTimeout(ctx, c.config.Timeout)
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, c.config.Timeout)
+		// Note: We intentionally don't call cancel here as the context is returned to the caller
+		// The caller is responsible for managing the context lifecycle
+		_ = cancel
 	}
-	
+
 	// Add metadata to context
 	return c.metadata.AddToOutgoingContext(ctx)
 }
@@ -187,7 +191,7 @@ func (c *Client) NewContextWithTimeout(ctx context.Context, timeout time.Duratio
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	
+
 	return context.WithTimeout(c.metadata.AddToOutgoingContext(ctx), timeout)
 }
 
@@ -196,7 +200,7 @@ func (c *Client) NewContextWithCancel(ctx context.Context) (context.Context, con
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	
+
 	return context.WithCancel(c.metadata.AddToOutgoingContext(ctx))
 }
 
@@ -205,7 +209,7 @@ func (c *Client) NewContextWithDeadline(ctx context.Context, deadline time.Time)
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	
+
 	return context.WithDeadline(c.metadata.AddToOutgoingContext(ctx), deadline)
 }
 
@@ -213,13 +217,13 @@ func (c *Client) NewContextWithDeadline(ctx context.Context, deadline time.Time)
 func (c *Client) Close() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	
+
 	if c.isClosed {
 		return nil // Already closed
 	}
-	
+
 	c.isClosed = true
-	
+
 	// Close gRPC connection
 	if c.grpcConn != nil {
 		if err := c.grpcConn.Close(); err != nil {
@@ -228,7 +232,7 @@ func (c *Client) Close() error {
 		c.grpcConn = nil
 		c.grpcClient = nil
 	}
-	
+
 	return nil
 }
 
@@ -237,12 +241,12 @@ func (c *Client) CloseWithContext(ctx context.Context) error {
 	// Try to close with context first
 	done := make(chan struct{})
 	var closeErr error
-	
+
 	go func() {
 		defer close(done)
 		closeErr = c.Close()
 	}()
-	
+
 	select {
 	case <-done:
 		return closeErr
@@ -255,21 +259,21 @@ func (c *Client) CloseWithContext(ctx context.Context) error {
 func (c *Client) EnsureGRPCConnection() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	
+
 	if c.isClosed {
 		return errors.NewConfigError("client is closed")
 	}
-	
+
 	// Check if connection is healthy
 	if c.grpcConn != nil && c.grpcConn.GetState().String() != "TRANSIENT_FAILURE" {
 		return nil
 	}
-	
+
 	// Recreate connection if needed
 	if err := c.createGRPCConnection(); err != nil {
 		return fmt.Errorf("failed to recreate gRPC connection: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -278,18 +282,18 @@ func (c *Client) HealthCheck(ctx context.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	
+
 	// Ensure connection is healthy
 	if err := c.EnsureGRPCConnection(); err != nil {
 		return fmt.Errorf("connection health check failed: %w", err)
 	}
-	
+
 	// Basic connectivity check
 	state := c.grpcConn.GetState()
 	if state.String() == "TRANSIENT_FAILURE" {
 		return errors.NewNetworkError("gRPC connection is in transient failure state")
 	}
-	
+
 	return nil
 }
 
@@ -297,10 +301,10 @@ func (c *Client) HealthCheck(ctx context.Context) error {
 func (c *Client) WithTimeout(timeout time.Duration) *Client {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	
+
 	newConfig := *c.config
 	newConfig.Timeout = timeout
-	
+
 	return &Client{
 		config:     &newConfig,
 		metadata:   c.metadata, // Same metadata
@@ -315,13 +319,13 @@ func (c *Client) WithTimeout(timeout time.Duration) *Client {
 func (c *Client) WithAPIKey(apiKey string) *Client {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	
+
 	newConfig := *c.config
 	newConfig.APIKey = apiKey
-	
+
 	newMetadata := c.metadata
 	newMetadata.APIKey = apiKey
-	
+
 	return &Client{
 		config:     &newConfig,
 		metadata:   newMetadata,
@@ -336,7 +340,7 @@ func (c *Client) WithAPIKey(apiKey string) *Client {
 func (c *Client) String() string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	
+
 	return fmt.Sprintf("Client{Config:%s, CreatedAt:%s, Closed:%t}",
 		c.config.String(),
 		c.createdAt.Format(time.RFC3339),

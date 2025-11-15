@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v6.32.0
-// source: xai/v1/models.proto
+// source: proto/xai/v1/models.proto
 
 package xaiv1
 
@@ -303,5 +303,5 @@ var Models_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "xai/v1/models.proto",
+	Metadata: "proto/xai/v1/models.proto",
 }

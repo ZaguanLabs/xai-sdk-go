@@ -20,14 +20,14 @@ const (
 
 // APIKeyAuthInterceptor creates a unary interceptor that authenticates requests with an API key.
 type APIKeyAuthInterceptor struct {
-	apiKey   string
+	apiKey     string
 	useXAPIKey bool
 }
 
 // NewAPIKeyAuthInterceptor creates a new API key authentication interceptor.
 func NewAPIKeyAuthInterceptor(apiKey string, useXAPIKey bool) *APIKeyAuthInterceptor {
 	return &APIKeyAuthInterceptor{
-		apiKey:   apiKey,
+		apiKey:     apiKey,
 		useXAPIKey: useXAPIKey,
 	}
 }
@@ -75,31 +75,20 @@ func (a *APIKeyAuthInterceptor) StreamInterceptor() grpc.StreamClientInterceptor
 }
 
 // addAuthMetadata adds authentication metadata to the context.
+// Uses AppendToOutgoingContext to preserve gRPC's internal metadata.
 func (a *APIKeyAuthInterceptor) addAuthMetadata(ctx context.Context) (context.Context, error) {
 	if a.apiKey == "" {
 		return nil, fmt.Errorf("API key is empty")
 	}
 
-	// Create metadata
-	md := metadata.Pairs()
-	
+	// Add authentication metadata using AppendToOutgoingContext
+	// This preserves any existing metadata including gRPC's content-type
 	if a.useXAPIKey {
 		// Use x-api-key header
-		md.Set(XAPIKeyHeader, a.apiKey)
-	} else {
-		// Use authorization bearer token
-		md.Set(AuthorizationHeader, fmt.Sprintf("Bearer %s", a.apiKey))
+		return metadata.AppendToOutgoingContext(ctx, XAPIKeyHeader, a.apiKey), nil
 	}
-
-	// Add to context
-	if existingMD, ok := metadata.FromOutgoingContext(ctx); ok {
-		// Merge with existing metadata
-		for k, v := range existingMD {
-			md[k] = v
-		}
-	}
-
-	return metadata.NewOutgoingContext(ctx, md), nil
+	// Use authorization bearer token
+	return metadata.AppendToOutgoingContext(ctx, AuthorizationHeader, fmt.Sprintf("Bearer %s", a.apiKey)), nil
 }
 
 // APIKeyAuthUnaryInterceptor creates a simple unary interceptor with the given API key.
@@ -128,16 +117,16 @@ func XAPIKeyAuthStreamInterceptor(apiKey string) grpc.StreamClientInterceptor {
 
 // CombinedAuthInterceptor creates interceptors that support both authorization and x-api-key headers.
 type CombinedAuthInterceptor struct {
-	apiKey        string
-	useXAPIKey    bool
+	apiKey         string
+	useXAPIKey     bool
 	useBearerToken bool
 }
 
 // NewCombinedAuthInterceptor creates a new combined auth interceptor.
 func NewCombinedAuthInterceptor(apiKey string, useXAPIKey, useBearerToken bool) *CombinedAuthInterceptor {
 	return &CombinedAuthInterceptor{
-		apiKey:        apiKey,
-		useXAPIKey:    useXAPIKey,
+		apiKey:         apiKey,
+		useXAPIKey:     useXAPIKey,
 		useBearerToken: useBearerToken,
 	}
 }
@@ -179,28 +168,24 @@ func (a *CombinedAuthInterceptor) StreamInterceptor() grpc.StreamClientIntercept
 }
 
 // addAuthMetadata for combined interceptor adds both auth types if configured.
+// Uses AppendToOutgoingContext to preserve gRPC's internal metadata.
 func (a *CombinedAuthInterceptor) addAuthMetadata(ctx context.Context) (context.Context, error) {
 	if a.apiKey == "" {
 		return nil, fmt.Errorf("API key is empty")
 	}
 
-	md := metadata.Pairs()
-	
+	// Build key-value pairs for AppendToOutgoingContext
+	pairs := make([]string, 0, 4)
+
 	if a.useXAPIKey {
-		md.Set(XAPIKeyHeader, a.apiKey)
+		pairs = append(pairs, XAPIKeyHeader, a.apiKey)
 	}
-	
+
 	if a.useBearerToken {
-		md.Set(AuthorizationHeader, fmt.Sprintf("Bearer %s", a.apiKey))
+		pairs = append(pairs, AuthorizationHeader, fmt.Sprintf("Bearer %s", a.apiKey))
 	}
 
-	if existingMD, ok := metadata.FromOutgoingContext(ctx); ok {
-		for k, v := range existingMD {
-			md[k] = v
-		}
-	}
-
-	return metadata.NewOutgoingContext(ctx, md), nil
+	return metadata.AppendToOutgoingContext(ctx, pairs...), nil
 }
 
 // EmptyAuthInterceptor returns interceptors that don't add any auth (for testing).

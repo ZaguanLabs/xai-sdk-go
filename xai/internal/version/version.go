@@ -8,16 +8,16 @@ import (
 )
 
 // SDKVersion is the current version of the xAI SDK Go client.
-const SDKVersion = "0.1.0"
+const SDKVersion = "0.1.1"
 
 // BuildInfo contains build and runtime information.
 type BuildInfo struct {
-	SDKVersion   string
-	GoVersion    string
-	GOOS         string
-	GOARCH       string
-	GitCommit    string
-	BuildTime    string
+	SDKVersion string
+	GoVersion  string
+	GOOS       string
+	GOARCH     string
+	GitCommit  string
+	BuildTime  string
 }
 
 // GetBuildInfo returns build information for the SDK.
@@ -28,13 +28,13 @@ func GetBuildInfo() BuildInfo {
 		GOOS:       runtime.GOOS,
 		GOARCH:     runtime.GOARCH,
 	}
-	
+
 	// Try to extract build info from runtime/debug if available
 	if buildInfo, ok := readBuildInfo(); ok {
 		info.GitCommit = buildInfo.GitCommit
 		info.BuildTime = buildInfo.BuildTime
 	}
-	
+
 	return info
 }
 
@@ -44,15 +44,15 @@ func (bi BuildInfo) String() string {
 	parts = append(parts, fmt.Sprintf("xai-sdk-go v%s", bi.SDKVersion))
 	parts = append(parts, fmt.Sprintf("go %s", bi.GoVersion))
 	parts = append(parts, fmt.Sprintf("%s/%s", bi.GOOS, bi.GOARCH))
-	
+
 	if bi.GitCommit != "" {
 		parts = append(parts, fmt.Sprintf("git %s", bi.GitCommit))
 	}
-	
+
 	if bi.BuildTime != "" {
 		parts = append(parts, fmt.Sprintf("built %s", bi.BuildTime))
 	}
-	
+
 	return strings.Join(parts, " ")
 }
 

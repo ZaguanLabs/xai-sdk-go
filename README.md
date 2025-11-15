@@ -6,7 +6,7 @@
 
 The official Go SDK for xAI provides a first-class, idiomatic Go interface to xAI's powerful AI capabilities. This SDK enables Go developers to integrate chat completions, streaming responses, and upcoming features like file operations, image generation, and more.
 
-> **Status**: **v0.1.0** - This is the first official release. The API is stabilizing, but breaking changes may occur.
+> **Status**: **v0.1.1** - Bug fix release with corrected proto definitions for models API.
 
 ## ✨ Features
 
@@ -26,7 +26,7 @@ The official Go SDK for xAI provides a first-class, idiomatic Go interface to xA
 ### Installation
 
 ```bash
-go get github.com/ZaguanLabs/xai-sdk-go@v0.1.0
+go get github.com/ZaguanLabs/xai-sdk-go@v0.1.1
 ```
 
 ### Basic Usage
@@ -197,6 +197,7 @@ go run examples/chat/streaming/main.go
 The SDK is being developed in phases. Current status:
 
 - ✅ **v0.1.0**: Foundation, proto, configuration, client, auth, basic and advanced chat
+- ✅ **v0.1.1**: Fixed models API proto definitions and metadata handling
 - 🚧 **Upcoming**: Deferred chat, files, image generation, and more.
 
 See [`docs/development-plan.md`](docs/development-plan.md) for detailed progress.

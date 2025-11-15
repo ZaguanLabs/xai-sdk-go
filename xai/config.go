@@ -323,6 +323,9 @@ func (c *Config) CreateGRPCDialOptions() ([]grpc.DialOption, error) {
 	unaryInterceptors = append(unaryInterceptors, timeoutInterceptor.UnaryInterceptor())
 	streamInterceptors = append(streamInterceptors, timeoutInterceptor.StreamInterceptor())
 
+	// Note: Content-Type header is automatically handled by gRPC
+	// Adding it manually can cause "malformed header" errors
+
 	// Apply interceptors
 	if len(unaryInterceptors) > 0 {
 		opts = append(opts, grpc.WithChainUnaryInterceptor(unaryInterceptors...))

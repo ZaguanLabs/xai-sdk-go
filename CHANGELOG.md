@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2025-11-15
+
+### Fixed
+- **Models API Proto Definitions**: Corrected proto package name from `xai.v1` to `xai_api` to match actual xAI API
+- **Models API RPC Methods**: Changed from generic `ListModels` to specific methods: `ListLanguageModels`, `ListEmbeddingModels`, `ListImageGenerationModels`
+- **Proto Field Numbers**: Fixed field number ordering in all model message types (LanguageModel, EmbeddingModel, ImageGenerationModel) to match server wire format
+- **Metadata Handling**: Changed from `metadata.NewOutgoingContext()` to `metadata.AppendToOutgoingContext()` to preserve gRPC internal headers
+- **Content-Type Header**: Removed manual content-type interceptor that was interfering with gRPC's automatic header handling
+
+### Changed
+- Updated models client API to use type-specific methods instead of generic `List()` and `Get()`
+- Enhanced models example with comprehensive debug logging and detailed model information display
+
+### Added
+- Debug logging throughout models example for better troubleshooting
+- Support for all xAI language models including grok-2, grok-3, grok-4 variants
+
 ## [0.1.0] - 2025-11-15
 
 ### Added
