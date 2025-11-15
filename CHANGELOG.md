@@ -5,6 +5,86 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-11-15
+
+### 🎉 Major Release: 100% Proto Alignment
+
+This is a major milestone release achieving **100% proto alignment** with the official xAI Python SDK v1.4.0.
+
+### Added
+
+#### New Proto Files (7 files)
+- **deferred.proto**: Deferred completion support (2 messages, 1 enum)
+- **documents.proto**: Document search functionality (4 messages)
+- **embed.proto**: Embeddings API (5 messages, 1 enum)
+- **sample.proto**: Text sampling (3 messages)
+- **types.proto**: Configuration types (5 messages)
+- **shared.proto**: Shared enums (Ordering)
+- **usage.proto**: Usage tracking (SamplingUsage, EmbeddingUsage, ServerSideTool enum)
+
+#### Chat Proto - Complete Alignment (37 messages, 6 enums)
+- **21 new messages**: CodeExecution, CollectionsSearch, DocumentSearch, DebugOutput, LogProb, LogProbs, TopLogProb, DeleteStoredCompletionRequest/Response, GetDeferredCompletionResponse, GetStoredCompletionRequest, FileContent, MCP (with ExtraHeadersEntry), NewsSource, RssSource, WebSource, XSource, RequestSettings, Source, WebSearch, XSearch
+- **4 new enums**: FinishReason, FormatType, ToolCallType, DeferredStatus
+- All message field numbers, types, and order verified against Python SDK
+
+#### Image Proto
+- **image.proto**: Renamed from images.proto for consistency
+- ImageUrlContent, ImageDetail, ImageFormat enums
+- GenerateImageRequest, GeneratedImage, ImageResponse
+
+#### New SDK Wrappers
+- **xai/embed**: Complete embeddings client with text and image input support
+
+#### Tools & Documentation
+- **tools/verify_protos.py**: Extract proto definitions from Python SDK
+- **tools/compare_protos.sh**: Compare protos with official definitions
+- **docs/PROTO_ALIGNMENT_PLAN.md**: Complete alignment roadmap
+- **docs/CHAT_PROTO_ALIGNMENT_STATUS.md**: Chat proto details
+- **docs/SDK_STATUS.md**: Comprehensive SDK status report
+
+### Changed
+
+#### Proto Updates
+- **auth.proto**: Replaced custom ValidateKey with official ApiKey message (12 fields)
+- **files.proto**: Complete rewrite with 12 messages, 2 enums (FilesSortBy, FilesOrdering)
+- **collections.proto**: Major update with 23 messages, 3 enums (CollectionsSortBy, DocumentStatus, DocumentsSortBy)
+- **models.proto**: Fixed ImageGenerationModel field numbers to match Python SDK
+- **tokenize.proto**: Renamed from tokenizer.proto, complete rewrite with Token message
+
+#### SDK Wrapper Updates
+- **FinishReason**: Now returns enum.String() instead of raw string
+- **Chat API**: Updated for new proto structure, maintains backward compatibility for core features
+
+### Breaking Changes
+
+⚠️ **This is a breaking release** due to proto structure changes:
+
+1. **Auth API**: Old ValidateKey messages removed, replaced with ApiKey
+2. **Files API**: Old UploadFile/DownloadFile messages replaced with new structure
+3. **Collections API**: Complete restructure with new message types
+4. **Tokenizer**: Renamed to tokenize, new message structure
+5. **Images**: Renamed to image for consistency
+
+**Migration**: Update to use new proto structures. Chat API maintains compatibility.
+
+### Fixed
+- All proto field numbers now match official xAI Python SDK v1.4.0
+- Wire format encoding verified correct for all message types
+- Package names consistent across all proto files (xai_api)
+
+### Tested
+- ✅ Chat completions working in production
+- ✅ Chat streaming working in production  
+- ✅ Wire format encoding verified
+- ✅ Proto alignment: 100% (14/14 files, 108 messages, 18 enums)
+
+### Statistics
+- **Proto files**: 14 (100% aligned)
+- **Messages**: 108 total
+- **Enums**: 18 total
+- **Lines of proto**: ~1,500
+- **Generated Go code**: ~15,000 lines
+
 ## [0.1.6] - 2025-11-15
 
 ### Changed
