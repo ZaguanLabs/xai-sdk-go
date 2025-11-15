@@ -21,6 +21,8 @@ This document tracks the feature parity between the Go and Python xAI SDKs.
 
 ## Python SDK Features
 
+The Python SDK exposes the following modules:
+
 - **Auth**: Authentication with API key.
 - **Chat**: Synchronous and streaming chat completion.
 - **Collections**: Manage collections and documents.
@@ -28,3 +30,7 @@ This document tracks the feature parity between the Go and Python xAI SDKs.
 - **Image**: Image generation.
 - **Models**: List and get models.
 - **Tokenizer**: Tokenize text.
+
+## Parity Status
+
+**Conclusion**: The Go SDK has reached feature parity with the Python SDK in terms of the core modules provided. Both SDKs offer clients for `auth`, `chat`, `collections`, `files`, `image`, `models`, and `tokenizer`.
