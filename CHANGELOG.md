@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2025-11-15
+
+### Fixed
+- **Message Proto Field Order**: Corrected Message proto to match official xAI Python SDK v1.4.0
+  - Field 1: `repeated Content content` (was incorrectly field 2)
+  - Field 2: `MessageRole role` (was incorrectly field 1)
+  - Field 3: `string name` (was incorrectly field 4)
+  - Field 4: `repeated ToolCall tool_calls` (was incorrectly field 5)
+  - Field 5: `string reasoning_content` (was incorrectly field 3)
+  - Field 6: `string encrypted_content` (unchanged)
+- **Wire Format Encoding**: Now correctly encodes messages with content as field 1 (LengthDelimited) and role as field 2 (Varint)
+- **Content Type**: Reverted content from string back to `repeated Content` array to match official API
+
+### Changed
+- Extracted official proto definitions from xAI Python SDK v1.4.0 distribution
+- Updated all message builders and validators to use correct field order
+- CompletionMessage (string content) now properly converts to Message (Content array)
+
+## [0.1.4] - 2025-11-15
+
+### Fixed
+- **Message Content Type**: Changed Message.content from `repeated Content` to `string` (later reverted in v0.1.5)
+- Attempted to fix wire type mismatch by simplifying content field
+
+### Note
+This version was superseded by v0.1.5 which uses the correct proto structure from official xAI SDK.
+
+## [0.1.3] - 2025-11-15
+
+### Fixed
+- **Message Proto Field Order**: Attempted to fix wire type error by reordering Message fields
+  - Changed role from field 2 to field 1
+  - Changed content from field 1 to field 2
+- Wire format encoding updated to match new field order
+
+### Note
+This version still had incorrect field order. The correct order was discovered in v0.1.5 by extracting official proto definitions.
+
 ## [0.1.2] - 2025-11-15
 
 ### Fixed

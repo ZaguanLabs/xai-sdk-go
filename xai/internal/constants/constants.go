@@ -143,5 +143,5 @@ const (
 // User agent
 const (
 	// DefaultUserAgent is the default User-Agent string.
-	DefaultUserAgent = "xai-sdk-go/" + "0.1.4"
+	DefaultUserAgent = "xai-sdk-go/" + "0.1.5"
 )
