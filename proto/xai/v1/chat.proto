@@ -7,6 +7,7 @@ option go_package = "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1"
 import "google/protobuf/timestamp.proto";
 import "xai/v1/usage.proto";
 import "xai/v1/image.proto";
+import "xai/v1/deferred.proto";
 
 // Chat service for conversational AI interactions
 service Chat {
@@ -406,10 +407,3 @@ message XSource {
   int32 post_view_count = 10;
 }
 
-// DeferredStatus from deferred.proto (imported conceptually)
-enum DeferredStatus {
-  INVALID_DEFERRED_STATUS = 0;
-  DONE = 1;
-  EXPIRED = 2;
-  PENDING = 3;
-}
