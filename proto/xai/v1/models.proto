@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package xai.v1;
+
+option go_package = "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1";
+
+// Models service for model information
+service Models {
+  // List available models
+  rpc ListModels(ListModelsRequest) returns (ListModelsResponse);
+  
+  // Get model information
+  rpc GetModel(GetModelRequest) returns (Model);
+}
+
+// Model information
+message Model {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  int32 max_tokens = 4;
+}
+
+// List models request
+message ListModelsRequest {
+  // Empty for now
+}
+
+// List models response
+message ListModelsResponse {
+  repeated Model models = 1;
+}
+
+// Get model request
+message GetModelRequest {
+  string model_id = 1;
+}

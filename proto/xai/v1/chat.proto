@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package xai.v1;
+
+option go_package = "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1";
+
+// Chat service for conversational AI interactions
+service Chat {
+  // Create a chat completion
+  rpc CreateChatCompletion(CreateChatCompletionRequest) returns (CreateChatCompletionResponse);
+  
+  // Stream chat completion chunks
+  rpc StreamChatCompletion(CreateChatCompletionRequest) returns (stream ChatCompletionChunk);
+}
+
+// Request to create a chat completion
+message CreateChatCompletionRequest {
+  string model = 1;
+  repeated Message messages = 2;
+  optional float temperature = 3;
+  optional int32 max_tokens = 4;
+}
+
+// Response from chat completion
+message CreateChatCompletionResponse {
+  string id = 1;
+  string model = 2;
+  repeated Choice choices = 3;
+  Usage usage = 4;
+}
+
+// Streaming chunk
+message ChatCompletionChunk {
+  string id = 1;
+  repeated ChoiceDelta choices = 2;
+}
+
+// Message in conversation
+message Message {
+  string role = 1;
+  string content = 2;
+}
+
+// Choice in response
+message Choice {
+  int32 index = 1;
+  Message message = 2;
+  string finish_reason = 3;
+}
+
+// Delta choice for streaming
+message ChoiceDelta {
+  int32 index = 1;
+  MessageDelta delta = 2;
+}
+
+// Message delta
+message MessageDelta {
+  optional string role = 1;
+  optional string content = 2;
+}
+
+// Token usage information
+message Usage {
+  int32 prompt_tokens = 1;
+  int32 completion_tokens = 2;
+  int32 total_tokens = 3;
+}

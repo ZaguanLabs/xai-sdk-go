@@ -22,7 +22,7 @@ test:
 	@go test ./...
 
 proto:
-	@echo "proto: run buf generate (configured in Phase 1)"
+	@$(HOME)/go/bin/buf generate proto
 
 clean:
 	@rm -rf bin build dist

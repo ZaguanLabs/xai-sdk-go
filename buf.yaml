@@ -1,5 +1,3 @@
-version: v1
-
-workspace:
-  directories:
-    - proto
+version: v2
+modules:
+  - path: proto
