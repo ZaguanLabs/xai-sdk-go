@@ -15,6 +15,7 @@ import (
 	"github.com/ZaguanLabs/xai-sdk-go/xai/files"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/errors"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/metadata"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/models"
 	"google.golang.org/grpc"
 )
@@ -24,6 +25,7 @@ type Client struct {
 	config       *Config
 	grpcConn     *grpc.ClientConn
 	grpcClient   *grpc.ClientConn // Alias for consistency
+	restClient   *rest.Client
 	chatClient   xaiv1.ChatClient
 	modelsClient xaiv1.ModelsClient
 	mu           sync.RWMutex
@@ -51,6 +53,18 @@ func NewClient(config *Config) (*Client, error) {
 		metadata:  metadata,
 		createdAt: time.Now(),
 	}
+
+	// Create REST client
+	baseURL := fmt.Sprintf("https://%s/v1", config.HTTPHost)
+	if config.Insecure {
+		baseURL = fmt.Sprintf("http://%s/v1", config.HTTPHost)
+	}
+	client.restClient = rest.NewClient(rest.Config{
+		BaseURL:   baseURL,
+		APIKey:    config.APIKey,
+		UserAgent: metadata.UserAgent,
+		Timeout:   config.Timeout,
+	})
 
 	// Create gRPC connection
 	if err := client.createGRPCConnection(); err != nil {
@@ -425,7 +439,7 @@ func (c *Client) Models() *models.Client {
 func (c *Client) Embed() *embed.Client {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	return embed.NewClient()
+	return embed.NewClient(c.restClient)
 }
 
 // Files returns the files service client.

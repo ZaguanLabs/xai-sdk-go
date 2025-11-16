@@ -5,16 +5,20 @@ import (
 	"context"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 // Client provides access to the xAI Embeddings API.
 type Client struct {
-	// client is the underlying gRPC client (to be added when service is defined)
+	restClient *rest.Client
 }
 
 // NewClient creates a new embeddings client.
-func NewClient() *Client {
-	return &Client{}
+func NewClient(restClient *rest.Client) *Client {
+	return &Client{
+		restClient: restClient,
+	}
 }
 
 // Request represents an embeddings request.
@@ -198,8 +202,28 @@ func (f *FeatureVector) Proto() *xaiv1.FeatureVector {
 }
 
 // Generate generates embeddings for the given request.
-// Note: This is a placeholder. Actual implementation requires gRPC client setup.
 func (c *Client) Generate(ctx context.Context, req *Request) (*Response, error) {
-	// TODO: Implement actual gRPC call when service is defined
-	return nil, nil
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+
+	// Convert proto to JSON
+	jsonData, err := protojson.Marshal(req.proto)
+	if err != nil {
+		return nil, err
+	}
+
+	// Make REST request
+	resp, err := c.restClient.Post(ctx, "/embeddings", jsonData)
+	if err != nil {
+		return nil, err
+	}
+
+	// Parse response
+	var embedResp xaiv1.EmbedResponse
+	if err := protojson.Unmarshal(resp.Body, &embedResp); err != nil {
+		return nil, err
+	}
+
+	return &Response{proto: &embedResp}, nil
 }
