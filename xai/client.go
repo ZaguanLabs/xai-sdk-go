@@ -13,6 +13,7 @@ import (
 	"github.com/ZaguanLabs/xai-sdk-go/xai/collections"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/embed"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/files"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/image"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/errors"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/metadata"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
@@ -461,4 +462,11 @@ func (c *Client) Auth() *auth.Client {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return auth.NewClient(c.restClient)
+}
+
+// Images returns the image generation service client.
+func (c *Client) Images() *image.Client {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return image.NewClient(c.restClient)
 }
