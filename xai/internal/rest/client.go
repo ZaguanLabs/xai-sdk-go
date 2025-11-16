@@ -7,8 +7,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
+	"sync"
 	"time"
+)
+
+// Buffer pool for JSON encoding to reduce allocations
+var bufferPool = sync.Pool{
+	New: func() interface{} {
+		return new(bytes.Buffer)
+	},
+}
+
+const (
+	// MaxResponseSize is the maximum size of a response body (100MB)
+	MaxResponseSize = 100 * 1024 * 1024
 )
 
 // Client is a REST client for xAI APIs.
@@ -27,7 +41,7 @@ type Config struct {
 	Timeout   time.Duration
 }
 
-// NewClient creates a new REST client.
+// NewClient creates a new REST client with optimized connection pooling.
 func NewClient(cfg Config) *Client {
 	if cfg.BaseURL == "" {
 		cfg.BaseURL = "https://api.x.ai/v1"
@@ -39,9 +53,32 @@ func NewClient(cfg Config) *Client {
 		cfg.UserAgent = "xai-sdk-go"
 	}
 
+	// Create optimized HTTP transport with connection pooling
+	transport := &http.Transport{
+		// Connection pooling settings
+		MaxIdleConns:        100,              // Maximum idle connections across all hosts
+		MaxIdleConnsPerHost: 10,               // Maximum idle connections per host
+		MaxConnsPerHost:     100,              // Maximum total connections per host
+		IdleConnTimeout:     90 * time.Second, // How long idle connections stay open
+
+		// Timeout settings
+		DialContext: (&net.Dialer{
+			Timeout:   10 * time.Second, // Connection timeout
+			KeepAlive: 30 * time.Second, // TCP keepalive
+		}).DialContext,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ResponseHeaderTimeout: 10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+
+		// Performance optimizations
+		DisableCompression: false, // Enable gzip compression
+		ForceAttemptHTTP2:  true,  // Use HTTP/2 when available
+	}
+
 	return &Client{
 		httpClient: &http.Client{
-			Timeout: cfg.Timeout,
+			Timeout:   cfg.Timeout,
+			Transport: transport,
 		},
 		baseURL:   cfg.BaseURL,
 		apiKey:    cfg.APIKey,
@@ -70,11 +107,19 @@ func (c *Client) Do(ctx context.Context, req Request) (*Response, error) {
 
 	var body io.Reader
 	if req.Body != nil {
-		jsonBody, err := json.Marshal(req.Body)
-		if err != nil {
+		// Use buffer pool to reduce allocations
+		buf := bufferPool.Get().(*bytes.Buffer)
+		buf.Reset()
+		defer bufferPool.Put(buf)
+
+		if err := json.NewEncoder(buf).Encode(req.Body); err != nil {
 			return nil, fmt.Errorf("failed to marshal request body: %w", err)
 		}
-		body = bytes.NewReader(jsonBody)
+
+		// Create a copy since buf will be returned to pool
+		bodyBytes := make([]byte, buf.Len())
+		copy(bodyBytes, buf.Bytes())
+		body = bytes.NewReader(bodyBytes)
 	}
 
 	httpReq, err := http.NewRequestWithContext(ctx, req.Method, url, body)
@@ -100,7 +145,9 @@ func (c *Client) Do(ctx context.Context, req Request) (*Response, error) {
 	}
 	defer httpResp.Body.Close()
 
-	respBody, err := io.ReadAll(httpResp.Body)
+	// Limit response size to prevent memory exhaustion
+	limitedReader := io.LimitReader(httpResp.Body, MaxResponseSize)
+	respBody, err := io.ReadAll(limitedReader)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
@@ -154,6 +201,16 @@ func (c *Client) Delete(ctx context.Context, path string) (*Response, error) {
 		Method: http.MethodDelete,
 		Path:   path,
 	})
+}
+
+// Close closes idle connections in the HTTP client's connection pool.
+// This should be called when the client is no longer needed to free resources.
+func (c *Client) Close() {
+	if c.httpClient != nil && c.httpClient.Transport != nil {
+		if transport, ok := c.httpClient.Transport.(*http.Transport); ok {
+			transport.CloseIdleConnections()
+		}
+	}
 }
 
 // DecodeJSON decodes a JSON response into a target struct.
