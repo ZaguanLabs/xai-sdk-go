@@ -4,7 +4,9 @@
 [![Release](https://img.shields.io/github/v/release/ZaguanLabs/xai-sdk-go)](https://github.com/ZaguanLabs/xai-sdk-go/releases/latest)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-The official Go SDK for xAI provides a first-class, idiomatic Go interface to xAI's powerful AI capabilities. This SDK enables Go developers to integrate chat completions, streaming responses, and upcoming features like file operations, image generation, and more.
+**The unofficial Go SDK for xAI** provides a first-class, idiomatic Go interface to xAI's powerful AI capabilities. This SDK enables Go developers to integrate chat completions, streaming responses, embeddings, file operations, and more.
+
+> **Note**: This is an unofficial, community-maintained SDK and is not affiliated with or endorsed by xAI.
 
 > **Status**: **v0.2.1** - Hotfix release fixing compilation errors from v0.2.0.
 
