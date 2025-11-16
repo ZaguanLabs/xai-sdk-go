@@ -10,6 +10,7 @@ import (
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/chat"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/embed"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/files"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/errors"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/metadata"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/models"
@@ -423,4 +424,11 @@ func (c *Client) Embed() *embed.Client {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return embed.NewClient()
+}
+
+// Files returns the files service client.
+func (c *Client) Files() *files.Client {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return files.NewClient()
 }
