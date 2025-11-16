@@ -20,6 +20,8 @@ import (
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/metadata"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/models"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/sample"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/tokenizer"
 	"google.golang.org/grpc"
 )
 
@@ -485,4 +487,18 @@ func (c *Client) Documents() *documents.Client {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return documents.NewClient(c.restClient)
+}
+
+// Sample returns the sample/completion service client (legacy).
+func (c *Client) Sample() *sample.Client {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return sample.NewClient(c.restClient)
+}
+
+// Tokenizer returns the tokenization service client.
+func (c *Client) Tokenizer() *tokenizer.Client {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return tokenizer.NewClient(c.restClient)
 }

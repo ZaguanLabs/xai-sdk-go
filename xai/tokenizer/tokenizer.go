@@ -1,203 +1,77 @@
-// Package tokenizer provides text tokenization functionality for xAI SDK.
+// Package tokenizer provides a client for the xAI Tokenization API.
 package tokenizer
 
 import (
 	"context"
-	"fmt"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
-// TokenizerServiceClient is an interface for the tokenizer service client.
-type TokenizerServiceClient interface {
-	EncodeText(ctx context.Context, req *xaiv1.EncodeTextRequest, opts ...grpc.CallOption) (*xaiv1.EncodeTextResponse, error)
-	DecodeTokens(ctx context.Context, req *xaiv1.DecodeTokensRequest, opts ...grpc.CallOption) (*xaiv1.DecodeTokensResponse, error)
-	CountTokens(ctx context.Context, req *xaiv1.CountTokensRequest, opts ...grpc.CallOption) (*xaiv1.CountTokensResponse, error)
-}
-
-// Client provides tokenization functionality.
+// Client provides access to the xAI Tokenization API.
 type Client struct {
-	grpcClient TokenizerServiceClient
+	restClient *rest.Client
 }
 
-// NewClient creates a new tokenizer client.
-func NewClient(grpcClient TokenizerServiceClient) *Client {
+// NewClient creates a new Tokenization API client.
+func NewClient(restClient *rest.Client) *Client {
 	return &Client{
-		grpcClient: grpcClient,
+		restClient: restClient,
 	}
 }
 
-// Encode converts text into tokens.
-func (c *Client) Encode(ctx context.Context, text, model string) ([]int32, error) {
-	if text == "" {
-		return nil, fmt.Errorf("text is required")
-	}
-	if model == "" {
-		return nil, fmt.Errorf("model is required")
+// Token represents a single token.
+type Token struct {
+	TokenID     uint32
+	StringToken string
+	TokenBytes  []byte
+}
+
+// Response represents the tokenization response.
+type Response struct {
+	Tokens []*Token
+	Model  string
+}
+
+// Tokenize tokenizes the given text.
+func (c *Client) Tokenize(ctx context.Context, text, model, user string) (*Response, error) {
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
 	}
 
-	req := &xaiv1.EncodeTextRequest{
+	req := &xaiv1.TokenizeTextRequest{
 		Text:  text,
 		Model: model,
+		User:  user,
 	}
 
-	resp, err := c.grpcClient.EncodeText(ctx, req)
+	jsonData, err := protojson.Marshal(req)
 	if err != nil {
-		// Handle specific gRPC errors
-		if st, ok := status.FromError(err); ok {
-			switch st.Code() {
-			case codes.Unauthenticated:
-				return nil, fmt.Errorf("authentication failed: %s", st.Message())
-			case codes.PermissionDenied:
-				return nil, fmt.Errorf("permission denied: %s", st.Message())
-			case codes.InvalidArgument:
-				return nil, fmt.Errorf("invalid request: %s", st.Message())
-			case codes.NotFound:
-				return nil, fmt.Errorf("model not found: %s", st.Message())
-			case codes.Unavailable:
-				return nil, fmt.Errorf("service unavailable: %s", st.Message())
-			default:
-				return nil, fmt.Errorf("encode text failed (%s): %s", st.Code().String(), st.Message())
-			}
+		return nil, err
+	}
+
+	resp, err := c.restClient.Post(ctx, "/tokenize", jsonData)
+	if err != nil {
+		return nil, err
+	}
+
+	var tokenResp xaiv1.TokenizeTextResponse
+	if err := protojson.Unmarshal(resp.Body, &tokenResp); err != nil {
+		return nil, err
+	}
+
+	tokens := make([]*Token, len(tokenResp.Tokens))
+	for i, t := range tokenResp.Tokens {
+		tokens[i] = &Token{
+			TokenID:     t.TokenId,
+			StringToken: t.StringToken,
+			TokenBytes:  t.TokenBytes,
 		}
-		return nil, fmt.Errorf("encode text failed: %w", err)
 	}
 
-	if resp == nil {
-		return nil, fmt.Errorf("received nil response")
-	}
-
-	return resp.Tokens, nil
-}
-
-// Decode converts tokens back into text.
-func (c *Client) Decode(ctx context.Context, tokens []int32, model string) (string, error) {
-	if len(tokens) == 0 {
-		return "", fmt.Errorf("tokens are required")
-	}
-	if model == "" {
-		return "", fmt.Errorf("model is required")
-	}
-
-	req := &xaiv1.DecodeTokensRequest{
+	return &Response{
 		Tokens: tokens,
-		Model:  model,
-	}
-
-	resp, err := c.grpcClient.DecodeTokens(ctx, req)
-	if err != nil {
-		// Handle specific gRPC errors
-		if st, ok := status.FromError(err); ok {
-			switch st.Code() {
-			case codes.Unauthenticated:
-				return "", fmt.Errorf("authentication failed: %s", st.Message())
-			case codes.PermissionDenied:
-				return "", fmt.Errorf("permission denied: %s", st.Message())
-			case codes.InvalidArgument:
-				return "", fmt.Errorf("invalid request: %s", st.Message())
-			case codes.NotFound:
-				return "", fmt.Errorf("model not found: %s", st.Message())
-			case codes.Unavailable:
-				return "", fmt.Errorf("service unavailable: %s", st.Message())
-			default:
-				return "", fmt.Errorf("decode tokens failed (%s): %s", st.Code().String(), st.Message())
-			}
-		}
-		return "", fmt.Errorf("decode tokens failed: %w", err)
-	}
-
-	if resp == nil {
-		return "", fmt.Errorf("received nil response")
-	}
-
-	return resp.Text, nil
-}
-
-// Count counts the number of tokens in text.
-func (c *Client) Count(ctx context.Context, text, model string) (int32, error) {
-	if text == "" {
-		return 0, fmt.Errorf("text is required")
-	}
-	if model == "" {
-		return 0, fmt.Errorf("model is required")
-	}
-
-	req := &xaiv1.CountTokensRequest{
-		Text:  text,
-		Model: model,
-	}
-
-	resp, err := c.grpcClient.CountTokens(ctx, req)
-	if err != nil {
-		// Handle specific gRPC errors
-		if st, ok := status.FromError(err); ok {
-			switch st.Code() {
-			case codes.Unauthenticated:
-				return 0, fmt.Errorf("authentication failed: %s", st.Message())
-			case codes.PermissionDenied:
-				return 0, fmt.Errorf("permission denied: %s", st.Message())
-			case codes.InvalidArgument:
-				return 0, fmt.Errorf("invalid request: %s", st.Message())
-			case codes.NotFound:
-				return 0, fmt.Errorf("model not found: %s", st.Message())
-			case codes.Unavailable:
-				return 0, fmt.Errorf("service unavailable: %s", st.Message())
-			default:
-				return 0, fmt.Errorf("count tokens failed (%s): %s", st.Code().String(), st.Message())
-			}
-		}
-		return 0, fmt.Errorf("count tokens failed: %w", err)
-	}
-
-	if resp == nil {
-		return 0, fmt.Errorf("received nil response")
-	}
-
-	return resp.TokenCount, nil
-}
-
-// CountWithDetails counts tokens and returns additional details.
-func (c *Client) CountWithDetails(ctx context.Context, text, model string) (tokenCount int32, characterCount int32, err error) {
-	if text == "" {
-		return 0, 0, fmt.Errorf("text is required")
-	}
-	if model == "" {
-		return 0, 0, fmt.Errorf("model is required")
-	}
-
-	req := &xaiv1.CountTokensRequest{
-		Text:  text,
-		Model: model,
-	}
-
-	resp, err := c.grpcClient.CountTokens(ctx, req)
-	if err != nil {
-		// Handle specific gRPC errors
-		if st, ok := status.FromError(err); ok {
-			switch st.Code() {
-			case codes.Unauthenticated:
-				return 0, 0, fmt.Errorf("authentication failed: %s", st.Message())
-			case codes.PermissionDenied:
-				return 0, 0, fmt.Errorf("permission denied: %s", st.Message())
-			case codes.InvalidArgument:
-				return 0, 0, fmt.Errorf("invalid request: %s", st.Message())
-			case codes.NotFound:
-				return 0, 0, fmt.Errorf("model not found: %s", st.Message())
-			case codes.Unavailable:
-				return 0, 0, fmt.Errorf("service unavailable: %s", st.Message())
-			default:
-				return 0, 0, fmt.Errorf("count tokens failed (%s): %s", st.Code().String(), st.Message())
-			}
-		}
-		return 0, 0, fmt.Errorf("count tokens failed: %w", err)
-	}
-
-	if resp == nil {
-		return 0, 0, fmt.Errorf("received nil response")
-	}
-
-	return resp.TokenCount, resp.CharacterCount, nil
+		Model:  tokenResp.Model,
+	}, nil
 }
