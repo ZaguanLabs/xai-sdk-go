@@ -74,8 +74,21 @@ func (c *Client) ValidateKey(ctx context.Context, apiKey string) (*ApiKey, error
 	if c.restClient == nil {
 		return nil, ErrClientNotInitialized
 	}
-	// TODO: Implement REST endpoint
-	return nil, ErrNotImplemented
+
+	// Create validation request with the API key
+	req := map[string]string{"api_key": apiKey}
+
+	resp, err := c.restClient.Post(ctx, "/auth/validate", req)
+	if err != nil {
+		return nil, err
+	}
+
+	var key xaiv1.ApiKey
+	if err := protojson.Unmarshal(resp.Body, &key); err != nil {
+		return nil, err
+	}
+
+	return fromProto(&key), nil
 }
 
 // GetKey retrieves API key metadata by ID.
@@ -102,6 +115,24 @@ func (c *Client) ListKeys(ctx context.Context) ([]*ApiKey, error) {
 	if c.restClient == nil {
 		return nil, ErrClientNotInitialized
 	}
-	// TODO: Implement REST endpoint
-	return nil, ErrNotImplemented
+
+	resp, err := c.restClient.Get(ctx, "/auth/keys")
+	if err != nil {
+		return nil, err
+	}
+
+	// Parse response as array of API keys
+	var keysResponse struct {
+		Keys []*xaiv1.ApiKey `json:"keys"`
+	}
+	if err := resp.DecodeJSON(&keysResponse); err != nil {
+		return nil, err
+	}
+
+	keys := make([]*ApiKey, len(keysResponse.Keys))
+	for i, k := range keysResponse.Keys {
+		keys[i] = fromProto(k)
+	}
+
+	return keys, nil
 }
