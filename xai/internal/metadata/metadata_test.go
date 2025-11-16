@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/version"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -28,7 +29,7 @@ func TestNewSDKMetadata(t *testing.T) {
 	}
 
 	// Check default values
-	expectedClientVersion := "xai-sdk-go/0.3.0"
+	expectedClientVersion := "xai-sdk-go/" + version.GetSDKVersion()
 	if md.ClientVersion != expectedClientVersion {
 		t.Errorf("Expected client version %s, got %s", expectedClientVersion, md.ClientVersion)
 	}

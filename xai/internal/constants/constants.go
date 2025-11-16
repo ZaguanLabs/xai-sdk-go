@@ -3,6 +3,8 @@ package constants
 
 import (
 	"time"
+
+	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/version"
 )
 
 // Default service endpoints and hosts
@@ -141,7 +143,8 @@ const (
 )
 
 // User agent
-const (
+var (
 	// DefaultUserAgent is the default User-Agent string.
-	DefaultUserAgent = "xai-sdk-go/0.3.0"
+	// This dynamically references the version from the version package.
+	DefaultUserAgent = "xai-sdk-go/" + version.SDKVersion
 )

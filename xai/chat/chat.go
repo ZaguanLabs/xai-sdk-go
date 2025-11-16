@@ -347,6 +347,97 @@ func WithMessage(msg *Message) RequestOption {
 	}
 }
 
+// WithTopP sets the nucleus sampling parameter as a functional option.
+func WithTopP(topP float32) RequestOption {
+	return func(r *Request) {
+		r.proto.TopP = topP
+	}
+}
+
+// WithStop sets stop sequences as a functional option.
+func WithStop(stop ...string) RequestOption {
+	return func(r *Request) {
+		r.proto.Stop = stop
+	}
+}
+
+// WithFrequencyPenalty sets the frequency penalty as a functional option.
+func WithFrequencyPenalty(penalty float32) RequestOption {
+	return func(r *Request) {
+		r.proto.FrequencyPenalty = penalty
+	}
+}
+
+// WithPresencePenalty sets the presence penalty as a functional option.
+func WithPresencePenalty(penalty float32) RequestOption {
+	return func(r *Request) {
+		r.proto.PresencePenalty = penalty
+	}
+}
+
+// WithSeed sets the seed for deterministic sampling as a functional option.
+func WithSeed(seed int32) RequestOption {
+	return func(r *Request) {
+		r.proto.Seed = seed
+	}
+}
+
+// WithLogprobs enables returning log probabilities as a functional option.
+func WithLogprobs(logprobs bool) RequestOption {
+	return func(r *Request) {
+		r.proto.Logprobs = logprobs
+	}
+}
+
+// WithTopLogprobs sets the number of top log probabilities as a functional option.
+func WithTopLogprobs(topLogprobs int32) RequestOption {
+	return func(r *Request) {
+		r.proto.TopLogprobs = topLogprobs
+	}
+}
+
+// WithN sets the number of completions to generate as a functional option.
+func WithN(n int32) RequestOption {
+	return func(r *Request) {
+		r.proto.N = n
+	}
+}
+
+// WithUser sets the user identifier as a functional option.
+func WithUser(user string) RequestOption {
+	return func(r *Request) {
+		r.proto.User = user
+	}
+}
+
+// WithParallelToolCalls sets whether to execute tool calls in parallel as a functional option.
+func WithParallelToolCalls(parallel bool) RequestOption {
+	return func(r *Request) {
+		r.proto.ParallelToolCalls = parallel
+	}
+}
+
+// WithPreviousResponseID sets the previous response ID as a functional option.
+func WithPreviousResponseID(responseID string) RequestOption {
+	return func(r *Request) {
+		r.proto.PreviousResponseId = responseID
+	}
+}
+
+// WithStoreMessages sets whether to store messages as a functional option.
+func WithStoreMessages(store bool) RequestOption {
+	return func(r *Request) {
+		r.proto.StoreMessages = store
+	}
+}
+
+// WithUseEncryptedContent sets whether to use encrypted content as a functional option.
+func WithUseEncryptedContent(encrypted bool) RequestOption {
+	return func(r *Request) {
+		r.proto.UseEncryptedContent = encrypted
+	}
+}
+
 // SetTemperature sets the temperature for sampling.
 func (r *Request) SetTemperature(temp float32) *Request {
 	r.proto.Temperature = temp
@@ -362,6 +453,106 @@ func (r *Request) SetMaxTokens(maxTokens int32) *Request {
 // MaxTokens returns the max tokens setting.
 func (r *Request) MaxTokens() int32 {
 	return r.proto.MaxTokens
+}
+
+// SetTopP sets the nucleus sampling parameter (top_p).
+// An alternative to sampling with temperature, where the model considers
+// the results of the tokens with top_p probability mass.
+// Values should be between 0 and 1.
+func (r *Request) SetTopP(topP float32) *Request {
+	r.proto.TopP = topP
+	return r
+}
+
+// SetStop sets up to 4 sequences where the API will stop generating further tokens.
+func (r *Request) SetStop(stop ...string) *Request {
+	r.proto.Stop = stop
+	return r
+}
+
+// SetFrequencyPenalty sets the frequency penalty parameter.
+// Positive values penalize new tokens based on their existing frequency in the text so far,
+// decreasing the model's likelihood to repeat the same line verbatim.
+// Values typically range from 0 to 2.
+func (r *Request) SetFrequencyPenalty(penalty float32) *Request {
+	r.proto.FrequencyPenalty = penalty
+	return r
+}
+
+// SetPresencePenalty sets the presence penalty parameter.
+// Positive values penalize new tokens based on whether they appear in the text so far,
+// increasing the model's likelihood to talk about new topics.
+// Values typically range from 0 to 2.
+func (r *Request) SetPresencePenalty(penalty float32) *Request {
+	r.proto.PresencePenalty = penalty
+	return r
+}
+
+// SetSeed sets the seed for deterministic sampling.
+// If specified, the system will make a best effort to sample deterministically,
+// such that repeated requests with the same seed and parameters should return the same result.
+func (r *Request) SetSeed(seed int32) *Request {
+	r.proto.Seed = seed
+	return r
+}
+
+// SetLogprobs enables or disables returning log probabilities.
+// If true, returns the log probabilities of each output token returned in the content of message.
+func (r *Request) SetLogprobs(logprobs bool) *Request {
+	r.proto.Logprobs = logprobs
+	return r
+}
+
+// SetTopLogprobs sets the number of most likely tokens to return at each token position.
+// An integer between 0 and 8 specifying the number of most likely tokens to return.
+// logprobs must be set to true if this parameter is used.
+func (r *Request) SetTopLogprobs(topLogprobs int32) *Request {
+	r.proto.TopLogprobs = topLogprobs
+	return r
+}
+
+// SetN sets the number of completions to generate.
+// How many chat completion choices to generate for each input message.
+// Note: Because this parameter generates many completions, it can quickly consume your token quota.
+func (r *Request) SetN(n int32) *Request {
+	r.proto.N = n
+	return r
+}
+
+// SetUser sets a unique identifier representing your end-user.
+// This can help xAI to monitor and detect abuse.
+func (r *Request) SetUser(user string) *Request {
+	r.proto.User = user
+	return r
+}
+
+// SetParallelToolCalls sets whether to execute tool calls in parallel.
+// If true, the model can call multiple tools simultaneously.
+// If false, tool calls are executed sequentially.
+func (r *Request) SetParallelToolCalls(parallel bool) *Request {
+	r.proto.ParallelToolCalls = parallel
+	return r
+}
+
+// SetPreviousResponseID sets the ID of a previous response for conversation continuity.
+// This allows the model to reference and build upon previous interactions.
+func (r *Request) SetPreviousResponseID(responseID string) *Request {
+	r.proto.PreviousResponseId = responseID
+	return r
+}
+
+// SetStoreMessages sets whether to store messages from this conversation.
+// If true, messages will be stored for future reference.
+func (r *Request) SetStoreMessages(store bool) *Request {
+	r.proto.StoreMessages = store
+	return r
+}
+
+// SetUseEncryptedContent sets whether to use encrypted content.
+// If true, content will be encrypted for enhanced security.
+func (r *Request) SetUseEncryptedContent(encrypted bool) *Request {
+	r.proto.UseEncryptedContent = encrypted
+	return r
 }
 
 // SetTools sets the tools for function calling.

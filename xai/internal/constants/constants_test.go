@@ -4,6 +4,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/version"
 )
 
 func TestDefaultEndpoints(t *testing.T) {
@@ -152,8 +154,9 @@ func TestDefaultUserAgent(t *testing.T) {
 		t.Errorf("DefaultUserAgent should contain 'xai-sdk-go', got: %s", DefaultUserAgent)
 	}
 
-	if !strings.Contains(DefaultUserAgent, "0.3.0") {
-		t.Errorf("DefaultUserAgent should contain version '0.3.0', got: %s", DefaultUserAgent)
+	// Verify it contains the version from the version package
+	if !strings.Contains(DefaultUserAgent, version.SDKVersion) {
+		t.Errorf("DefaultUserAgent should contain version '%s', got: %s", version.SDKVersion, DefaultUserAgent)
 	}
 }
 

@@ -8,7 +8,7 @@
 
 > **Note**: This is an unofficial, community-maintained SDK and is not affiliated with or endorsed by xAI.
 
-> **Status**: **v0.3.0 Released** - Production-ready with 100% API coverage (11/11 APIs), comprehensive examples, integration tests, performance optimizations, and security enhancements!
+> **Status**: **v0.4.0 Released** - Production-ready with 100% API coverage (11/11 APIs), 100% Chat parameter coverage (24/24), comprehensive examples, integration tests, performance optimizations, and security enhancements!
 
 ## ✨ Features
 
@@ -45,7 +45,7 @@
 ### Installation
 
 ```bash
-go get github.com/ZaguanLabs/xai-sdk-go@v0.3.0
+go get github.com/ZaguanLabs/xai-sdk-go@v0.4.0
 ```
 
 ### Basic Usage
@@ -266,7 +266,7 @@ if err != nil {
 - ✅ **v0.2.0**: 100% proto alignment with xAI Python SDK v1.4.0
 - ✅ **v0.2.1**: Hotfix for compilation errors
 
-### Current (v0.3.0 - Released 2025-11-16)
+### Current (v0.3.1 - Released 2025-11-16)
 - ✅ **REST Client Foundation**: Complete HTTP infrastructure with connection pooling
 - ✅ **All 11 APIs Implemented**: 100% API coverage (28+ methods)
 - ✅ **Production Ready**: Chat and Models tested in production

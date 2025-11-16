@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/version"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 )
@@ -51,7 +52,7 @@ type SDKMetadata struct {
 func NewSDKMetadata(apiKey string) *SDKMetadata {
 	return &SDKMetadata{
 		APIKey:        apiKey,
-		ClientVersion: "xai-sdk-go/0.3.0",
+		ClientVersion: "xai-sdk-go/" + version.GetSDKVersion(),
 		Environment:   "production",
 	}
 }

@@ -7,6 +7,101 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2025-11-16
+
+### 🎉 Complete Feature Parity: 100% Chat API Parameter Coverage
+
+This release achieves **complete feature parity** with the Python SDK by implementing all 13 missing Chat API parameters. The Go SDK now exposes all 24 parameters from the proto definition.
+
+### Added
+
+#### Chat API - All Missing Parameters (13/13)
+
+**Phase 1: Basic Parameters (v0.3.1)**
+- **TopP (Nucleus Sampling)**: Added `SetTopP()` and `WithTopP()` for nucleus sampling control
+- **Stop Sequences**: Added `SetStop()` and `WithStop()` to stop generation at specific sequences (up to 4)
+- **Frequency Penalty**: Added `SetFrequencyPenalty()` and `WithFrequencyPenalty()` to reduce repetition
+- **Presence Penalty**: Added `SetPresencePenalty()` and `WithPresencePenalty()` to encourage new topics
+
+**Phase 2: High-Priority Parameters (v0.3.2)**
+- **Seed**: Added `SetSeed()` and `WithSeed()` for deterministic sampling
+  - Enables reproducible outputs for testing and debugging
+  - Same seed + parameters = same result
+- **Logprobs**: Added `SetLogprobs()` and `WithLogprobs()` to enable log probability output
+  - Returns log probabilities for confidence scoring
+  - Essential for model analysis and calibration
+- **TopLogprobs**: Added `SetTopLogprobs()` and `WithTopLogprobs()` for alternative token probabilities
+  - Returns top N most likely tokens at each position (0-8)
+  - Requires `logprobs` to be enabled
+- **N**: Added `SetN()` and `WithN()` to generate multiple completions
+  - Generate multiple responses in a single request
+  - Useful for exploring response diversity
+- **User**: Added `SetUser()` and `WithUser()` for end-user identification
+  - Track requests by user ID for abuse monitoring
+  - Important for production deployments
+
+**Phase 3: Advanced Features (v0.4.0)**
+- **ParallelToolCalls**: Added `SetParallelToolCalls()` and `WithParallelToolCalls()`
+  - Control whether tool calls execute in parallel or sequentially
+  - Enables performance optimization for multi-tool scenarios
+- **PreviousResponseID**: Added `SetPreviousResponseID()` and `WithPreviousResponseID()`
+  - Reference previous responses for conversation continuity
+  - Enables context-aware follow-up interactions
+- **StoreMessages**: Added `SetStoreMessages()` and `WithStoreMessages()`
+  - Control whether messages are stored for future reference
+  - Useful for ephemeral vs. persistent conversations
+- **UseEncryptedContent**: Added `SetUseEncryptedContent()` and `WithUseEncryptedContent()`
+  - Enable content encryption for enhanced security
+  - Important for handling sensitive information
+
+#### Version Management
+- **Centralized Version**: Single source of truth in `xai/internal/version/version.go`
+- **Dynamic References**: `DefaultUserAgent` and `ClientVersion` now reference the central version
+- **Simplified Releases**: Only one file needs updating for version bumps
+
+#### Examples
+- **New Example**: `examples/chat/advanced_parameters` - Demonstrates TopP, Stop, FrequencyPenalty, PresencePenalty
+- **New Example**: `examples/chat/complete_parameters` - Comprehensive demonstration of all chat parameters
+  - Deterministic outputs with Seed
+  - Log probabilities for confidence scoring
+  - Multiple completions with N
+  - User tracking for abuse monitoring
+  - All parameters combined in one example
+- **New Example**: `examples/chat/advanced_features` - Comprehensive demonstration of advanced parameters
+  - Conversation continuity with PreviousResponseID
+  - Parallel vs. sequential tool execution
+  - Message storage control
+  - Encrypted content handling
+  - All advanced features combined
+
+### Changed
+- **Chat API Coverage**: Increased from 58% to 100% (24/24 parameters) ✅
+- **Overall SDK Coverage**: 100% across all 11 APIs ✅
+- **Version Management**: Centralized version string to `xai/internal/version.SDKVersion`
+- **Constants Package**: `DefaultUserAgent` now dynamically references version package
+- **Metadata Package**: `ClientVersion` now dynamically references version package
+- **Tests**: Updated to reference version constant instead of hardcoded strings
+
+### Documentation
+- Added `docs/PARAMETER_AUDIT.md` - Detailed Chat API parameter audit
+- Added `docs/COMPLETE_API_PARAMETER_AUDIT.md` - Comprehensive audit of all 11 APIs
+- Updated README with v0.4.0 and complete parameter coverage
+
+### Technical Details
+- All parameters follow existing patterns (Set* and With* methods)
+- Maintains backward compatibility - all parameters are optional
+- Matches Python SDK v1.4.0 implementation completely
+- No breaking changes from v0.3.0
+
+### Statistics
+- **Total APIs**: 11
+- **APIs with 100% coverage**: 11 (100%) ✅
+- **Chat API parameters**: 24/24 (100%) ✅
+- **Overall parameter coverage**: 100% ✅
+
+### Migration from v0.3.0
+No breaking changes. All existing code continues to work. New parameters are optional and can be adopted incrementally.
+
 ## [0.3.0] - 2025-11-16
 
 ### 🎉 Major Release: Complete API Coverage & Performance
