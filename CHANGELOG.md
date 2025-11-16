@@ -7,6 +7,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2025-11-16
+
+### 🐛 Critical Bug Fixes
+
+This patch release fixes critical bugs in JSON Schema generation for client-side function tools that would cause tool calls to fail or behave incorrectly.
+
+### Fixed
+
+#### Tool JSON Schema Generation (Critical)
+- **Fixed `ToJSONSchema()` bug**: The `"required"` field was incorrectly included in individual property definitions, creating invalid JSON Schema. Now properly strips `"required"` from properties and builds a top-level `"required": []` array.
+  - **Before (INVALID)**: `{"city": {"type": "string", "required": true}}`
+  - **After (VALID)**: `{"type": "object", "properties": {"city": {"type": "string"}}, "required": ["city"]}`
+
+- **Fixed `WithTool()` bug**: Was marshaling raw `tool.Parameters()` instead of `tool.ToJSONSchema()`, resulting in malformed JSON Schema being sent to the API. Now correctly marshals the properly formatted schema.
+  - Location: `xai/chat/chat.go:258`
+  - Impact: All client-side function tools now generate 100% valid JSON Schema
+
+### Added
+
+#### Tests
+- **New test**: `TestToolJSONSchemaFormat` - Verifies `ToJSONSchema()` produces valid JSON Schema format
+- **New test**: `TestToolToJSON` - Verifies `ToJSON()` produces valid tool JSON representation
+- **New test**: `TestWithToolJSONSchemaFormat` - Verifies `WithTool()` creates valid proto with correct JSON Schema
+
+#### Documentation
+- **New doc**: `docs/PYTHON_SDK_COMPARISON_AUDIT.md` - Comprehensive comparison between Python SDK and Go SDK
+  - Feature parity analysis
+  - Identified bugs and fixes
+  - Missing features roadmap
+  - Design differences explanation
+
+### Impact
+
+These bugs would have caused:
+- API rejections for tool calls
+- Tool parameter validation failures
+- Incorrect tool execution
+- Incompatibility with xAI's expected JSON Schema format
+
+All tools now generate **100% valid JSON Schema** matching the Python SDK's format and xAI API expectations.
+
+### Migration from v0.5.0
+
+No code changes required. The fixes are internal to the SDK and automatically apply to all existing code using `WithTool()` or `NewTool()`.
+
+```go
+// Your existing code works correctly now
+tool := chat.NewTool("get_weather", "Get weather")
+tool.WithParameter("city", "string", "City name", true)
+req := chat.NewRequest("grok-beta", chat.WithTool(tool))
+// Now generates valid JSON Schema automatically ✅
+```
+
 ## [0.5.0] - 2025-11-16
 
 ### 🎉 Complete Tool Support: 100% Feature Parity with Python SDK

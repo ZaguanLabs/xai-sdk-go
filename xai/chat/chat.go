@@ -254,8 +254,9 @@ func WithTool(tools ...*Tool) RequestOption {
 		// Convert tools to proto format
 		protoTools := make([]*xaiv1.Tool, len(tools))
 		for i, tool := range tools {
-			// Convert parameters map to JSON string
-			paramsJSON, _ := json.Marshal(tool.Parameters())
+			// Convert parameters to proper JSON Schema format
+			// ToJSONSchema() strips "required" from properties and builds top-level required array
+			paramsJSON, _ := json.Marshal(tool.ToJSONSchema())
 			protoTools[i] = &xaiv1.Tool{
 				Function: &xaiv1.Function{
 					Name:        tool.Name(),

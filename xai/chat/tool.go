@@ -73,16 +73,25 @@ func (t *Tool) Parameters() map[string]interface{} {
 // ToJSONSchema converts the tool to JSON schema format.
 func (t *Tool) ToJSONSchema() map[string]interface{} {
 	properties := make(map[string]interface{})
-	for name, param := range t.parameters {
-		properties[name] = param
-	}
-
 	required := make([]string, 0)
+
 	for name, param := range t.parameters {
 		if paramMap, ok := param.(map[string]interface{}); ok {
-			if req, exists := paramMap["required"]; exists && req.(bool) {
-				required = append(required, name)
+			// Create a copy of the parameter without the "required" field
+			// The "required" field should only be in the top-level "required" array
+			propCopy := make(map[string]interface{})
+			for key, value := range paramMap {
+				if key != "required" {
+					propCopy[key] = value
+				} else if req, ok := value.(bool); ok && req {
+					// Add to required array if true
+					required = append(required, name)
+				}
 			}
+			properties[name] = propCopy
+		} else {
+			// If it's not a map, just copy it as-is
+			properties[name] = param
 		}
 	}
 
