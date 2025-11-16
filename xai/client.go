@@ -8,6 +8,7 @@ import (
 	"time"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/auth"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/chat"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/collections"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/embed"
@@ -439,4 +440,11 @@ func (c *Client) Collections() *collections.Client {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return collections.NewClient()
+}
+
+// Auth returns the auth service client.
+func (c *Client) Auth() *auth.Client {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return auth.NewClient()
 }
