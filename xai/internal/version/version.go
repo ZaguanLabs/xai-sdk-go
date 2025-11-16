@@ -10,7 +10,7 @@ import (
 // SDKVersion is the current version of the xAI SDK Go client.
 // This is the single source of truth for the SDK version.
 // Update this constant for new releases.
-const SDKVersion = "0.5.2"
+const SDKVersion = "0.5.3"
 
 // BuildInfo contains build and runtime information.
 type BuildInfo struct {

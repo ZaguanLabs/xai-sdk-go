@@ -15,6 +15,7 @@ type Tool struct {
 	name        string
 	description string
 	parameters  map[string]interface{}
+	strict      bool // Enable strict schema validation
 }
 
 // NewTool creates a new tool with the given name and description.
@@ -68,6 +69,18 @@ func (t *Tool) Parameters() map[string]interface{} {
 		return make(map[string]interface{})
 	}
 	return t.parameters
+}
+
+// WithStrict enables strict schema validation for this tool.
+// When enabled, the model will strictly validate function arguments against the schema.
+func (t *Tool) WithStrict(strict bool) *Tool {
+	t.strict = strict
+	return t
+}
+
+// Strict returns whether strict schema validation is enabled.
+func (t *Tool) Strict() bool {
+	return t.strict
 }
 
 // ToJSONSchema converts the tool to JSON schema format.

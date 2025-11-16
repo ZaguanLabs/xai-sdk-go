@@ -57,6 +57,20 @@ func reasoningEffortToProto(effort string) xaiv1.ReasoningEffort {
 	}
 }
 
+// reasoningEffortFromProto converts ReasoningEffort enum to string
+func reasoningEffortFromProto(effort xaiv1.ReasoningEffort) string {
+	switch effort {
+	case xaiv1.ReasoningEffort_EFFORT_LOW:
+		return "low"
+	case xaiv1.ReasoningEffort_EFFORT_MEDIUM:
+		return "medium"
+	case xaiv1.ReasoningEffort_EFFORT_HIGH:
+		return "high"
+	default:
+		return ""
+	}
+}
+
 // toolModeToProto converts a string to ToolMode enum
 func toolModeToProto(mode string) xaiv1.ToolMode {
 	switch mode {

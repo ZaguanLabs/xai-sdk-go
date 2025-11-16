@@ -7,6 +7,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.3] - 2025-11-16
+
+### 🎉 100% Proto Field Coverage Achieved!
+
+This release completes the Go SDK with **100% proto field coverage** (64/64 fields), achieving full parity with the Python SDK. All missing fields have been implemented across 3 phases.
+
+### Added
+
+#### Phase 1: Critical Accessors
+- **`Message.Name()` and `WithName()`**: Set participant names in multi-user conversations
+- **`Response.Citations()`**: Access search citations from responses
+- **`Response.SystemFingerprint()`**: System version tracking for debugging
+- **`Chunk.Citations()`**: Access citations in streaming responses
+- **`Chunk.SystemFingerprint()`**: System fingerprint in streaming
+
+#### Phase 2: Advanced Features
+- **`RequestSettings` type**: Complete wrapper with 9 accessors (max_tokens, temperature, top_p, user, etc.)
+- **`Response.RequestSettings()`**: See what settings were actually used by the API
+- **`DebugOutput` type**: Complete debug info with 12 accessors (attempts, cache stats, etc.)
+- **`Response.DebugOutput()`**: Access cache statistics, attempts, and debugging data
+- **`LogProb`, `TopLogProb`, `LogProbs` types**: Full log probability support
+- **`Choice.LogProbs()`**: Detailed log probability access for token analysis
+- **`Tool.WithStrict()` and `Strict()`**: Enable strict schema validation for function tools
+
+#### Phase 3: Search Enhancements
+- **`SearchParameters.WithFromDate()`**: Filter search results by start date
+- **`SearchParameters.WithToDate()`**: Filter search results by end date
+- **`WebSource` type**: Web search configuration (excluded/allowed websites, country, safe search)
+- **`NewsSource` type**: News search configuration (excluded websites, country, safe search)
+- **`XSource` type**: X/Twitter search configuration (included/excluded handles, favorite/view counts)
+- **`RssSource` type**: RSS feed search configuration (feed links)
+- **`Source` wrapper type**: Unified interface for all search sources
+- **`SearchParameters.WithSources()`**: Configure custom search sources
+
+#### Image & File Support (Critical Fix)
+- **`Image()` helper**: Create image content parts with URL or base64 data
+- **`ImageDetail` enum**: Control image resolution (auto, low, high)
+- **`File()` helper**: Create file content parts with file IDs
+- **`ImagePart` and `FilePart` types**: Proper image and file content support
+- **Fixed `NewMessage()`**: Now correctly populates `image_url` and `file` fields in proto
+
+### Fixed
+- **`Chunk.Usage()`**: Was always returning `nil`, now properly returns usage information
+- **Image/File content**: Was silently dropped, now properly sent to vision models like grok-2-vision and grok-4
+
+### Testing
+- **25 new tests** added across 3 test files (phase1_test.go, phase2_test.go, phase3_test.go)
+- **100% test coverage** for all new features
+- All tests passing with nil-safety and chaining verified
+
+### Documentation
+- **6 new documentation files** created:
+  - `COMPLETE_PROTO_AUDIT.md` - Complete field-by-field audit
+  - `v0.5.3_COMPLETE_SUMMARY.md` - Comprehensive release summary
+  - `VERIFICATION_CHECKLIST_RESULTS.md` - Detailed verification results
+  - `IMAGE_SUPPORT_DEEP_DIVE.md` - Image handling analysis
+  - `IMAGE_SUPPORT_CRITICAL_ISSUE.md` - Image bug documentation
+  - `MISSING_FIELDS_SUMMARY.md` - Field coverage summary
+
+### Breaking Changes
+None - All additions are backwards compatible.
+
+### Migration from v0.5.2
+No changes required. All new features are opt-in additions.
+
+---
+
 ## [0.5.2] - 2025-11-16
 
 ### 🔴 Critical Bug Fixes - Tool Calling & Response Parsing

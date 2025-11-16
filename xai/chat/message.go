@@ -19,9 +19,32 @@ func NewMessage(role string, parts ...Part) *Message {
 	// Convert parts to Content array
 	contents := make([]*xaiv1.Content, 0, len(parts))
 	for _, p := range parts {
-		contents = append(contents, &xaiv1.Content{
-			Text: p.Content(),
-		})
+		switch p.Type() {
+		case PartTypeImage:
+			// Handle image parts
+			if img, ok := p.(*ImagePart); ok {
+				contents = append(contents, &xaiv1.Content{
+					ImageUrl: &xaiv1.ImageUrlContent{
+						ImageUrl: img.ImageURL(),
+						Detail:   img.Detail(),
+					},
+				})
+			}
+		case PartTypeFile:
+			// Handle file parts
+			if file, ok := p.(*FilePart); ok {
+				contents = append(contents, &xaiv1.Content{
+					File: &xaiv1.FileContent{
+						FileId: file.FileID(),
+					},
+				})
+			}
+		default:
+			// Handle text parts (default)
+			contents = append(contents, &xaiv1.Content{
+				Text: p.Content(),
+			})
+		}
 	}
 
 	return &Message{
@@ -80,6 +103,23 @@ func (m *Message) WithRole(role string) *Message {
 // Parts returns the parts of the message.
 func (m *Message) Parts() []Part {
 	return m.parts
+}
+
+// Name returns the name of the message sender.
+// This is useful for multi-user conversations to identify participants.
+func (m *Message) Name() string {
+	if m.proto == nil {
+		return ""
+	}
+	return m.proto.Name
+}
+
+// WithName sets the name of the message sender.
+func (m *Message) WithName(name string) *Message {
+	if m.proto != nil {
+		m.proto.Name = name
+	}
+	return m
 }
 
 // ToolCalls returns the tool calls in the message.

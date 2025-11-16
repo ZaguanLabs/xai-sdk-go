@@ -126,6 +126,14 @@ func (c *Choice) Proto() *xaiv1.CompletionOutput {
 	return c.proto
 }
 
+// LogProbs returns the log probabilities for this choice.
+func (c *Choice) LogProbs() *LogProbs {
+	if c.proto == nil || c.proto.Logprobs == nil {
+		return nil
+	}
+	return &LogProbs{proto: c.proto.Logprobs}
+}
+
 // Request represents a chat completion request.
 type Request struct {
 	proto *xaiv1.GetCompletionsRequest
@@ -262,6 +270,7 @@ func WithTool(tools ...*Tool) RequestOption {
 					Name:        tool.Name(),
 					Description: tool.Description(),
 					Parameters:  string(paramsJSON),
+					Strict:      tool.Strict(),
 				},
 			}
 		}
@@ -1028,6 +1037,42 @@ func (r *Response) Usage() *TokenUsage {
 	return &TokenUsage{proto: r.proto.Usage}
 }
 
+// Citations returns the citations from the response.
+// Citations are returned when search is enabled and return_citations is true.
+func (r *Response) Citations() []string {
+	if r.proto == nil {
+		return nil
+	}
+	return r.proto.Citations
+}
+
+// SystemFingerprint returns the system fingerprint.
+// This can be used for debugging and tracking system versions.
+func (r *Response) SystemFingerprint() string {
+	if r.proto == nil {
+		return ""
+	}
+	return r.proto.SystemFingerprint
+}
+
+// RequestSettings returns the settings that were used for this request.
+// This shows what settings were actually applied by the API.
+func (r *Response) RequestSettings() *RequestSettings {
+	if r.proto == nil || r.proto.Settings == nil {
+		return nil
+	}
+	return &RequestSettings{proto: r.proto.Settings}
+}
+
+// DebugOutput returns debug information from the API.
+// This includes cache statistics, attempts, and other debugging data.
+func (r *Response) DebugOutput() *DebugOutput {
+	if r.proto == nil || r.proto.DebugOutput == nil {
+		return nil
+	}
+	return &DebugOutput{proto: r.proto.DebugOutput}
+}
+
 // Chunk methods
 
 // Content returns the content of the chunk.
@@ -1117,8 +1162,27 @@ func (c *Chunk) FinishReason() string {
 
 // Usage returns the token usage information in the chunk.
 func (c *Chunk) Usage() *TokenUsage {
-	// Streaming chunks don't typically include usage information
-	return nil
+	if c.proto == nil || c.proto.Usage == nil {
+		return nil
+	}
+	return &TokenUsage{proto: c.proto.Usage}
+}
+
+// Citations returns the citations from the chunk.
+// Citations may be included in streaming responses when search is enabled.
+func (c *Chunk) Citations() []string {
+	if c.proto == nil {
+		return nil
+	}
+	return c.proto.Citations
+}
+
+// SystemFingerprint returns the system fingerprint from the chunk.
+func (c *Chunk) SystemFingerprint() string {
+	if c.proto == nil {
+		return ""
+	}
+	return c.proto.SystemFingerprint
 }
 
 // TokenUsage represents token usage information.
