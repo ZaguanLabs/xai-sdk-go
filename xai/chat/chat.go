@@ -248,7 +248,7 @@ func (p *SearchParameters) Proto() *xaiv1.SearchParameters {
 	return p.pb
 }
 
-// WithTool adds tools to the request.
+// WithTool adds client-side function tools to the request.
 func WithTool(tools ...*Tool) RequestOption {
 	return func(r *Request) {
 		// Convert tools to proto format
@@ -264,7 +264,19 @@ func WithTool(tools ...*Tool) RequestOption {
 				},
 			}
 		}
-		r.proto.Tools = protoTools
+		r.proto.Tools = append(r.proto.Tools, protoTools...)
+	}
+}
+
+// WithServerTool adds server-side tools to the request.
+// Server-side tools include web search, X search, code execution, etc.
+func WithServerTool(tools ...*ServerTool) RequestOption {
+	return func(r *Request) {
+		for _, tool := range tools {
+			if tool != nil && tool.Proto() != nil {
+				r.proto.Tools = append(r.proto.Tools, tool.Proto())
+			}
+		}
 	}
 }
 

@@ -4,6 +4,10 @@ package chat
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Tool represents a function tool that can be called by the model.
@@ -284,4 +288,226 @@ func (tr *ToolResult) Validate() error {
 		return fmt.Errorf("tool result cannot have both error and result")
 	}
 	return nil
+}
+
+// ============================================================================
+// Server-Side Tools
+// ============================================================================
+
+// ServerTool represents a server-side tool (web search, code execution, etc.)
+type ServerTool struct {
+	proto *xaiv1.Tool
+}
+
+// Proto returns the underlying proto representation.
+func (st *ServerTool) Proto() *xaiv1.Tool {
+	return st.proto
+}
+
+// WebSearchTool creates a web search server-side tool.
+// This enables the model to search the web for information.
+func WebSearchTool(opts ...WebSearchOption) *ServerTool {
+	ws := &xaiv1.WebSearch{}
+	for _, opt := range opts {
+		opt(ws)
+	}
+	return &ServerTool{
+		proto: &xaiv1.Tool{
+			WebSearch: ws,
+		},
+	}
+}
+
+// WebSearchOption configures web search tool.
+type WebSearchOption func(*xaiv1.WebSearch)
+
+// WithExcludedDomains excludes specific domains from web search.
+func WithExcludedDomains(domains ...string) WebSearchOption {
+	return func(ws *xaiv1.WebSearch) {
+		ws.ExcludedDomains = domains
+	}
+}
+
+// WithAllowedDomains restricts web search to specific domains.
+func WithAllowedDomains(domains ...string) WebSearchOption {
+	return func(ws *xaiv1.WebSearch) {
+		ws.AllowedDomains = domains
+	}
+}
+
+// WithImageUnderstanding enables image understanding in web search results.
+func WithImageUnderstanding(enable bool) WebSearchOption {
+	return func(ws *xaiv1.WebSearch) {
+		ws.EnableImageUnderstanding = enable
+	}
+}
+
+// XSearchTool creates an X (Twitter) search server-side tool.
+// This enables the model to search X/Twitter for information.
+func XSearchTool(opts ...XSearchOption) *ServerTool {
+	xs := &xaiv1.XSearch{}
+	for _, opt := range opts {
+		opt(xs)
+	}
+	return &ServerTool{
+		proto: &xaiv1.Tool{
+			XSearch: xs,
+		},
+	}
+}
+
+// XSearchOption configures X search tool.
+type XSearchOption func(*xaiv1.XSearch)
+
+// WithXDateRange sets the date range for X search.
+func WithXDateRange(from, to time.Time) XSearchOption {
+	return func(xs *xaiv1.XSearch) {
+		if !from.IsZero() {
+			xs.FromDate = timestamppb.New(from)
+		}
+		if !to.IsZero() {
+			xs.ToDate = timestamppb.New(to)
+		}
+	}
+}
+
+// WithAllowedXHandles restricts X search to specific handles.
+func WithAllowedXHandles(handles ...string) XSearchOption {
+	return func(xs *xaiv1.XSearch) {
+		xs.AllowedXHandles = handles
+	}
+}
+
+// WithExcludedXHandles excludes specific X handles from search.
+func WithExcludedXHandles(handles ...string) XSearchOption {
+	return func(xs *xaiv1.XSearch) {
+		xs.ExcludedXHandles = handles
+	}
+}
+
+// WithXImageUnderstanding enables image understanding in X search results.
+func WithXImageUnderstanding(enable bool) XSearchOption {
+	return func(xs *xaiv1.XSearch) {
+		xs.EnableImageUnderstanding = enable
+	}
+}
+
+// WithXVideoUnderstanding enables video understanding in X search results.
+func WithXVideoUnderstanding(enable bool) XSearchOption {
+	return func(xs *xaiv1.XSearch) {
+		xs.EnableVideoUnderstanding = enable
+	}
+}
+
+// CodeExecutionTool creates a code execution server-side tool.
+// This enables the model to execute code.
+func CodeExecutionTool() *ServerTool {
+	return &ServerTool{
+		proto: &xaiv1.Tool{
+			CodeExecution: &xaiv1.CodeExecution{},
+		},
+	}
+}
+
+// CollectionsSearchTool creates a collections search server-side tool.
+// This enables the model to search within document collections.
+func CollectionsSearchTool(collectionIDs []string, opts ...CollectionsSearchOption) *ServerTool {
+	cs := &xaiv1.CollectionsSearch{
+		CollectionIds: collectionIDs,
+	}
+	for _, opt := range opts {
+		opt(cs)
+	}
+	return &ServerTool{
+		proto: &xaiv1.Tool{
+			CollectionsSearch: cs,
+		},
+	}
+}
+
+// CollectionsSearchOption configures collections search tool.
+type CollectionsSearchOption func(*xaiv1.CollectionsSearch)
+
+// WithCollectionsLimit sets the maximum number of results.
+func WithCollectionsLimit(limit int32) CollectionsSearchOption {
+	return func(cs *xaiv1.CollectionsSearch) {
+		cs.Limit = limit
+	}
+}
+
+// DocumentSearchTool creates a document search server-side tool.
+// This enables the model to search within uploaded documents.
+func DocumentSearchTool(opts ...DocumentSearchOption) *ServerTool {
+	ds := &xaiv1.DocumentSearch{}
+	for _, opt := range opts {
+		opt(ds)
+	}
+	return &ServerTool{
+		proto: &xaiv1.Tool{
+			DocumentSearch: ds,
+		},
+	}
+}
+
+// DocumentSearchOption configures document search tool.
+type DocumentSearchOption func(*xaiv1.DocumentSearch)
+
+// WithDocumentLimit sets the maximum number of document results.
+func WithDocumentLimit(limit int32) DocumentSearchOption {
+	return func(ds *xaiv1.DocumentSearch) {
+		ds.Limit = limit
+	}
+}
+
+// MCPTool creates an MCP (Model Context Protocol) server-side tool.
+// This enables the model to interact with MCP servers.
+func MCPTool(serverLabel, serverURL string, opts ...MCPOption) *ServerTool {
+	mcp := &xaiv1.MCP{
+		ServerLabel: serverLabel,
+		ServerUrl:   serverURL,
+	}
+	for _, opt := range opts {
+		opt(mcp)
+	}
+	return &ServerTool{
+		proto: &xaiv1.Tool{
+			Mcp: mcp,
+		},
+	}
+}
+
+// MCPOption configures MCP tool.
+type MCPOption func(*xaiv1.MCP)
+
+// WithMCPDescription sets the MCP server description.
+func WithMCPDescription(description string) MCPOption {
+	return func(mcp *xaiv1.MCP) {
+		mcp.ServerDescription = description
+	}
+}
+
+// WithMCPAllowedTools restricts which MCP tools can be called.
+func WithMCPAllowedTools(toolNames ...string) MCPOption {
+	return func(mcp *xaiv1.MCP) {
+		mcp.AllowedToolNames = toolNames
+	}
+}
+
+// WithMCPAuthorization sets the authorization header for MCP server.
+func WithMCPAuthorization(auth string) MCPOption {
+	return func(mcp *xaiv1.MCP) {
+		mcp.Authorization = auth
+	}
+}
+
+// WithMCPExtraHeaders adds extra headers for MCP server requests.
+func WithMCPExtraHeaders(headers map[string]string) MCPOption {
+	return func(mcp *xaiv1.MCP) {
+		for key, value := range headers {
+			mcp.ExtraHeaders = append(mcp.ExtraHeaders, &xaiv1.MCP_ExtraHeadersEntry{
+				Key:   key,
+				Value: value,
+			})
+		}
+	}
 }

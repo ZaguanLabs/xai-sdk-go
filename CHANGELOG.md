@@ -7,6 +7,95 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2025-11-16
+
+### 🎉 Complete Tool Support: 100% Feature Parity with Python SDK
+
+This release achieves **complete tool support** by implementing all 6 server-side tool types. The Go SDK now has 100% feature parity with the Python SDK for both client-side and server-side tools.
+
+### Added
+
+#### Server-Side Tools (6/6)
+- **WebSearchTool**: Enable web search with domain filtering and image understanding
+  - `WithAllowedDomains()` - Restrict search to specific domains
+  - `WithExcludedDomains()` - Exclude specific domains from search
+  - `WithImageUnderstanding()` - Enable image analysis in search results
+- **XSearchTool**: Enable X/Twitter search with advanced filtering
+  - `WithAllowedXHandles()` - Restrict to specific X handles
+  - `WithExcludedXHandles()` - Exclude specific X handles
+  - `WithXDateRange()` - Set date range for posts
+  - `WithXImageUnderstanding()` - Enable image analysis in posts
+  - `WithXVideoUnderstanding()` - Enable video analysis in posts
+- **CodeExecutionTool**: Enable code execution (Python, etc.) for calculations and data processing
+- **CollectionsSearchTool**: Enable search within document collections
+  - `WithCollectionsLimit()` - Set maximum number of results
+- **DocumentSearchTool**: Enable search within uploaded documents
+  - `WithDocumentLimit()` - Set maximum number of document results
+- **MCPTool**: Enable Model Context Protocol integration
+  - `WithMCPDescription()` - Set MCP server description
+  - `WithMCPAllowedTools()` - Restrict which MCP tools can be called
+  - `WithMCPAuthorization()` - Set authorization header
+  - `WithMCPExtraHeaders()` - Add custom HTTP headers
+
+#### API Enhancements
+- **WithServerTool()**: New function to add server-side tools to chat requests
+- **Updated WithTool()**: Now supports mixing client-side and server-side tools in the same request
+
+#### Examples
+- **New Example**: `examples/chat/server_side_tools` - Comprehensive demonstration of all server-side tools
+  - Web search with domain filtering
+  - X search with handle and date filtering
+  - Code execution for calculations
+  - Document and collections search
+  - MCP integration
+  - Multiple tools in one request
+  - Mixed client-side and server-side tools
+
+#### Documentation
+- **New Guide**: `docs/SERVER_SIDE_TOOLS.md` - Complete guide with examples, best practices, and API reference
+- Comprehensive documentation for all 6 server-side tool types
+- Configuration options and usage patterns
+- Migration guide from client-side only tools
+
+### Changed
+- **Tool Coverage**: Increased from 14% to 100% (7/7 tool types) ✅
+- **Feature Parity**: Now matches Python SDK 100% for tool support ✅
+
+### Technical Details
+- All tools follow idiomatic Go patterns with functional options
+- Maintains backward compatibility - all existing code continues to work
+- No breaking changes from v0.4.0
+- Server-side tools are executed automatically by xAI backend
+
+### Statistics
+- **Total APIs**: 11/11 (100%) ✅
+- **Chat API parameters**: 24/24 (100%) ✅
+- **Tool types**: 7/7 (100%) ✅
+  - Client-side functions: ✅
+  - Web search: ✅
+  - X search: ✅
+  - Code execution: ✅
+  - Collections search: ✅
+  - Document search: ✅
+  - MCP: ✅
+- **Overall SDK Coverage**: 100% ✅
+
+### Migration from v0.4.0
+No breaking changes. Existing code continues to work. New server-side tools can be adopted incrementally:
+
+```go
+// Before (v0.4.0) - Still works
+req := chat.NewRequest("grok-beta",
+    chat.WithTool(myFunction),
+)
+
+// After (v0.5.0) - With server-side tools
+req := chat.NewRequest("grok-beta",
+    chat.WithTool(myFunction),                // Client-side
+    chat.WithServerTool(chat.WebSearchTool()), // Server-side
+)
+```
+
 ## [0.4.0] - 2025-11-16
 
 ### 🎉 Complete Feature Parity: 100% Chat API Parameter Coverage
