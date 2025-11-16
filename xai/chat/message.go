@@ -2,6 +2,7 @@
 package chat
 
 import (
+	"encoding/json"
 	"strings"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
@@ -79,4 +80,76 @@ func (m *Message) WithRole(role string) *Message {
 // Parts returns the parts of the message.
 func (m *Message) Parts() []Part {
 	return m.parts
+}
+
+// ToolCalls returns the tool calls in the message.
+func (m *Message) ToolCalls() []*ToolCall {
+	if m.proto == nil || len(m.proto.ToolCalls) == 0 {
+		return nil
+	}
+
+	result := make([]*ToolCall, 0, len(m.proto.ToolCalls))
+	for _, protoCall := range m.proto.ToolCalls {
+		toolCall := parseToolCall(protoCall)
+		if toolCall != nil {
+			result = append(result, toolCall)
+		}
+	}
+	return result
+}
+
+// ReasoningContent returns the reasoning content of the message.
+func (m *Message) ReasoningContent() string {
+	if m.proto == nil {
+		return ""
+	}
+	return m.proto.ReasoningContent
+}
+
+// EncryptedContent returns the encrypted content of the message.
+func (m *Message) EncryptedContent() string {
+	if m.proto == nil {
+		return ""
+	}
+	return m.proto.EncryptedContent
+}
+
+// WithToolCalls sets the tool calls for the message.
+func (m *Message) WithToolCalls(toolCalls []*ToolCall) *Message {
+	if m.proto == nil {
+		return m
+	}
+	m.proto.ToolCalls = make([]*xaiv1.ToolCall, 0, len(toolCalls))
+	for _, tc := range toolCalls {
+		if tc == nil {
+			continue
+		}
+		// Convert to proto ToolCall
+		argsJSON, _ := json.Marshal(tc.Arguments())
+		m.proto.ToolCalls = append(m.proto.ToolCalls, &xaiv1.ToolCall{
+			Id:   tc.ID(),
+			Type: xaiv1.ToolCallType_TOOL_CALL_TYPE_CLIENT_SIDE_TOOL,
+			Function: &xaiv1.FunctionCall{
+				Name:      tc.Name(),
+				Arguments: string(argsJSON),
+			},
+		})
+	}
+	return m
+}
+
+// WithReasoningContent sets the reasoning content for the message.
+func (m *Message) WithReasoningContent(reasoning string) *Message {
+	if m.proto != nil {
+		m.proto.ReasoningContent = reasoning
+	}
+	return m
+}
+
+// WithEncryptedContent sets the encrypted content for the message.
+func (m *Message) WithEncryptedContent(encrypted string) *Message {
+	if m.proto != nil {
+		m.proto.EncryptedContent = encrypted
+	}
+	return m
 }

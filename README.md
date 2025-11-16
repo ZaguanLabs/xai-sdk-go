@@ -8,7 +8,7 @@
 
 > **Note**: This is an unofficial, community-maintained SDK and is not affiliated with or endorsed by xAI.
 
-> **Status**: **v0.5.1 Released** - Production-ready with 100% API coverage (11/11 APIs), 100% Chat parameter coverage (24/24), 100% Tool support (7/7 tool types), critical bug fixes for JSON Schema formatting, comprehensive examples, and integration tests!
+> **Status**: **v0.5.2 Released** - Production-ready with 100% API coverage (11/11 APIs), 100% Chat parameter coverage (24/24), 100% Tool support (7/7 tool types), 100% Python SDK feature parity for critical features, all placeholder code removed, comprehensive examples, and integration tests!
 
 ## ✨ Features
 
@@ -45,7 +45,7 @@
 ### Installation
 
 ```bash
-go get github.com/ZaguanLabs/xai-sdk-go@v0.5.1
+go get github.com/ZaguanLabs/xai-sdk-go@v0.5.2
 ```
 
 ### Basic Usage

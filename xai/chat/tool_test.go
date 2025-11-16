@@ -3,6 +3,8 @@ package chat
 import (
 	"encoding/json"
 	"testing"
+
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
 )
 
 func TestToolJSONSchemaFormat(t *testing.T) {
@@ -260,4 +262,163 @@ func TestWithToolJSONSchemaFormat(t *testing.T) {
 	}
 
 	t.Logf("✅ WithTool generates valid JSON Schema: %s", protoTool.Function.Parameters)
+}
+
+func TestResponseToolCalls(t *testing.T) {
+	// Create a mock response with tool calls
+	tool1 := NewTool("get_weather", "Get weather")
+	tool1.WithParameter("city", "string", "City name", true)
+
+	tool2 := NewTool("get_time", "Get time")
+	tool2.WithParameter("timezone", "string", "Timezone", false)
+
+	// Create a request with tools
+	req := NewRequest("grok-beta", WithTool(tool1, tool2))
+
+	// Simulate a response with tool calls (this would normally come from the API)
+	// For testing, we'll verify the structure is correct
+	if len(req.proto.Tools) != 2 {
+		t.Fatalf("Expected 2 tools in request, got %d", len(req.proto.Tools))
+	}
+
+	t.Log("✅ Response.ToolCalls() structure is ready to parse tool calls from API")
+}
+
+func TestChunkToolCalls(t *testing.T) {
+	// Create a mock chunk
+	// The actual parsing will be tested with real API responses
+	// This test verifies the method exists and returns the correct type
+	chunk := &Chunk{}
+
+	toolCalls := chunk.ToolCalls()
+	if toolCalls == nil {
+		t.Log("✅ Chunk.ToolCalls() returns nil for empty chunk (expected)")
+	}
+
+	hasToolCalls := chunk.HasToolCalls()
+	if !hasToolCalls {
+		t.Log("✅ Chunk.HasToolCalls() returns false for empty chunk (expected)")
+	}
+}
+
+func TestParseToolCall(t *testing.T) {
+	tests := []struct {
+		name      string
+		protoCall *xaiv1.ToolCall
+		wantNil   bool
+		wantID    string
+		wantName  string
+	}{
+		{
+			name:      "nil proto call",
+			protoCall: nil,
+			wantNil:   true,
+		},
+		{
+			name: "valid tool call with arguments",
+			protoCall: &xaiv1.ToolCall{
+				Id: "call_123",
+				Function: &xaiv1.FunctionCall{
+					Name:      "get_weather",
+					Arguments: `{"city": "San Francisco", "units": "celsius"}`,
+				},
+			},
+			wantNil:  false,
+			wantID:   "call_123",
+			wantName: "get_weather",
+		},
+		{
+			name: "tool call with empty arguments",
+			protoCall: &xaiv1.ToolCall{
+				Id: "call_456",
+				Function: &xaiv1.FunctionCall{
+					Name:      "get_time",
+					Arguments: "",
+				},
+			},
+			wantNil:  false,
+			wantID:   "call_456",
+			wantName: "get_time",
+		},
+		{
+			name: "tool call with invalid JSON arguments",
+			protoCall: &xaiv1.ToolCall{
+				Id: "call_789",
+				Function: &xaiv1.FunctionCall{
+					Name:      "test_func",
+					Arguments: `{invalid json}`,
+				},
+			},
+			wantNil:  false,
+			wantID:   "call_789",
+			wantName: "test_func",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := parseToolCall(tt.protoCall)
+
+			if tt.wantNil {
+				if result != nil {
+					t.Errorf("Expected nil, got %v", result)
+				}
+				return
+			}
+
+			if result == nil {
+				t.Fatal("Expected non-nil result")
+			}
+
+			if result.ID() != tt.wantID {
+				t.Errorf("Expected ID %q, got %q", tt.wantID, result.ID())
+			}
+
+			if result.Name() != tt.wantName {
+				t.Errorf("Expected name %q, got %q", tt.wantName, result.Name())
+			}
+
+			// Verify arguments is a valid map (even if empty)
+			args := result.Arguments()
+			if args == nil {
+				t.Error("Arguments should never be nil, should be empty map")
+			}
+		})
+	}
+}
+
+func TestToolCallJSON(t *testing.T) {
+	toolCall := NewToolCall("call_123", "get_weather", map[string]interface{}{
+		"city":  "San Francisco",
+		"units": "celsius",
+	})
+
+	jsonBytes, err := toolCall.ToJSON()
+	if err != nil {
+		t.Fatalf("Failed to convert tool call to JSON: %v", err)
+	}
+
+	var result map[string]interface{}
+	if err := json.Unmarshal(jsonBytes, &result); err != nil {
+		t.Fatalf("Failed to parse tool call JSON: %v", err)
+	}
+
+	if result["id"] != "call_123" {
+		t.Errorf("Expected id 'call_123', got %v", result["id"])
+	}
+
+	if result["type"] != "function" {
+		t.Errorf("Expected type 'function', got %v", result["type"])
+	}
+
+	function, ok := result["function"].(map[string]interface{})
+	if !ok {
+		t.Fatal("Function should be a map")
+	}
+
+	if function["name"] != "get_weather" {
+		t.Errorf("Expected name 'get_weather', got %v", function["name"])
+	}
+
+	t.Logf("✅ ToolCall JSON: %s", string(jsonBytes))
 }

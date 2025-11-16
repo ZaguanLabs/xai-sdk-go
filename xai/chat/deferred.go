@@ -37,22 +37,19 @@ func NewDeferredRequest(model string, opts ...DeferredRequestOption) *DeferredRe
 
 // WithStoreMessages enables message storage for the request.
 func (r *DeferredRequest) WithStoreMessages(store bool) *DeferredRequest {
-	// Note: This is a placeholder until message storage is properly defined in proto
-	// r.proto.StoreMessages = store
+	r.proto.StoreMessages = store
 	return r
 }
 
 // WithPreviousResponseID sets the previous response ID for conversation continuation.
 func (r *DeferredRequest) WithPreviousResponseID(responseID string) *DeferredRequest {
-	// Note: This is a placeholder until previous response ID is properly defined in proto
-	// r.proto.PreviousResponseID = responseID
+	r.proto.PreviousResponseId = responseID
 	return r
 }
 
 // WithEncryptedContent enables encrypted content for the request.
 func (r *DeferredRequest) WithEncryptedContent(encrypted bool) *DeferredRequest {
-	// Note: This is a placeholder until encrypted content is properly defined in proto
-	// r.proto.EncryptedContent = encrypted
+	r.proto.UseEncryptedContent = encrypted
 	return r
 }
 
@@ -159,29 +156,27 @@ func (r *DeferredResponse) ID() string {
 }
 
 // Status returns the status of the deferred request.
+// Returns "pending" if status is not available.
 func (r *DeferredResponse) Status() string {
-	// Note: This is a placeholder until status is properly defined in proto
-	// if r.proto.Status != nil {
-	// 	return r.proto.Status
-	// }
+	// Status information is provided by the GetDeferredCompletionResponse
+	// which wraps this response. This method returns a default value.
 	return "pending"
 }
 
 // CreatedAt returns the creation time of the deferred request.
+// Returns zero time if creation time is not available in the response.
 func (r *DeferredResponse) CreatedAt() time.Time {
-	// Note: This is a placeholder until creation time is properly defined in proto
-	// if r.proto.CreatedAt != nil {
-	// 	return r.proto.CreatedAt
-	// }
+	if r.proto != nil && r.proto.Created != nil {
+		return r.proto.Created.AsTime()
+	}
 	return time.Time{}
 }
 
 // CompletedAt returns the completion time of the deferred request.
+// Returns zero time if completion time is not available.
+// Note: Completion time is typically tracked externally to the response.
 func (r *DeferredResponse) CompletedAt() time.Time {
-	// Note: This is a placeholder until completion time is properly defined in proto
-	// if r.proto.CompletedAt != nil {
-	// 	return r.proto.CompletedAt
-	// }
+	// Completion time is not stored in GetChatCompletionResponse
 	return time.Time{}
 }
 
@@ -235,7 +230,6 @@ func (r *DeferredRequest) Poll(ctx context.Context, client ChatServiceClient, in
 
 		case <-ticker.C:
 			// Check if the request is complete
-			// Note: This is a placeholder until we can properly check completion status
 			if response.Status() == "completed" {
 				return &PollResult{
 					Response: response,
@@ -269,13 +263,9 @@ func GetStoredCompletion(ctx context.Context, client ChatServiceClient, completi
 		return nil, fmt.Errorf("completion ID is required")
 	}
 
-	// Note: This is a placeholder until stored completion retrieval is properly defined in proto
-	// For now, we'll return a mock response
-	return &StoredCompletion{
-		id:        completionID,
-		content:   "Stored completion content",
-		createdAt: time.Now(),
-	}, nil
+	// TODO: Implement actual gRPC call to GetStoredCompletion
+	// This requires implementing the ChatServiceClient.GetStoredCompletion method
+	return nil, fmt.Errorf("GetStoredCompletion not yet implemented")
 }
 
 // DeleteStoredCompletion deletes a stored completion by ID.
@@ -287,9 +277,9 @@ func DeleteStoredCompletion(ctx context.Context, client ChatServiceClient, compl
 		return fmt.Errorf("completion ID is required")
 	}
 
-	// Note: This is a placeholder until stored completion deletion is properly defined in proto
-	// For now, we'll just return success
-	return nil
+	// TODO: Implement actual gRPC call to DeleteStoredCompletion
+	// This requires implementing the ChatServiceClient.DeleteStoredCompletion method
+	return fmt.Errorf("DeleteStoredCompletion not yet implemented")
 }
 
 // StoredCompletion represents a stored chat completion.
@@ -320,9 +310,9 @@ func ListStoredCompletions(ctx context.Context, client ChatServiceClient, opts .
 		return nil, fmt.Errorf("chat client is nil")
 	}
 
-	// Note: This is a placeholder until stored completion listing is properly defined in proto
-	// For now, we'll return an empty list
-	return []*StoredCompletion{}, nil
+	// TODO: Implement actual gRPC call to ListStoredCompletions
+	// This requires implementing the ChatServiceClient.ListStoredCompletions method
+	return nil, fmt.Errorf("ListStoredCompletions not yet implemented")
 }
 
 // ListOption represents an option for listing stored completions.

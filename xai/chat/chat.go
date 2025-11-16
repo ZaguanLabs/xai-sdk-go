@@ -283,10 +283,9 @@ func WithServerTool(tools ...*ServerTool) RequestOption {
 
 // ... (rest of the code remains the same)
 // WithToolResults adds tool results to the request.
+// Tool results are added as user messages with tool role.
 func WithToolResults(results ...ToolResult) RequestOption {
 	return func(r *Request) {
-		// Note: Tool results would be added as assistant messages with tool role
-		// This is a placeholder until proper tool result handling is implemented
 		for _, result := range results {
 			var content string
 			if result.Error() != nil {
@@ -326,6 +325,44 @@ func (r *Request) GetModel() string {
 // AppendMessage appends a message to the request.
 func (r *Request) AppendMessage(msg Message) *Request {
 	r.proto.Messages = append(r.proto.Messages, msg.Proto())
+	return r
+}
+
+// AppendResponse appends a response as assistant message(s) to the request.
+// This extracts the assistant's message including content, tool_calls,
+// reasoning_content, and encrypted_content from the response.
+// If the response has multiple outputs (N > 1), all outputs are appended.
+func (r *Request) AppendResponse(resp *Response) *Request {
+	if resp == nil || resp.proto == nil {
+		return r
+	}
+
+	// Append all outputs from the response
+	for _, output := range resp.proto.Outputs {
+		if output == nil || output.Message == nil {
+			continue
+		}
+
+		// Convert string content to Content array
+		var contents []*xaiv1.Content
+		if output.Message.Content != "" {
+			contents = []*xaiv1.Content{
+				{Text: output.Message.Content},
+			}
+		}
+
+		// Create message with all fields from the response
+		msg := &xaiv1.Message{
+			Role:             output.Message.Role,
+			Content:          contents,
+			ToolCalls:        output.Message.ToolCalls,
+			ReasoningContent: output.Message.ReasoningContent,
+			EncryptedContent: output.Message.EncryptedContent,
+		}
+
+		r.proto.Messages = append(r.proto.Messages, msg)
+	}
+
 	return r
 }
 
@@ -569,12 +606,10 @@ func (r *Request) SetUseEncryptedContent(encrypted bool) *Request {
 }
 
 // SetTools sets the tools for function calling.
-// Note: Tool functionality is not yet implemented in the proto definitions.
+// This method is deprecated. Use WithTool() or WithServerTool() instead.
 func (r *Request) SetTools(tools ...Tool) *Request {
-	// Placeholder implementation until tools are properly defined in proto
-	// r.proto.Tools = make([]*xaiv1.Tool, 0, len(tools))
-	// for _, tool := range tools {
-	// 	if tool.Proto() != nil {
+	// This method is kept for backwards compatibility but does nothing.
+	// Use WithTool() for client-side function tools or WithServerTool() for server-side tools.
 	// 		r.proto.Tools = append(r.proto.Tools, tool.Proto())
 	// 	}
 	// }
@@ -836,24 +871,59 @@ func (r *Response) Content() string {
 	return r.proto.Outputs[0].Message.Content
 }
 
+// parseToolCall converts a proto ToolCall to a chat.ToolCall.
+func parseToolCall(protoCall *xaiv1.ToolCall) *ToolCall {
+	if protoCall == nil {
+		return nil
+	}
+
+	// Parse function arguments from JSON string
+	var arguments map[string]interface{}
+	if protoCall.Function != nil && protoCall.Function.Arguments != "" {
+		if err := json.Unmarshal([]byte(protoCall.Function.Arguments), &arguments); err != nil {
+			// If parsing fails, create empty arguments map
+			arguments = make(map[string]interface{})
+		}
+	} else {
+		arguments = make(map[string]interface{})
+	}
+
+	// Get function name
+	name := ""
+	if protoCall.Function != nil {
+		name = protoCall.Function.Name
+	}
+
+	return &ToolCall{
+		id:        protoCall.Id,
+		name:      name,
+		arguments: arguments,
+	}
+}
+
 // ToolCalls returns any tool calls in the response.
-func (r *Response) ToolCalls() []ToolCall {
-	// Placeholder implementation until tool calls are properly defined in proto
-	// if r.proto == nil || len(r.proto.Choices) == 0 {
-	// 	return nil
-	// }
+func (r *Response) ToolCalls() []*ToolCall {
+	if r.proto == nil || len(r.proto.Outputs) == 0 {
+		return nil
+	}
 
-	// calls := r.proto.Choices[0].Message.ToolCalls
-	// if len(calls) == 0 {
-	// 	return nil
-	// }
+	var toolCalls []*ToolCall
+	for _, output := range r.proto.Outputs {
+		if output.Message == nil {
+			continue
+		}
+		// Only include tool calls from assistant messages
+		if output.Message.Role == xaiv1.MessageRole_ROLE_ASSISTANT {
+			for _, protoCall := range output.Message.ToolCalls {
+				toolCall := parseToolCall(protoCall)
+				if toolCall != nil {
+					toolCalls = append(toolCalls, toolCall)
+				}
+			}
+		}
+	}
 
-	// result := make([]ToolCall, len(calls))
-	// for i, call := range calls {
-	// 	result[i] = ToolCall{proto: call}
-	// }
-	// return result
-	return nil
+	return toolCalls
 }
 
 // Role returns the role of the response message.
@@ -865,6 +935,28 @@ func (r *Response) Role() string {
 		return ""
 	}
 	return roleFromProto(r.proto.Outputs[0].Message.Role)
+}
+
+// ReasoningContent returns the reasoning content from the response.
+func (r *Response) ReasoningContent() string {
+	if r.proto == nil || len(r.proto.Outputs) == 0 {
+		return ""
+	}
+	if r.proto.Outputs[0] == nil || r.proto.Outputs[0].Message == nil {
+		return ""
+	}
+	return r.proto.Outputs[0].Message.ReasoningContent
+}
+
+// EncryptedContent returns the encrypted content from the response.
+func (r *Response) EncryptedContent() string {
+	if r.proto == nil || len(r.proto.Outputs) == 0 {
+		return ""
+	}
+	if r.proto.Outputs[0] == nil || r.proto.Outputs[0].Message == nil {
+		return ""
+	}
+	return r.proto.Outputs[0].Message.EncryptedContent
 }
 
 // FinishReason returns the finish reason of the response.
@@ -951,10 +1043,25 @@ func (c *Chunk) Content() string {
 }
 
 // ToolCalls returns any tool calls in the chunk.
-// Note: Tool functionality is not yet implemented in the proto definitions.
-func (c *Chunk) ToolCalls() []ToolCall {
-	// Placeholder implementation until tool calls are properly defined in proto
-	return nil
+func (c *Chunk) ToolCalls() []*ToolCall {
+	if c.proto == nil || len(c.proto.Outputs) == 0 {
+		return nil
+	}
+
+	var toolCalls []*ToolCall
+	for _, output := range c.proto.Outputs {
+		if output.Delta == nil {
+			continue
+		}
+		for _, protoCall := range output.Delta.ToolCalls {
+			toolCall := parseToolCall(protoCall)
+			if toolCall != nil {
+				toolCalls = append(toolCalls, toolCall)
+			}
+		}
+	}
+
+	return toolCalls
 }
 
 // HasToolCalls returns whether the chunk has tool calls.
@@ -973,6 +1080,28 @@ func (c *Chunk) Role() string {
 		return roleFromProto(c.proto.Outputs[0].Delta.GetRole())
 	}
 	return ""
+}
+
+// ReasoningContent returns the reasoning content from the chunk.
+func (c *Chunk) ReasoningContent() string {
+	if c.proto == nil || len(c.proto.Outputs) == 0 {
+		return ""
+	}
+	if c.proto.Outputs[0] == nil || c.proto.Outputs[0].Delta == nil {
+		return ""
+	}
+	return c.proto.Outputs[0].Delta.ReasoningContent
+}
+
+// EncryptedContent returns the encrypted content from the chunk.
+func (c *Chunk) EncryptedContent() string {
+	if c.proto == nil || len(c.proto.Outputs) == 0 {
+		return ""
+	}
+	if c.proto.Outputs[0] == nil || c.proto.Outputs[0].Delta == nil {
+		return ""
+	}
+	return c.proto.Outputs[0].Delta.EncryptedContent
 }
 
 // Proto returns the underlying protobuf chunk.

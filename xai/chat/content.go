@@ -2,9 +2,10 @@
 package chat
 
 // Part represents a part of a message content.
-// Note: Content parts are not yet implemented in the proto definitions.
+// This interface allows for different content types (text, images, files, etc.)
+// to be used in messages.
 type Part interface {
-	// Placeholder interface until content parts are properly defined in proto
+	// Content returns the string representation of the part.
 	Content() string
 }
 
