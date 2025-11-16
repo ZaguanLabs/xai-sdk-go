@@ -2,6 +2,7 @@
 package files
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -83,8 +84,38 @@ func (c *Client) Upload(ctx context.Context, reader io.Reader, opts UploadOption
 	if c.restClient == nil {
 		return nil, ErrClientNotInitialized
 	}
-	// TODO: Implement multipart upload
-	return nil, ErrNotImplemented
+
+	// Read file content
+	content, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file content: %w", err)
+	}
+
+	// Create upload request
+	req := &xaiv1.UploadFileChunk{
+		Init: &xaiv1.UploadFileInit{
+			Name:    opts.Name,
+			Purpose: opts.Purpose,
+		},
+		Data: content,
+	}
+
+	jsonData, err := protojson.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.restClient.Post(ctx, "/files", jsonData)
+	if err != nil {
+		return nil, err
+	}
+
+	var file xaiv1.File
+	if err := protojson.Unmarshal(resp.Body, &file); err != nil {
+		return nil, err
+	}
+
+	return fromProto(&file), nil
 }
 
 // Download downloads a file's content.
@@ -92,8 +123,20 @@ func (c *Client) Download(ctx context.Context, fileID string) (io.ReadCloser, er
 	if c.restClient == nil {
 		return nil, ErrClientNotInitialized
 	}
-	// TODO: Implement streaming download
-	return nil, ErrNotImplemented
+
+	resp, err := c.restClient.Get(ctx, fmt.Sprintf("/files/%s/content", fileID))
+	if err != nil {
+		return nil, err
+	}
+
+	// Parse the response to get file chunks
+	var chunks xaiv1.FileContentChunk
+	if err := protojson.Unmarshal(resp.Body, &chunks); err != nil {
+		return nil, err
+	}
+
+	// Return the data as a ReadCloser
+	return io.NopCloser(bytes.NewReader(chunks.Data)), nil
 }
 
 // List lists files with optional filtering and pagination.
