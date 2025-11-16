@@ -446,19 +446,19 @@ func (c *Client) Embed() *embed.Client {
 func (c *Client) Files() *files.Client {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	return files.NewClient()
+	return files.NewClient(c.restClient)
 }
 
 // Collections returns the collections service client.
 func (c *Client) Collections() *collections.Client {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	return collections.NewClient()
+	return collections.NewClient(c.restClient)
 }
 
 // Auth returns the auth service client.
 func (c *Client) Auth() *auth.Client {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	return auth.NewClient()
+	return auth.NewClient(c.restClient)
 }

@@ -3,20 +3,24 @@ package auth
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 // Client provides access to the xAI Auth API.
 type Client struct {
-	// Note: Auth API is currently REST-based in the Python SDK
-	// This wrapper is prepared for when gRPC support is added
+	restClient *rest.Client
 }
 
 // NewClient creates a new Auth API client.
-func NewClient() *Client {
-	return &Client{}
+func NewClient(restClient *rest.Client) *Client {
+	return &Client{
+		restClient: restClient,
+	}
 }
 
 // ApiKey represents an API key with metadata.
@@ -66,25 +70,38 @@ func fromProto(pk *xaiv1.ApiKey) *ApiKey {
 }
 
 // ValidateKey validates an API key and returns its metadata.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) ValidateKey(ctx context.Context, apiKey string) (*ApiKey, error) {
-	// TODO: Implement when gRPC service is available
-	// For now, this would need to use REST API
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+	// TODO: Implement REST endpoint
 	return nil, ErrNotImplemented
 }
 
 // GetKey retrieves API key metadata by ID.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) GetKey(ctx context.Context, apiKeyID string) (*ApiKey, error) {
-	// TODO: Implement when gRPC service is available
-	// For now, this would need to use REST API
-	return nil, ErrNotImplemented
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+
+	resp, err := c.restClient.Get(ctx, fmt.Sprintf("/auth/keys/%s", apiKeyID))
+	if err != nil {
+		return nil, err
+	}
+
+	var key xaiv1.ApiKey
+	if err := protojson.Unmarshal(resp.Body, &key); err != nil {
+		return nil, err
+	}
+
+	return fromProto(&key), nil
 }
 
 // ListKeys lists API keys for the authenticated user.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) ListKeys(ctx context.Context) ([]*ApiKey, error) {
-	// TODO: Implement when gRPC service is available
-	// For now, this would need to use REST API
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+	// TODO: Implement REST endpoint
 	return nil, ErrNotImplemented
 }

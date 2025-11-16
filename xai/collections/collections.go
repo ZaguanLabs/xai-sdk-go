@@ -6,17 +6,19 @@ import (
 	"time"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
 )
 
 // Client provides access to the xAI Collections API.
 type Client struct {
-	// Note: Collections API is currently REST-based in the Python SDK
-	// This wrapper is prepared for when gRPC support is added
+	restClient *rest.Client
 }
 
 // NewClient creates a new Collections API client.
-func NewClient() *Client {
-	return &Client{}
+func NewClient(restClient *rest.Client) *Client {
+	return &Client{
+		restClient: restClient,
+	}
 }
 
 // Collection represents a document collection.

@@ -3,21 +3,25 @@ package files
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"time"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 // Client provides access to the xAI Files API.
 type Client struct {
-	// Note: Files API is currently REST-based in the Python SDK
-	// This wrapper is prepared for when gRPC support is added
+	restClient *rest.Client
 }
 
 // NewClient creates a new Files API client.
-func NewClient() *Client {
-	return &Client{}
+func NewClient(restClient *rest.Client) *Client {
+	return &Client{
+		restClient: restClient,
+	}
 }
 
 // File represents a file with metadata.
@@ -75,49 +79,107 @@ func fromProto(pf *xaiv1.File) *File {
 }
 
 // Upload uploads a file.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) Upload(ctx context.Context, reader io.Reader, opts UploadOptions) (*File, error) {
-	// TODO: Implement when gRPC service is available
-	// For now, this would need to use REST API
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+	// TODO: Implement multipart upload
 	return nil, ErrNotImplemented
 }
 
 // Download downloads a file's content.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) Download(ctx context.Context, fileID string) (io.ReadCloser, error) {
-	// TODO: Implement when gRPC service is available
-	// For now, this would need to use REST API
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+	// TODO: Implement streaming download
 	return nil, ErrNotImplemented
 }
 
 // List lists files with optional filtering and pagination.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) List(ctx context.Context, opts *ListOptions) (*ListResult, error) {
-	// TODO: Implement when gRPC service is available
-	// For now, this would need to use REST API
-	return nil, ErrNotImplemented
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+
+	req := &xaiv1.ListFilesRequest{}
+	if opts != nil {
+		req.Limit = opts.Limit
+		req.Order = opts.Order
+		req.PaginationToken = opts.PaginationToken
+		req.SortBy = opts.SortBy
+	}
+
+	jsonData, err := protojson.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.restClient.Post(ctx, "/files/list", jsonData)
+	if err != nil {
+		return nil, err
+	}
+
+	var listResp xaiv1.ListFilesResponse
+	if err := protojson.Unmarshal(resp.Body, &listResp); err != nil {
+		return nil, err
+	}
+
+	files := make([]*File, len(listResp.Data))
+	for i, f := range listResp.Data {
+		files[i] = fromProto(f)
+	}
+
+	return &ListResult{
+		Files:           files,
+		PaginationToken: listResp.PaginationToken,
+	}, nil
 }
 
 // Get retrieves file metadata by ID.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) Get(ctx context.Context, fileID string) (*File, error) {
-	// TODO: Implement when gRPC service is available
-	// For now, this would need to use REST API
-	return nil, ErrNotImplemented
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+
+	resp, err := c.restClient.Get(ctx, fmt.Sprintf("/files/%s", fileID))
+	if err != nil {
+		return nil, err
+	}
+
+	var file xaiv1.File
+	if err := protojson.Unmarshal(resp.Body, &file); err != nil {
+		return nil, err
+	}
+
+	return fromProto(&file), nil
 }
 
 // GetURL retrieves a temporary URL for downloading a file.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) GetURL(ctx context.Context, fileID string) (string, error) {
-	// TODO: Implement when gRPC service is available
-	// For now, this would need to use REST API
-	return "", ErrNotImplemented
+	if c.restClient == nil {
+		return "", ErrClientNotInitialized
+	}
+
+	resp, err := c.restClient.Get(ctx, fmt.Sprintf("/files/%s/url", fileID))
+	if err != nil {
+		return "", err
+	}
+
+	var urlResp xaiv1.RetrieveFileURLResponse
+	if err := protojson.Unmarshal(resp.Body, &urlResp); err != nil {
+		return "", err
+	}
+
+	return urlResp.Url, nil
 }
 
 // Delete deletes a file by ID.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) Delete(ctx context.Context, fileID string) error {
-	// TODO: Implement when gRPC service is available
-	// For now, this would need to use REST API
-	return ErrNotImplemented
+	if c.restClient == nil {
+		return ErrClientNotInitialized
+	}
+
+	_, err := c.restClient.Delete(ctx, fmt.Sprintf("/files/%s", fileID))
+	return err
 }
