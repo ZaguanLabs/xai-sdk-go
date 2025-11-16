@@ -11,6 +11,7 @@ import (
 	"github.com/ZaguanLabs/xai-sdk-go/xai/auth"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/chat"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/collections"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/deferred"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/embed"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/files"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/image"
@@ -469,4 +470,11 @@ func (c *Client) Images() *image.Client {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return image.NewClient(c.restClient)
+}
+
+// Deferred returns the deferred completions service client.
+func (c *Client) Deferred() *deferred.Client {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return deferred.NewClient(c.restClient)
 }
