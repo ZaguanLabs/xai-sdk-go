@@ -28,7 +28,7 @@ func TestNewSDKMetadata(t *testing.T) {
 	}
 
 	// Check default values
-	expectedClientVersion := "xai-sdk-go/0.1.0"
+	expectedClientVersion := "xai-sdk-go/0.2.1"
 	if md.ClientVersion != expectedClientVersion {
 		t.Errorf("Expected client version %s, got %s", expectedClientVersion, md.ClientVersion)
 	}

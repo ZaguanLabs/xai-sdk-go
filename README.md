@@ -4,23 +4,37 @@
 [![Release](https://img.shields.io/github/v/release/ZaguanLabs/xai-sdk-go)](https://github.com/ZaguanLabs/xai-sdk-go/releases/latest)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-**The unofficial Go SDK for xAI** provides a first-class, idiomatic Go interface to xAI's powerful AI capabilities. This SDK enables Go developers to integrate chat completions, streaming responses, embeddings, file operations, and more.
+**The unofficial Go SDK for xAI** provides a first-class, idiomatic Go interface to xAI's powerful AI capabilities. This SDK enables Go developers to integrate chat completions, streaming responses, embeddings, file operations, image generation, document search, and more.
 
 > **Note**: This is an unofficial, community-maintained SDK and is not affiliated with or endorsed by xAI.
 
-> **Status**: **v0.2.1** - Hotfix release fixing compilation errors from v0.2.0.
+> **Status**: **Unreleased** - Feature-complete with 100% API coverage (11/11 APIs implemented)
 
 ## ✨ Features
 
+### Core APIs
 - **🤖 Chat Completions** - Synchronous and streaming chat with message builders
 - **🛠️ Function Calling** - Define and use tools in your chat completions
 - **🧠 Reasoning & Search** - Control reasoning effort and perform searches
 - **📝 Structured Outputs** - Get structured JSON and JSON schema outputs
+- **🎯 Models** - List and retrieve available models
+
+### REST APIs
+- **🖼️ Image Generation** - Text-to-image and image-to-image generation
+- **📄 Embeddings** - Generate embeddings for text and images
+- **📁 Files** - Upload, download, list, and delete files
+- **📚 Collections** - Manage document collections with 11 methods
+- **🔍 Document Search** - Search across document collections
+- **🔐 Auth** - API key validation and management
+- **⏳ Deferred Completions** - Long-running completion support
+- **🔤 Tokenizer** - Text tokenization utilities
+- **📋 Sample** - Legacy text completion (Chat API recommended)
+
+### Infrastructure
 - **🔐 Secure Authentication** - API key and Bearer token support with TLS
 - **⚙️ Flexible Configuration** - Environment variables and programmatic config
 - **🔄 Connection Management** - Health checks, retries, and keepalive
-- **🛡️ Error Handling** - Comprehensive error types with gRPC integration
-- **📊 Telemetry Ready** - Foundation for observability (coming soon)
+- **🛡️ Error Handling** - Comprehensive error types with gRPC and REST integration
 - **🧪 Well Tested** - Comprehensive test coverage for all components
 
 ## 🚀 Quick Start
@@ -194,38 +208,46 @@ go run examples/chat/streaming/main.go
 - **Examples**: [`examples/README.md`](examples/README.md) - Usage examples and tutorials
 - **API Reference**: Available via [godoc.org](https://pkg.go.dev/github.com/ZaguanLabs/xai-sdk-go) (once published)
 
+## � API Coverage
+
+**100% Complete** - All 11 APIs from the xAI Python SDK are implemented!
+
+| API | Transport | Status | Methods |
+|-----|-----------|--------|---------|
+| Chat | gRPC | ✅ Production Ready | All |
+| Models | gRPC | ✅ Production Ready | All |
+| Embed | REST | ✅ Complete | 1/1 |
+| Files | REST | ✅ Complete | 6/6 |
+| Auth | REST | ✅ Complete | 3/3 |
+| Collections | REST | ✅ Complete | 11/11 |
+| Image | REST | ✅ Complete | 1/1 |
+| Deferred | REST | ✅ Complete | 2/2 |
+| Documents | REST | ✅ Complete | 1/1 |
+| Sample | REST | ✅ Complete | 1/1 |
+| Tokenizer | REST | ✅ Complete | 1/1 |
+
+**Total**: 28+ methods across 11 APIs
+
 ## 🗺️ Roadmap
 
-The SDK is being developed in phases. Current status:
-
 ### Released
-- ✅ **v0.1.0**: Foundation, proto, configuration, client, auth, basic and advanced chat
-- ✅ **v0.1.1**: Fixed models API proto definitions and metadata handling
-- ✅ **v0.1.2**: Fixed chat API proto definitions (package name, method names, message structures)
-- ✅ **v0.1.3**: Attempted Message field order fix (superseded)
-- ✅ **v0.1.4**: Attempted Message content type fix (superseded)
-- ✅ **v0.1.5**: Correct Message proto using official xAI Python SDK v1.4.0
-- ✅ **v0.1.6**: Version string alignment (internal version matches release tag)
-- ✅ **v0.2.0**: **100% proto alignment** with xAI Python SDK v1.4.0
-  - All 14 proto files aligned (108 messages, 18 enums)
-  - Chat API fully functional and tested in production
-  - New proto files: deferred, documents, embed, sample, types, shared, usage
-  - Complete chat proto with all 37 messages
-  - Embed API wrapper added
-  - Breaking changes: auth, files, collections proto restructure
+- ✅ **v0.1.x**: Foundation, proto alignment, Chat and Models APIs
+- ✅ **v0.2.0**: 100% proto alignment with xAI Python SDK v1.4.0
+- ✅ **v0.2.1**: Hotfix for compilation errors
 
-### Upcoming
-- 🚧 **v0.2.x**: SDK wrapper implementations
-  - Deferred completions API
-  - Documents search API
-  - Update files and collections wrappers
-- 🚧 **v0.3.0**: Additional features
-  - Image generation API
-  - Tokenization API
-  - Enhanced error handling
-  - Integration tests
+### Current (Unreleased)
+- ✅ **REST Client Foundation**: Complete HTTP infrastructure
+- ✅ **All 11 APIs Implemented**: 100% API coverage
+- ✅ **Production Ready**: Chat and Models tested in production
+- ✅ **Feature Complete**: Embed, Files, Auth, Collections, Image, Deferred, Documents, Sample, Tokenizer
 
-See [`docs/SDK_STATUS.md`](docs/SDK_STATUS.md) for detailed status and [`docs/PROTO_ALIGNMENT_PLAN.md`](docs/PROTO_ALIGNMENT_PLAN.md) for alignment details.
+### Next Steps
+- 📝 Integration tests for REST APIs
+- 📝 Enhanced examples and documentation
+- 📝 Performance optimizations
+- 📝 Release v0.3.0
+
+See [`docs/SDK_STATUS.md`](docs/SDK_STATUS.md) for detailed status and [`CHANGELOG.md`](CHANGELOG.md) for release notes.
 
 ## 🤝 Contributing
 

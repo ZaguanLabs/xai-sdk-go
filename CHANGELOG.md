@@ -5,6 +5,61 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### 🎉 Major Release: Complete API Coverage
+
+This release achieves **100% API coverage** with all 11 APIs from the xAI Python SDK fully implemented!
+
+### Added
+
+#### REST Client Foundation
+- **REST client infrastructure**: Complete HTTP client with JSON support
+- **Authentication**: Bearer token support
+- **Error handling**: HTTP status code helpers and error types
+- **Request/Response**: JSON marshaling with protobuf support
+
+#### New APIs (5 APIs)
+- **Image Generation API**: Text-to-image and image-to-image generation
+- **Deferred Completions API**: Long-running completion support
+- **Document Search API**: Search across document collections
+- **Sample API**: Legacy text completion (Chat API recommended)
+- **Tokenizer API**: Text tokenization utilities
+
+#### Completed REST APIs (4 APIs)
+- **Embed API**: Generate embeddings for text and images
+- **Files API**: Upload, download, list, delete files (6 methods)
+- **Auth API**: API key validation and management (3 methods)
+- **Collections API**: Document collection management (11 methods)
+
+### Changed
+- **Main client**: Added accessor methods for all 11 APIs
+- **Documentation**: Clarified SDK is unofficial and community-maintained
+- **Tests**: Updated version expectations to 0.2.1
+
+### Fixed
+- **Test failures**: Fixed version test expectations
+- **Compilation**: All packages compile successfully
+
+### API Status Summary
+
+**Production Ready (gRPC)**:
+- ✅ Chat API - Fully functional, production-tested
+- ✅ Models API - Fully functional
+
+**Fully Functional (REST)**:
+- ✅ Embed API - Generate embeddings
+- ✅ Files API - Complete file operations (6/6 methods)
+- ✅ Auth API - API key management (3/3 methods)
+- ✅ Collections API - Document collections (11/11 methods)
+- ✅ Image API - Image generation
+- ✅ Deferred API - Deferred completions
+- ✅ Documents API - Document search
+- ✅ Sample API - Text completion (legacy)
+- ✅ Tokenizer API - Text tokenization
+
+**Total**: 11/11 APIs (100% coverage)
+
 ## [0.2.1] - 2025-11-15
 
 ### 🔧 Hotfix: Compilation Errors

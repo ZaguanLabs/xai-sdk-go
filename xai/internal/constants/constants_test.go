@@ -152,8 +152,8 @@ func TestDefaultUserAgent(t *testing.T) {
 		t.Errorf("DefaultUserAgent should contain 'xai-sdk-go', got: %s", DefaultUserAgent)
 	}
 
-	if !strings.Contains(DefaultUserAgent, "0.1.0") {
-		t.Errorf("DefaultUserAgent should contain version '0.1.0', got: %s", DefaultUserAgent)
+	if !strings.Contains(DefaultUserAgent, "0.2.1") {
+		t.Errorf("DefaultUserAgent should contain version '0.2.1', got: %s", DefaultUserAgent)
 	}
 }
 
