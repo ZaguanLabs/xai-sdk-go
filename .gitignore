@@ -32,10 +32,13 @@ coverage.out
 # Other repos
 /docs/xai-sdk-python
 
-# Local binaries
+# Local binaries (example executables)
 /basic
 /function_calling
 /streaming
 /structured_outputs
 /list
 /main
+/advanced_parameters
+/complete_parameters
+/advanced_features
