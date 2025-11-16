@@ -9,6 +9,7 @@ import (
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/chat"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/collections"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/embed"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/files"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/errors"
@@ -431,4 +432,11 @@ func (c *Client) Files() *files.Client {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return files.NewClient()
+}
+
+// Collections returns the collections service client.
+func (c *Client) Collections() *collections.Client {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return collections.NewClient()
 }
