@@ -45,7 +45,7 @@ func main() {
 	// Print the response
 	fmt.Printf("Response: %s\n", resp.Content())
 	fmt.Printf("Role: %s\n", resp.Role())
-	
+
 	// Print token usage if available
 	if usage := resp.Usage(); usage != nil {
 		fmt.Printf("Prompt tokens: %d\n", usage.PromptTokens())

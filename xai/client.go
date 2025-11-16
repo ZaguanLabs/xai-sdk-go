@@ -235,6 +235,11 @@ func (c *Client) Close() error {
 
 	c.isClosed = true
 
+	// Close REST client
+	if c.restClient != nil {
+		c.restClient.Close()
+	}
+
 	// Close gRPC connection
 	if c.grpcConn != nil {
 		if err := c.grpcConn.Close(); err != nil {
@@ -317,12 +322,15 @@ func (c *Client) WithTimeout(timeout time.Duration) *Client {
 	newConfig.Timeout = timeout
 
 	return &Client{
-		config:     &newConfig,
-		metadata:   c.metadata, // Same metadata
-		grpcConn:   c.grpcConn,
-		grpcClient: c.grpcConn,
-		createdAt:  c.createdAt,
-		isClosed:   c.isClosed,
+		config:       &newConfig,
+		metadata:     c.metadata,
+		grpcConn:     c.grpcConn,
+		grpcClient:   c.grpcConn,
+		restClient:   c.restClient,
+		chatClient:   c.chatClient,
+		modelsClient: c.modelsClient,
+		createdAt:    c.createdAt,
+		isClosed:     c.isClosed,
 	}
 }
 
@@ -338,12 +346,15 @@ func (c *Client) WithAPIKey(apiKey string) *Client {
 	newMetadata.APIKey = apiKey
 
 	return &Client{
-		config:     &newConfig,
-		metadata:   newMetadata,
-		grpcConn:   c.grpcConn,
-		grpcClient: c.grpcConn,
-		createdAt:  c.createdAt,
-		isClosed:   c.isClosed,
+		config:       &newConfig,
+		metadata:     newMetadata,
+		grpcConn:     c.grpcConn,
+		grpcClient:   c.grpcConn,
+		restClient:   c.restClient,
+		chatClient:   c.chatClient,
+		modelsClient: c.modelsClient,
+		createdAt:    c.createdAt,
+		isClosed:     c.isClosed,
 	}
 }
 

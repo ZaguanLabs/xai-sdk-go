@@ -19,16 +19,16 @@ import (
 type RetryPolicy struct {
 	// MaxAttempts is the maximum number of retry attempts.
 	MaxAttempts int `json:"max_attempts"`
-	
+
 	// InitialBackoff is the initial backoff duration.
 	InitialBackoff time.Duration `json:"initial_backoff"`
-	
+
 	// MaxBackoff is the maximum backoff duration.
 	MaxBackoff time.Duration `json:"max_backoff"`
-	
+
 	// BackoffMultiplier is the multiplier for exponential backoff.
 	BackoffMultiplier float64 `json:"backoff_multiplier"`
-	
+
 	// RetryableCodes are the gRPC status codes that should trigger a retry.
 	RetryableCodes []string `json:"retryable_codes"`
 }
@@ -42,7 +42,7 @@ func DefaultRetryPolicy() *RetryPolicy {
 		BackoffMultiplier: 1.6,
 		RetryableCodes: []string{
 			"UNAVAILABLE",
-			"DEADLINE_EXCEEDED", 
+			"DEADLINE_EXCEEDED",
 			"RESOURCE_EXHAUSTED",
 			"INTERNAL",
 		},
@@ -68,10 +68,10 @@ func (rp *RetryPolicy) ToServiceConfig() map[string]any {
 type KeepAliveConfig struct {
 	// Time is the time after which if no activity is seen, a ping is sent.
 	Time time.Duration `json:"time"`
-	
+
 	// Timeout is the time the ping response must be received before the connection is closed.
 	Timeout time.Duration `json:"timeout"`
-	
+
 	// EnforcementPolicy specifies the keepalive enforcement policy.
 	EnforcementPolicy keepalive.EnforcementPolicy `json:"enforcement_policy"`
 }
@@ -82,8 +82,8 @@ func DefaultKeepAliveConfig() *KeepAliveConfig {
 		Time:    20 * time.Second,
 		Timeout: 10 * time.Second,
 		EnforcementPolicy: keepalive.EnforcementPolicy{
-			MinTime:             5 * time.Second,  // Minimum time between pings
-			PermitWithoutStream: true,              // Permit pings without active streams
+			MinTime:             5 * time.Second, // Minimum time between pings
+			PermitWithoutStream: true,            // Permit pings without active streams
 		},
 	}
 }
@@ -111,22 +111,22 @@ func (kac *KeepAliveConfig) ToGRPCKeepAliveEnforcementPolicy() keepalive.Enforce
 
 // DialOptionBuilder builds gRPC dial options.
 type DialOptionBuilder struct {
-	retryPolicy    *RetryPolicy
-	keepAlive      *KeepAliveConfig
-	insecure       bool
-	customTLS      credentials.TransportCredentials
-	block          bool
-	waitForReady   bool
-	compressor     string
+	retryPolicy  *RetryPolicy
+	keepAlive    *KeepAliveConfig
+	insecure     bool
+	customTLS    credentials.TransportCredentials
+	block        bool
+	waitForReady bool
+	compressor   string
 }
 
 // NewDialOptionBuilder creates a new dial option builder.
 func NewDialOptionBuilder() *DialOptionBuilder {
 	return &DialOptionBuilder{
-		retryPolicy: DefaultRetryPolicy(),
-		keepAlive:   DefaultKeepAliveConfig(),
-		insecure:    false,
-		block:       true,
+		retryPolicy:  DefaultRetryPolicy(),
+		keepAlive:    DefaultKeepAliveConfig(),
+		insecure:     false,
+		block:        true,
 		waitForReady: true,
 	}
 }
@@ -211,10 +211,10 @@ func (dob *DialOptionBuilder) Build() ([]grpc.DialOption, error) {
 
 // ConnectionState represents the state of a gRPC connection.
 type ConnectionState struct {
-	State        connectivity.State `json:"state"`
-	Address      string             `json:"address,omitempty"`
-	LastConnected time.Time         `json:"last_connected,omitempty"`
-	Error        string             `json:"error,omitempty"`
+	State         connectivity.State `json:"state"`
+	Address       string             `json:"address,omitempty"`
+	LastConnected time.Time          `json:"last_connected,omitempty"`
+	Error         string             `json:"error,omitempty"`
 }
 
 // HealthChecker provides health checking utilities for gRPC connections.
@@ -235,18 +235,18 @@ func NewHealthChecker(conn *grpc.ClientConn, address string) *HealthChecker {
 func (hc *HealthChecker) CheckConnection() ConnectionState {
 	if hc.conn == nil {
 		return ConnectionState{
-			State:  connectivity.Shutdown,
+			State:   connectivity.Shutdown,
 			Address: hc.addr,
-			Error:  "connection is nil",
+			Error:   "connection is nil",
 		}
 	}
-	
+
 	state := hc.conn.GetState()
-	
+
 	return ConnectionState{
-		State:     state,
-		Address:   hc.addr,
-		Error:     hc.getStateError(state),
+		State:   state,
+		Address: hc.addr,
+		Error:   hc.getStateError(state),
 	}
 }
 
@@ -277,41 +277,41 @@ func (hc *HealthChecker) getStateError(state connectivity.State) string {
 // RetryWithBackoff performs a retry operation with exponential backoff.
 func RetryWithBackoff(ctx context.Context, policy *RetryPolicy, operation func() error) error {
 	backoff := policy.InitialBackoff
-	
+
 	for attempt := 0; attempt < policy.MaxAttempts; attempt++ {
 		err := operation()
 		if err == nil {
 			return nil
 		}
-		
+
 		// Check if error is retryable
 		if !isRetryableError(err, policy.RetryableCodes) {
 			return err
 		}
-		
+
 		// If this is the last attempt, return the error
 		if attempt == policy.MaxAttempts-1 {
 			return err
 		}
-		
+
 		// Create a new context with timeout for the backoff period
 		backoffCtx, cancel := context.WithTimeout(ctx, backoff)
 		defer cancel()
-		
+
 		// Wait for the backoff period or context cancellation
 		select {
 		case <-backoffCtx.Done():
 			return backoffCtx.Err()
 		case <-time.After(backoff):
 		}
-		
+
 		// Increase backoff for next iteration
 		backoff = time.Duration(float64(backoff) * policy.BackoffMultiplier)
 		if backoff > policy.MaxBackoff {
 			backoff = policy.MaxBackoff
 		}
 	}
-	
+
 	return nil
 }
 
@@ -326,13 +326,13 @@ func isRetryableError(err error, retryableCodes []string) bool {
 			}
 		}
 	}
-	
+
 	// For other error types, check common retryable conditions
 	errorStr := err.Error()
 	if errorStr == "context canceled" || errorStr == "context deadline exceeded" {
 		return true
 	}
-	
+
 	return false
 }
 

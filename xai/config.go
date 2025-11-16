@@ -25,58 +25,63 @@ import (
 type Config struct {
 	// APIKey is the xAI API key for authentication.
 	APIKey string `json:"api_key"`
-	
+
 	// Host is the xAI API host (default: api.x.ai).
 	Host string `json:"host"`
-	
+
 	// GRPCPort is the gRPC port (default: 443).
 	GRPCPort string `json:"grpc_port"`
-	
+
 	// HTTPHost is the HTTP API host (default: api.x.ai).
 	HTTPHost string `json:"http_host"`
-	
+
 	// HTTPPort is the HTTP API port (default: 80).
 	HTTPPort string `json:"http_port"`
-	
+
 	// Timeout is the default request timeout (default: 30s).
 	Timeout time.Duration `json:"timeout"`
-	
+
 	// ConnectTimeout is the connection timeout (default: 10s).
 	ConnectTimeout time.Duration `json:"connect_timeout"`
-	
+
 	// KeepAliveTimeout is the keep-alive timeout (default: 20s).
 	KeepAliveTimeout time.Duration `json:"keep_alive_timeout"`
-	
+
 	// StreamTimeout is the streaming timeout (default: 300s).
 	StreamTimeout time.Duration `json:"stream_timeout"`
-	
+
 	// Insecure controls whether to use TLS (default: false).
+	// WARNING: Setting this to true disables TLS encryption entirely.
+	// Only use in local development or testing environments. Never use in production.
 	Insecure bool `json:"insecure"`
-	
+
 	// SkipVerify controls whether to skip TLS certificate verification (default: false).
+	// WARNING: Setting this to true disables certificate validation, making connections
+	// vulnerable to man-in-the-middle attacks. Only use in local development or testing
+	// environments with self-signed certificates. Never use in production.
 	SkipVerify bool `json:"skip_verify"`
-	
+
 	// MaxRetries is the maximum number of retries (default: 3).
 	MaxRetries int `json:"max_retries"`
-	
+
 	// RetryBackoff is the retry backoff duration (default: 1s).
 	RetryBackoff time.Duration `json:"retry_backoff"`
-	
+
 	// MaxBackoff is the maximum backoff duration (default: 60s).
 	MaxBackoff time.Duration `json:"max_backoff"`
-	
+
 	// Environment is the deployment environment (default: production).
 	Environment string `json:"environment"`
-	
+
 	// UserAgent is the user agent string (default: xai-sdk-go/version).
 	UserAgent string `json:"user_agent"`
-	
+
 	// EnableTelemetry controls whether to enable telemetry (default: true).
 	EnableTelemetry bool `json:"enable_telemetry"`
-	
+
 	// CustomTLSConfig allows providing a custom TLS configuration.
 	CustomTLSConfig *tls.Config `json:"-"`
-	
+
 	// Logger is an optional logger (if nil, no logging is performed).
 	// Logger logger.Logger `json:"-"`
 }
@@ -84,22 +89,22 @@ type Config struct {
 // DefaultConfig returns a Config with default values.
 func DefaultConfig() *Config {
 	return &Config{
-		Host:            constants.DefaultAPIV1Host,
-		GRPCPort:        constants.DefaultGRPCPort,
-		HTTPHost:        constants.DefaultHTTPHost,
-		HTTPPort:        "80",
-		Timeout:         constants.DefaultTimeout,
-		ConnectTimeout:  constants.DefaultConnectTimeout,
+		Host:             constants.DefaultAPIV1Host,
+		GRPCPort:         constants.DefaultGRPCPort,
+		HTTPHost:         constants.DefaultHTTPHost,
+		HTTPPort:         "80",
+		Timeout:          constants.DefaultTimeout,
+		ConnectTimeout:   constants.DefaultConnectTimeout,
 		KeepAliveTimeout: constants.DefaultKeepAliveTimeout,
-		StreamTimeout:   constants.DefaultStreamTimeout,
-		Insecure:        false,
-		SkipVerify:      false,
-		MaxRetries:      constants.DefaultMaxRetries,
-		RetryBackoff:    constants.DefaultRetryBackoff,
-		MaxBackoff:      constants.DefaultMaxBackoff,
-		Environment:     "production",
-		UserAgent:       constants.DefaultUserAgent,
-		EnableTelemetry: true,
+		StreamTimeout:    constants.DefaultStreamTimeout,
+		Insecure:         false,
+		SkipVerify:       false,
+		MaxRetries:       constants.DefaultMaxRetries,
+		RetryBackoff:     constants.DefaultRetryBackoff,
+		MaxBackoff:       constants.DefaultMaxBackoff,
+		Environment:      "production",
+		UserAgent:        constants.DefaultUserAgent,
+		EnableTelemetry:  true,
 	}
 }
 
@@ -123,90 +128,90 @@ func (c *Config) LoadFromEnvironment() {
 	if apiKey := os.Getenv("XAI_API_KEY"); apiKey != "" {
 		c.APIKey = apiKey
 	}
-	
+
 	// Host configuration
 	if host := os.Getenv("XAI_HOST"); host != "" {
 		c.Host = host
 	}
-	
+
 	if grpcPort := os.Getenv("XAI_GRPC_PORT"); grpcPort != "" {
 		c.GRPCPort = grpcPort
 	}
-	
+
 	if httpHost := os.Getenv("XAI_HTTP_HOST"); httpHost != "" {
 		c.HTTPHost = httpHost
 	}
-	
+
 	if httpPort := os.Getenv("XAI_HTTP_PORT"); httpPort != "" {
 		c.HTTPPort = httpPort
 	}
-	
+
 	// Timeouts
 	if timeoutStr := os.Getenv("XAI_TIMEOUT"); timeoutStr != "" {
 		if timeout, err := parseDuration(timeoutStr); err == nil {
 			c.Timeout = timeout
 		}
 	}
-	
+
 	if connectTimeoutStr := os.Getenv("XAI_CONNECT_TIMEOUT"); connectTimeoutStr != "" {
 		if timeout, err := parseDuration(connectTimeoutStr); err == nil {
 			c.ConnectTimeout = timeout
 		}
 	}
-	
+
 	if keepAliveTimeoutStr := os.Getenv("XAI_KEEPALIVE_TIMEOUT"); keepAliveTimeoutStr != "" {
 		if timeout, err := parseDuration(keepAliveTimeoutStr); err == nil {
 			c.KeepAliveTimeout = timeout
 		}
 	}
-	
+
 	if streamTimeoutStr := os.Getenv("XAI_STREAM_TIMEOUT"); streamTimeoutStr != "" {
 		if timeout, err := parseDuration(streamTimeoutStr); err == nil {
 			c.StreamTimeout = timeout
 		}
 	}
-	
+
 	// Security settings
 	if insecureStr := os.Getenv("XAI_INSECURE"); insecureStr != "" {
 		if insecure, err := strconv.ParseBool(insecureStr); err == nil {
 			c.Insecure = insecure
 		}
 	}
-	
+
 	if skipVerifyStr := os.Getenv("XAI_SKIP_VERIFY"); skipVerifyStr != "" {
 		if skipVerify, err := strconv.ParseBool(skipVerifyStr); err == nil {
 			c.SkipVerify = skipVerify
 		}
 	}
-	
+
 	// Retry settings
 	if maxRetriesStr := os.Getenv("XAI_MAX_RETRIES"); maxRetriesStr != "" {
 		if maxRetries, err := strconv.Atoi(maxRetriesStr); err == nil && maxRetries >= 0 {
 			c.MaxRetries = maxRetries
 		}
 	}
-	
+
 	if retryBackoffStr := os.Getenv("XAI_RETRY_BACKOFF"); retryBackoffStr != "" {
 		if backoff, err := parseDuration(retryBackoffStr); err == nil {
 			c.RetryBackoff = backoff
 		}
 	}
-	
+
 	if maxBackoffStr := os.Getenv("XAI_MAX_BACKOFF"); maxBackoffStr != "" {
 		if backoff, err := parseDuration(maxBackoffStr); err == nil {
 			c.MaxBackoff = backoff
 		}
 	}
-	
+
 	// Other settings
 	if environment := os.Getenv("XAI_ENVIRONMENT"); environment != "" {
 		c.Environment = environment
 	}
-	
+
 	if userAgent := os.Getenv("XAI_USER_AGENT"); userAgent != "" {
 		c.UserAgent = userAgent
 	}
-	
+
 	if enableTelemetryStr := os.Getenv("XAI_ENABLE_TELEMETRY"); enableTelemetryStr != "" {
 		if enableTelemetry, err := strconv.ParseBool(enableTelemetryStr); err == nil {
 			c.EnableTelemetry = enableTelemetry
@@ -219,68 +224,68 @@ func (c *Config) Validate() error {
 	if c.APIKey == "" {
 		return errors.NewConfigError("API key is required. Set XAI_API_KEY environment variable or call WithAPIKey().")
 	}
-	
+
 	// Validate host configuration
 	if c.Host == "" {
 		c.Host = constants.DefaultAPIV1Host
 	}
-	
+
 	if c.GRPCPort == "" {
 		c.GRPCPort = constants.DefaultGRPCPort
 	}
-	
+
 	if c.HTTPHost == "" {
 		c.HTTPHost = constants.DefaultHTTPHost
 	}
-	
+
 	if c.HTTPPort == "" {
 		c.HTTPPort = "80"
 	}
-	
+
 	// Validate timeouts
 	if c.Timeout <= 0 {
 		return errors.NewConfigError("timeout must be positive")
 	}
-	
+
 	if c.ConnectTimeout <= 0 {
 		return errors.NewConfigError("connect_timeout must be positive")
 	}
-	
+
 	if c.KeepAliveTimeout <= 0 {
 		return errors.NewConfigError("keep_alive_timeout must be positive")
 	}
-	
+
 	if c.StreamTimeout <= 0 {
 		return errors.NewConfigError("stream_timeout must be positive")
 	}
-	
+
 	// Validate retry settings
 	if c.MaxRetries < 0 {
 		return errors.NewConfigError("max_retries must be non-negative")
 	}
-	
+
 	if c.RetryBackoff <= 0 {
 		return errors.NewConfigError("retry_backoff must be positive")
 	}
-	
+
 	if c.MaxBackoff <= 0 {
 		return errors.NewConfigError("max_backoff must be positive")
 	}
-	
+
 	if c.MaxBackoff < c.RetryBackoff {
 		return errors.NewConfigError("max_backoff must be greater than or equal to retry_backoff")
 	}
-	
+
 	// Validate environment
 	if c.Environment == "" {
 		c.Environment = "production"
 	}
-	
+
 	// Validate user agent
 	if c.UserAgent == "" {
 		c.UserAgent = constants.DefaultUserAgent
 	}
-	
+
 	return nil
 }
 
@@ -452,11 +457,11 @@ func parseDuration(s string) (time.Duration, error) {
 	if d, err := time.ParseDuration(s); err == nil {
 		return d, nil
 	}
-	
+
 	// If parsing failed, try treating it as seconds
 	if num, err := strconv.Atoi(s); err == nil {
 		return time.Duration(num) * time.Second, nil
 	}
-	
+
 	return 0, fmt.Errorf("invalid duration: %s", s)
 }

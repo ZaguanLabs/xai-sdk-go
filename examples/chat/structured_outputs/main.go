@@ -12,12 +12,12 @@ import (
 
 // WeatherResponse represents the structured weather data we want
 type WeatherResponse struct {
-	Location    string  `json:"location"`
-	Temperature string  `json:"temperature"`
-	Unit        string  `json:"unit"`
-	Description string  `json:"description"`
-	Conditions  string  `json:"conditions"`
-	Humidity   int     `json:"humidity"`
+	Location    string `json:"location"`
+	Temperature string `json:"temperature"`
+	Unit        string `json:"unit"`
+	Description string `json:"description"`
+	Conditions  string `json:"conditions"`
+	Humidity    int    `json:"humidity"`
 }
 
 // TaskResponse represents a structured task
@@ -26,7 +26,7 @@ type TaskResponse struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Priority    string `json:"priority"`
-	DueDate    string `json:"due_date"`
+	DueDate     string `json:"due_date"`
 	Completed   bool   `json:"completed"`
 }
 

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/constants"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
 	"google.golang.org/protobuf/encoding/protojson"
 )
@@ -53,6 +54,8 @@ type ListResult struct {
 type UploadOptions struct {
 	Name    string
 	Purpose string
+	// MaxSize is the maximum file size in bytes. If 0, defaults to DefaultMaxFileSize (100MB).
+	MaxSize int64
 }
 
 // fromProto converts a proto File to a File.
@@ -85,10 +88,24 @@ func (c *Client) Upload(ctx context.Context, reader io.Reader, opts UploadOption
 		return nil, ErrClientNotInitialized
 	}
 
+	// Determine max size (use default if not specified)
+	maxSize := opts.MaxSize
+	if maxSize <= 0 {
+		maxSize = constants.DefaultMaxFileSize
+	}
+
+	// Limit file size to prevent memory exhaustion
+	limitedReader := io.LimitReader(reader, maxSize+1)
+
 	// Read file content
-	content, err := io.ReadAll(reader)
+	content, err := io.ReadAll(limitedReader)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file content: %w", err)
+	}
+
+	// Check if file size exceeds the limit
+	if int64(len(content)) > maxSize {
+		return nil, fmt.Errorf("%w: file size %d exceeds limit %d", ErrFileTooLarge, len(content), maxSize)
 	}
 
 	// Create upload request

@@ -28,7 +28,7 @@ func TestNewSDKMetadata(t *testing.T) {
 	}
 
 	// Check default values
-	expectedClientVersion := "xai-sdk-go/0.2.1"
+	expectedClientVersion := "xai-sdk-go/0.3.0"
 	if md.ClientVersion != expectedClientVersion {
 		t.Errorf("Expected client version %s, got %s", expectedClientVersion, md.ClientVersion)
 	}
@@ -105,7 +105,7 @@ func TestSDKMetadataToMetadataWithEmptyFields(t *testing.T) {
 
 func TestAddToOutgoingContext(t *testing.T) {
 	md := &SDKMetadata{
-		APIKey: "test-api-key",
+		APIKey:        "test-api-key",
 		ClientVersion: "test-version",
 	}
 
@@ -466,7 +466,7 @@ func TestGetPeerInfo(t *testing.T) {
 	// But we can test that the function doesn't panic
 	ctx := context.Background()
 	peerInfo, ok := GetPeerInfo(ctx)
-	
+
 	// In a normal context without peer info, should return false
 	if ok {
 		t.Log("Peer info is available in this context")

@@ -12,7 +12,7 @@ func TestSDKVersion(t *testing.T) {
 		t.Error("SDK version should not be empty")
 	}
 
-	expectedVersion := "0.2.1"
+	expectedVersion := "0.3.0"
 	if version != expectedVersion {
 		t.Errorf("Expected SDK version %s, got %s", expectedVersion, version)
 	}
@@ -55,7 +55,7 @@ func TestGetBuildInfo(t *testing.T) {
 
 func TestBuildInfoString(t *testing.T) {
 	info := BuildInfo{
-		SDKVersion: "0.2.1",
+		SDKVersion: "0.3.0",
 		GoVersion:  "go1.21.0",
 		GOOS:       "linux",
 		GOARCH:     "amd64",
@@ -66,7 +66,7 @@ func TestBuildInfoString(t *testing.T) {
 	str := info.String()
 
 	// Check that the string contains expected parts
-	if !containsSubstring(str, "xai-sdk-go v0.2.1") {
+	if !containsSubstring(str, "xai-sdk-go v0.3.0") {
 		t.Errorf("Expected string to contain SDK version, got: %s", str)
 	}
 

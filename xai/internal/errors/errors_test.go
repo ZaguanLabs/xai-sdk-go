@@ -107,7 +107,7 @@ func TestNewErrorWithCause(t *testing.T) {
 
 func TestNewErrorWithContext(t *testing.T) {
 	context := map[string]interface{}{
-		"user_id": "12345",
+		"user_id":      "12345",
 		"request_path": "/api/test",
 	}
 
@@ -178,7 +178,7 @@ func TestNewErrorFull(t *testing.T) {
 func TestErrorString(t *testing.T) {
 	cause := errors.New("original error")
 	context := map[string]interface{}{
-		"user_id": "12345",
+		"user_id":   "12345",
 		"operation": "upload",
 	}
 
@@ -210,12 +210,12 @@ func TestErrorString(t *testing.T) {
 func TestErrorUnwrap(t *testing.T) {
 	cause := errors.New("original error")
 	err := NewErrorWithCause(ErrorTypeAPI, codes.InvalidArgument, "test error", cause)
-	
+
 	unwrapped := err.Unwrap()
 	if unwrapped == nil {
 		t.Error("Unwrap should return the cause error")
 	}
-	
+
 	if unwrapped != cause {
 		t.Error("Unwrap should return the exact cause error")
 	}
@@ -244,16 +244,16 @@ func TestErrorMethods(t *testing.T) {
 
 func TestErrorGRPCStatus(t *testing.T) {
 	err := NewError(ErrorTypeAPI, codes.NotFound, "not found")
-	
+
 	status := err.GRPCStatus()
 	if status == nil {
 		t.Error("GRPCStatus() should not return nil")
 	}
-	
+
 	if status.Code() != codes.NotFound {
 		t.Errorf("GRPC status code should be %v, got %v", codes.NotFound, status.Code())
 	}
-	
+
 	if status.Message() != "not found" {
 		t.Errorf("GRPC status message should be 'not found', got '%s'", status.Message())
 	}
@@ -265,30 +265,30 @@ func TestFromGRPC(t *testing.T) {
 	if result != nil {
 		t.Error("FromGRPC(nil) should return nil")
 	}
-	
+
 	// Test with gRPC status error
 	st := status.New(codes.NotFound, "resource not found")
 	grpcErr := st.Err()
 	result = FromGRPC(grpcErr)
-	
+
 	if result == nil {
 		t.Error("FromGRPC should not return nil for gRPC error")
 	}
-	
+
 	// Test with io.EOF
 	eofErr := io.EOF
 	result = FromGRPC(eofErr)
 	if result != io.EOF {
 		t.Error("FromGRPC should return io.EOF as-is")
 	}
-	
+
 	// Test with context canceled error
 	cancelErr := errors.New("context canceled")
 	result = FromGRPC(cancelErr)
 	if result == nil {
 		t.Error("FromGRPC should not return nil for context error")
 	}
-	
+
 	// Test with generic error
 	genericErr := errors.New("generic error")
 	result = FromGRPC(genericErr)
@@ -301,7 +301,7 @@ func TestFromGRPCAlreadyErrorType(t *testing.T) {
 	// Test that if we pass an Error type, it returns as-is
 	originalErr := NewError(ErrorTypeAPI, codes.InvalidArgument, "test error")
 	result := FromGRPC(originalErr)
-	
+
 	if result != originalErr {
 		t.Error("FromGRPC should return the same Error instance when passed an Error type")
 	}
@@ -322,8 +322,8 @@ func TestFromGRPCWithWrappedError(t *testing.T) {
 
 func TestMapGRPCCodeToErrorType(t *testing.T) {
 	tests := []struct {
-		code      codes.Code
-		want      ErrorType
+		code codes.Code
+		want ErrorType
 	}{
 		{codes.InvalidArgument, ErrorTypeValidation},
 		{codes.Unauthenticated, ErrorTypeAuth},
@@ -387,21 +387,21 @@ func TestHelperFunctions(t *testing.T) {
 
 func TestGetStackTrace(t *testing.T) {
 	stack := getStackTrace()
-	
+
 	if stack == nil {
 		t.Error("Stack trace should not be nil")
 	}
-	
+
 	if len(stack) == 0 {
 		t.Error("Stack trace should contain at least one frame")
 	}
-	
+
 	// Check that stack frames contain expected information
 	for _, frame := range stack {
 		if frame == "" {
 			t.Error("Stack frame should not be empty")
 		}
-		
+
 		// Should contain file:line:function format
 		if !strings.Contains(frame, ":") {
 			t.Errorf("Stack frame should contain ':' separator, got: %s", frame)
@@ -442,7 +442,7 @@ func BenchmarkNewError(b *testing.B) {
 
 func BenchmarkFromGRPC(b *testing.B) {
 	grpcErr := status.New(codes.InvalidArgument, "grpc error").Err()
-	
+
 	for i := 0; i < b.N; i++ {
 		_ = FromGRPC(grpcErr)
 	}

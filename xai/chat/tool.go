@@ -31,7 +31,7 @@ func (t *Tool) WithParameter(name string, paramType string, description string, 
 	t.parameters[name] = map[string]interface{}{
 		"type":        paramType,
 		"description": description,
-		"required":     required,
+		"required":    required,
 	}
 	return t
 }
@@ -83,16 +83,16 @@ func (t *Tool) ToJSONSchema() map[string]interface{} {
 	}
 
 	return map[string]interface{}{
-		"type":        "object",
-		"properties":   properties,
-		"required":    required,
+		"type":       "object",
+		"properties": properties,
+		"required":   required,
 	}
 }
 
 // ToJSON converts the tool to JSON representation.
 func (t *Tool) ToJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
-		"type":        "function",
+		"type": "function",
 		"function": map[string]interface{}{
 			"name":        t.name,
 			"description": t.description,
@@ -135,11 +135,10 @@ func (t *Tool) Validate() error {
 	return nil
 }
 
-
 // ToolCall represents a call to a tool.
 type ToolCall struct {
-	id       string
-	name     string
+	id        string
+	name      string
 	arguments map[string]interface{}
 }
 
@@ -200,8 +199,8 @@ func (f *ToolCallFunction) Arguments() map[string]interface{} {
 // ToJSON converts the tool call to JSON representation.
 func (tc *ToolCall) ToJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
-		"id":       tc.id,
-		"type":      "function",
+		"id":   tc.id,
+		"type": "function",
 		"function": map[string]interface{}{
 			"name":      tc.name,
 			"arguments": tc.arguments,

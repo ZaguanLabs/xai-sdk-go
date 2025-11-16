@@ -22,7 +22,7 @@ func NewTimeoutInterceptor(defaultTimeout, maxTimeout time.Duration) *TimeoutInt
 	if maxTimeout <= 0 {
 		maxTimeout = 5 * time.Minute
 	}
-	
+
 	return &TimeoutInterceptor{
 		defaultTimeout: defaultTimeout,
 		maxTimeout:     maxTimeout,
@@ -100,8 +100,8 @@ func TimeoutStreamInterceptor(timeout time.Duration) grpc.StreamClientIntercepto
 
 // StreamTimeoutSettings configures timeout settings for streaming operations.
 type StreamTimeoutSettings struct {
-	ServerStreamTimeout time.Duration
-	ClientStreamTimeout time.Duration
+	ServerStreamTimeout  time.Duration
+	ClientStreamTimeout  time.Duration
 	BidirectionalTimeout time.Duration
 }
 
@@ -115,7 +115,7 @@ func NewStreamTimeoutInterceptor(settings StreamTimeoutSettings) *TimeoutInterce
 
 // TimeoutOptions provides options for configuring timeout behavior.
 type TimeoutOptions struct {
-	DefaultTimeout       time.Duration
+	DefaultTimeout      time.Duration
 	MaxTimeout          time.Duration
 	EnableDeadlineCheck bool
 }
@@ -128,7 +128,7 @@ func NewTimeoutInterceptorWithOptions(options TimeoutOptions) *TimeoutIntercepto
 	if options.MaxTimeout <= 0 {
 		options.MaxTimeout = 5 * time.Minute
 	}
-	
+
 	return &TimeoutInterceptor{
 		defaultTimeout: options.DefaultTimeout,
 		maxTimeout:     options.MaxTimeout,
@@ -145,7 +145,7 @@ func NewDeadlineInterceptor(maxTimeout time.Duration) *DeadlineInterceptor {
 	if maxTimeout <= 0 {
 		maxTimeout = 5 * time.Minute
 	}
-	
+
 	return &DeadlineInterceptor{
 		maxTimeout: maxTimeout,
 	}
@@ -209,6 +209,6 @@ func GetRemainingTimeout(ctx context.Context) (time.Duration, bool) {
 	if !ok {
 		return 0, false
 	}
-	
+
 	return time.Until(deadline), true
 }

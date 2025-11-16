@@ -278,6 +278,7 @@ func (c *Client) ListDocuments(ctx context.Context, opts *ListDocumentsOptions) 
 	}
 
 	req := &xaiv1.ListDocumentsRequest{}
+	var collectionID string
 	if opts != nil {
 		req.CollectionId = opts.CollectionID
 		req.TeamId = opts.TeamID
@@ -285,6 +286,7 @@ func (c *Client) ListDocuments(ctx context.Context, opts *ListDocumentsOptions) 
 		req.Order = opts.Order
 		req.PaginationToken = opts.PaginationToken
 		req.SortBy = opts.SortBy
+		collectionID = opts.CollectionID
 	}
 
 	jsonData, err := protojson.Marshal(req)
@@ -292,7 +294,7 @@ func (c *Client) ListDocuments(ctx context.Context, opts *ListDocumentsOptions) 
 		return nil, "", err
 	}
 
-	resp, err := c.restClient.Post(ctx, fmt.Sprintf("/collections/%s/documents/list", opts.CollectionID), jsonData)
+	resp, err := c.restClient.Post(ctx, fmt.Sprintf("/collections/%s/documents/list", collectionID), jsonData)
 	if err != nil {
 		return nil, "", err
 	}

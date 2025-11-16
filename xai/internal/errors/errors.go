@@ -89,43 +89,43 @@ type ErrorType string
 const (
 	// ErrorTypeConfig represents configuration errors.
 	ErrorTypeConfig ErrorType = "config"
-	
+
 	// ErrorTypeAuth represents authentication errors.
 	ErrorTypeAuth ErrorType = "auth"
-	
+
 	// ErrorTypeAPI represents API errors.
 	ErrorTypeAPI ErrorType = "api"
-	
+
 	// ErrorTypeNetwork represents network errors.
 	ErrorTypeNetwork ErrorType = "network"
-	
+
 	// ErrorTypeValidation represents validation errors.
 	ErrorTypeValidation ErrorType = "validation"
-	
+
 	// ErrorTypeRateLimit represents rate limiting errors.
 	ErrorTypeRateLimit ErrorType = "rate_limit"
-	
+
 	// ErrorTypeQuota represents quota errors.
 	ErrorTypeQuota ErrorType = "quota"
-	
+
 	// ErrorTypeInternal represents internal errors.
 	ErrorTypeInternal ErrorType = "internal"
-	
+
 	// ErrorTypeService represents service errors.
 	ErrorTypeService ErrorType = "service"
-	
+
 	// ErrorTypeTimeout represents timeout errors.
 	ErrorTypeTimeout ErrorType = "timeout"
-	
+
 	// ErrorTypeCanceled represents cancellation errors.
 	ErrorTypeCanceled ErrorType = "canceled"
-	
+
 	// ErrorTypeStream represents stream errors.
 	ErrorTypeStream ErrorType = "stream"
-	
+
 	// ErrorTypeParsing represents parsing errors.
 	ErrorTypeParsing ErrorType = "parsing"
-	
+
 	// ErrorTypeFile represents file-related errors.
 	ErrorTypeFile ErrorType = "file"
 )
@@ -144,10 +144,10 @@ type Error struct {
 func NewError(errorType ErrorType, code codes.Code, message string) *Error {
 	return &Error{
 		errorType:  errorType,
-		grpcCode:    code,
+		grpcCode:   code,
 		message:    message,
-		context:     make(map[string]interface{}),
-		stackTrace:  getStackTrace(),
+		context:    make(map[string]interface{}),
+		stackTrace: getStackTrace(),
 	}
 }
 
@@ -155,11 +155,11 @@ func NewError(errorType ErrorType, code codes.Code, message string) *Error {
 func NewErrorWithCause(errorType ErrorType, code codes.Code, message string, cause error) *Error {
 	return &Error{
 		errorType:  errorType,
-		grpcCode:    code,
+		grpcCode:   code,
 		message:    message,
 		cause:      cause,
-		context:     make(map[string]interface{}),
-		stackTrace:  getStackTrace(),
+		context:    make(map[string]interface{}),
+		stackTrace: getStackTrace(),
 	}
 }
 
@@ -167,10 +167,10 @@ func NewErrorWithCause(errorType ErrorType, code codes.Code, message string, cau
 func NewErrorWithContext(errorType ErrorType, code codes.Code, message string, context map[string]interface{}) *Error {
 	return &Error{
 		errorType:  errorType,
-		grpcCode:    code,
+		grpcCode:   code,
 		message:    message,
-		context:     context,
-		stackTrace:  getStackTrace(),
+		context:    context,
+		stackTrace: getStackTrace(),
 	}
 }
 
@@ -178,11 +178,11 @@ func NewErrorWithContext(errorType ErrorType, code codes.Code, message string, c
 func NewErrorFull(errorType ErrorType, code codes.Code, message string, cause error, context map[string]interface{}) *Error {
 	return &Error{
 		errorType:  errorType,
-		grpcCode:    code,
-		message:     message,
-		cause:       cause,
-		context:     context,
-		stackTrace:   getStackTrace(),
+		grpcCode:   code,
+		message:    message,
+		cause:      cause,
+		context:    context,
+		stackTrace: getStackTrace(),
 	}
 }
 

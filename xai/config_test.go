@@ -207,7 +207,6 @@ func TestConfigHTTPAddress(t *testing.T) {
 	}
 }
 
-
 func TestConfigCreateGRPCDialOptions(t *testing.T) {
 	t.Run("InsecureConnection", func(t *testing.T) {
 		config := &Config{
@@ -226,7 +225,7 @@ func TestConfigCreateGRPCDialOptions(t *testing.T) {
 
 	t.Run("SecureConnection", func(t *testing.T) {
 		config := &Config{
-			Insecure:  false,
+			Insecure:   false,
 			SkipVerify: true,
 		}
 
@@ -314,12 +313,12 @@ func TestConfigWithMethods(t *testing.T) {
 
 func TestConfigString(t *testing.T) {
 	config := &Config{
-		APIKey:         "1234567890abcdef",
-		Host:           "api.example.com",
-		GRPCPort:       "443",
-		Insecure:       false,
-		Environment:    "production",
-		MaxRetries:     3,
+		APIKey:          "1234567890abcdef",
+		Host:            "api.example.com",
+		GRPCPort:        "443",
+		Insecure:        false,
+		Environment:     "production",
+		MaxRetries:      3,
 		EnableTelemetry: true,
 	}
 
