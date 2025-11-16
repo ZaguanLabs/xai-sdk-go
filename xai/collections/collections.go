@@ -3,10 +3,12 @@ package collections
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 // Client provides access to the xAI Collections API.
@@ -23,26 +25,24 @@ func NewClient(restClient *rest.Client) *Client {
 
 // Collection represents a document collection.
 type Collection struct {
-	ID                 string
-	Name               string
-	TeamID             string
-	CreatedAt          time.Time
-	UpdatedAt          time.Time
-	IndexConfiguration *IndexConfiguration
-	ChunkConfiguration *ChunkConfiguration
-	DocumentCount      int32
+	ID             string
+	Name           string
+	CreatedAt      time.Time
+	DocumentsCount int32
 }
 
 // Document represents a document in a collection.
 type Document struct {
-	ID           string
-	CollectionID string
-	FileID       string
-	TeamID       string
-	Status       xaiv1.DocumentStatus
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	Fields       map[string]string
+	FileID      string
+	Name        string
+	SizeBytes   int64
+	ContentType string
+	CreatedAt   time.Time
+	ExpiresAt   time.Time
+	Hash        string
+	Status      xaiv1.DocumentStatus
+	ErrorMsg    string
+	Fields      map[string]string
 }
 
 // IndexConfiguration contains index settings.
@@ -91,78 +91,302 @@ type AddDocumentOptions struct {
 }
 
 // CreateCollection creates a new collection.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) CreateCollection(ctx context.Context, opts CreateCollectionOptions) (*Collection, error) {
-	// TODO: Implement when gRPC service is available
-	return nil, ErrNotImplemented
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+
+	req := &xaiv1.CreateCollectionRequest{
+		TeamId:         opts.TeamID,
+		CollectionName: opts.Name,
+	}
+
+	jsonData, err := protojson.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.restClient.Post(ctx, "/collections", jsonData)
+	if err != nil {
+		return nil, err
+	}
+
+	var collection xaiv1.CollectionMetadata
+	if err := protojson.Unmarshal(resp.Body, &collection); err != nil {
+		return nil, err
+	}
+
+	return fromProtoCollection(&collection), nil
 }
 
 // GetCollection retrieves a collection by ID.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) GetCollection(ctx context.Context, collectionID, teamID string) (*Collection, error) {
-	// TODO: Implement when gRPC service is available
-	return nil, ErrNotImplemented
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+
+	resp, err := c.restClient.Get(ctx, fmt.Sprintf("/collections/%s?team_id=%s", collectionID, teamID))
+	if err != nil {
+		return nil, err
+	}
+
+	var collection xaiv1.CollectionMetadata
+	if err := protojson.Unmarshal(resp.Body, &collection); err != nil {
+		return nil, err
+	}
+
+	return fromProtoCollection(&collection), nil
 }
 
 // ListCollections lists collections with optional filtering and pagination.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) ListCollections(ctx context.Context, opts *ListCollectionsOptions) ([]*Collection, string, error) {
-	// TODO: Implement when gRPC service is available
-	return nil, "", ErrNotImplemented
+	if c.restClient == nil {
+		return nil, "", ErrClientNotInitialized
+	}
+
+	req := &xaiv1.ListCollectionsRequest{}
+	if opts != nil {
+		req.TeamId = opts.TeamID
+		req.Limit = opts.Limit
+		req.Order = opts.Order
+		req.PaginationToken = opts.PaginationToken
+		req.SortBy = opts.SortBy
+	}
+
+	jsonData, err := protojson.Marshal(req)
+	if err != nil {
+		return nil, "", err
+	}
+
+	resp, err := c.restClient.Post(ctx, "/collections/list", jsonData)
+	if err != nil {
+		return nil, "", err
+	}
+
+	var listResp xaiv1.ListCollectionsResponse
+	if err := protojson.Unmarshal(resp.Body, &listResp); err != nil {
+		return nil, "", err
+	}
+
+	collections := make([]*Collection, len(listResp.Collections))
+	for i, col := range listResp.Collections {
+		collections[i] = fromProtoCollection(col)
+	}
+
+	return collections, listResp.PaginationToken, nil
 }
 
 // UpdateCollection updates a collection's configuration.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) UpdateCollection(ctx context.Context, collectionID, teamID string, opts CreateCollectionOptions) (*Collection, error) {
-	// TODO: Implement when gRPC service is available
-	return nil, ErrNotImplemented
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+
+	req := &xaiv1.UpdateCollectionRequest{
+		CollectionId:   collectionID,
+		TeamId:         teamID,
+		CollectionName: opts.Name,
+	}
+
+	jsonData, err := protojson.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.restClient.Put(ctx, fmt.Sprintf("/collections/%s", collectionID), jsonData)
+	if err != nil {
+		return nil, err
+	}
+
+	var collection xaiv1.CollectionMetadata
+	if err := protojson.Unmarshal(resp.Body, &collection); err != nil {
+		return nil, err
+	}
+
+	return fromProtoCollection(&collection), nil
 }
 
 // DeleteCollection deletes a collection.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) DeleteCollection(ctx context.Context, collectionID, teamID string) error {
-	// TODO: Implement when gRPC service is available
-	return ErrNotImplemented
+	if c.restClient == nil {
+		return ErrClientNotInitialized
+	}
+
+	_, err := c.restClient.Delete(ctx, fmt.Sprintf("/collections/%s?team_id=%s", collectionID, teamID))
+	return err
 }
 
 // AddDocument adds a document to a collection.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) AddDocument(ctx context.Context, opts AddDocumentOptions) (*Document, error) {
-	// TODO: Implement when gRPC service is available
-	return nil, ErrNotImplemented
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+
+	fields := make([]*xaiv1.FieldsEntry, 0, len(opts.Fields))
+	for k, v := range opts.Fields {
+		fields = append(fields, &xaiv1.FieldsEntry{Key: k, Value: v})
+	}
+
+	req := &xaiv1.AddDocumentToCollectionRequest{
+		FileId:       opts.FileID,
+		TeamId:       opts.TeamID,
+		CollectionId: opts.CollectionID,
+		Fields:       fields,
+	}
+
+	jsonData, err := protojson.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.restClient.Post(ctx, fmt.Sprintf("/collections/%s/documents", opts.CollectionID), jsonData)
+	if err != nil {
+		return nil, err
+	}
+
+	var doc xaiv1.DocumentMetadata
+	if err := protojson.Unmarshal(resp.Body, &doc); err != nil {
+		return nil, err
+	}
+
+	return fromProtoDocument(&doc), nil
 }
 
 // GetDocument retrieves a document by ID.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) GetDocument(ctx context.Context, collectionID, fileID, teamID string) (*Document, error) {
-	// TODO: Implement when gRPC service is available
-	return nil, ErrNotImplemented
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+
+	resp, err := c.restClient.Get(ctx, fmt.Sprintf("/collections/%s/documents/%s?team_id=%s", collectionID, fileID, teamID))
+	if err != nil {
+		return nil, err
+	}
+
+	var doc xaiv1.DocumentMetadata
+	if err := protojson.Unmarshal(resp.Body, &doc); err != nil {
+		return nil, err
+	}
+
+	return fromProtoDocument(&doc), nil
 }
 
 // ListDocuments lists documents in a collection.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) ListDocuments(ctx context.Context, opts *ListDocumentsOptions) ([]*Document, string, error) {
-	// TODO: Implement when gRPC service is available
-	return nil, "", ErrNotImplemented
+	if c.restClient == nil {
+		return nil, "", ErrClientNotInitialized
+	}
+
+	req := &xaiv1.ListDocumentsRequest{}
+	if opts != nil {
+		req.CollectionId = opts.CollectionID
+		req.TeamId = opts.TeamID
+		req.Limit = opts.Limit
+		req.Order = opts.Order
+		req.PaginationToken = opts.PaginationToken
+		req.SortBy = opts.SortBy
+	}
+
+	jsonData, err := protojson.Marshal(req)
+	if err != nil {
+		return nil, "", err
+	}
+
+	resp, err := c.restClient.Post(ctx, fmt.Sprintf("/collections/%s/documents/list", opts.CollectionID), jsonData)
+	if err != nil {
+		return nil, "", err
+	}
+
+	var listResp xaiv1.ListDocumentsResponse
+	if err := protojson.Unmarshal(resp.Body, &listResp); err != nil {
+		return nil, "", err
+	}
+
+	docs := make([]*Document, len(listResp.Documents))
+	for i, d := range listResp.Documents {
+		docs[i] = fromProtoDocument(d)
+	}
+
+	return docs, listResp.PaginationToken, nil
 }
 
 // UpdateDocument updates a document's fields.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) UpdateDocument(ctx context.Context, collectionID, fileID, teamID string, fields map[string]string) (*Document, error) {
-	// TODO: Implement when gRPC service is available
-	return nil, ErrNotImplemented
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+
+	fieldsProto := make([]*xaiv1.FieldsEntry, 0, len(fields))
+	for k, v := range fields {
+		fieldsProto = append(fieldsProto, &xaiv1.FieldsEntry{Key: k, Value: v})
+	}
+
+	req := &xaiv1.UpdateDocumentRequest{
+		CollectionId: collectionID,
+		FileId:       fileID,
+		TeamId:       teamID,
+		Fields:       fieldsProto,
+	}
+
+	jsonData, err := protojson.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.restClient.Put(ctx, fmt.Sprintf("/collections/%s/documents/%s", collectionID, fileID), jsonData)
+	if err != nil {
+		return nil, err
+	}
+
+	var doc xaiv1.DocumentMetadata
+	if err := protojson.Unmarshal(resp.Body, &doc); err != nil {
+		return nil, err
+	}
+
+	return fromProtoDocument(&doc), nil
 }
 
 // DeleteDocument removes a document from a collection.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) DeleteDocument(ctx context.Context, collectionID, fileID, teamID string) error {
-	// TODO: Implement when gRPC service is available
-	return ErrNotImplemented
+	if c.restClient == nil {
+		return ErrClientNotInitialized
+	}
+
+	_, err := c.restClient.Delete(ctx, fmt.Sprintf("/collections/%s/documents/%s?team_id=%s", collectionID, fileID, teamID))
+	return err
 }
 
 // BatchGetDocuments retrieves multiple documents at once.
-// Note: This method is a placeholder until gRPC support is added.
 func (c *Client) BatchGetDocuments(ctx context.Context, collectionID, teamID string, fileIDs []string) ([]*Document, error) {
-	// TODO: Implement when gRPC service is available
-	return nil, ErrNotImplemented
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+
+	req := &xaiv1.BatchGetDocumentsRequest{
+		TeamId:       teamID,
+		CollectionId: collectionID,
+		FileIds:      fileIDs,
+	}
+
+	jsonData, err := protojson.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.restClient.Post(ctx, fmt.Sprintf("/collections/%s/documents/batch", collectionID), jsonData)
+	if err != nil {
+		return nil, err
+	}
+
+	var batchResp xaiv1.BatchGetDocumentsResponse
+	if err := protojson.Unmarshal(resp.Body, &batchResp); err != nil {
+		return nil, err
+	}
+
+	docs := make([]*Document, len(batchResp.Documents))
+	for i, d := range batchResp.Documents {
+		docs[i] = fromProtoDocument(d)
+	}
+
+	return docs, nil
 }
