@@ -1,6 +1,6 @@
 # Release v0.6.0 - Test Coverage & Quality
 
-**Release Date:** TBD  
+**Release Date:** 2025-11-19
 **Type:** Minor Release  
 **Focus:** Test Coverage & Code Quality
 
