@@ -8,7 +8,7 @@
 
 > **Note**: This is an unofficial, community-maintained SDK and is not affiliated with or endorsed by xAI.
 
-> **Status**: **v0.5.3 Released** - Production-ready with 100% API coverage (11/11 APIs), 100% Proto field coverage (64/64 fields), 100% Python SDK parity, complete image/file support, advanced debugging, search enhancements, and comprehensive testing!
+> **Status**: **v0.6.0 Released** - Production-ready with critical bug fixes, 45.8% test coverage (+15.1pp), 100% API coverage (11/11 APIs), 100% Proto field coverage (64/64 fields), security hardened (gosec clean), and all quality checks passing!
 
 ## ✨ Features
 
@@ -45,7 +45,7 @@
 ### Installation
 
 ```bash
-go get github.com/ZaguanLabs/xai-sdk-go@v0.5.3
+go get github.com/ZaguanLabs/xai-sdk-go@v0.6.0
 ```
 
 ### Basic Usage
@@ -277,20 +277,25 @@ if err != nil {
 - ✅ **Security Hardened**: Audit completed with all P0-P1 issues resolved
 - ✅ **Well Documented**: Performance guide, testing guide, audit reports, and API docs
 
-### What's New in v0.3.0
-- 🎉 **100% API Coverage**: All 11 xAI APIs fully implemented
-- ⚡ **2-10x Performance**: Connection pooling, HTTP/2, buffer pooling
-- 🔒 **Security Enhanced**: File size limits, safe error logging, TLS warnings
-- 🧪 **Production Tested**: Comprehensive audit with all critical fixes
-- 📚 **Complete Documentation**: Examples, guides, and best practices
+### What's New in v0.6.0
+- 🐛 **Critical Bug Fixes**: Fixed JSON parsing panic and example compilation errors
+- ✅ **45.8% Test Coverage**: Added comprehensive unit tests for 9 packages (+15.1pp)
+- 🔒 **Security Hardened**: gosec scan clean, enhanced error handling
+- 🚀 **Future-Proof**: Migrated to non-deprecated gRPC APIs
+- 📊 **Quality Assured**: All checks passing (go vet, staticcheck, race detector)
+- 📚 **Well Documented**: Comprehensive audit report and release notes
 
-### Next Steps
-- 📝 Community feedback and improvements
-- 🔧 Bug fixes and enhancements
-- 🌟 Additional features based on user requests
-- 🚀 v0.4.0 planning
+### Test Coverage by Package
+- `xai/auth`: 90.0% | `xai/documents`: 90.0% | `xai/sample`: 90.9%
+- `xai/image`: 89.3% | `xai/tokenizer`: 88.2% | `xai/deferred`: 87.0%
+- `xai/embed`: 83.6% | `xai/collections`: 76.9% | `xai/models`: 24.4%
 
-See [`docs/SDK_STATUS.md`](docs/SDK_STATUS.md) for detailed status and [`CHANGELOG.md`](CHANGELOG.md) for release notes.
+### Roadmap to v1.0
+- 🎯 **v0.7.0**: Increase test coverage to 60%
+- 🎯 **v0.8.0**: Achieve 70% test coverage + performance benchmarks
+- 🎯 **v1.0.0**: 80%+ coverage, complete docs, production-ready
+
+See [`CHANGELOG.md`](CHANGELOG.md) for detailed release notes and [`docs/RELEASE_v0.6.0.md`](docs/RELEASE_v0.6.0.md) for comprehensive release information.
 
 ## 🤝 Contributing
 
