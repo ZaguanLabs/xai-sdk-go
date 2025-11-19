@@ -76,14 +76,15 @@ func (r *Request) Parse(ctx context.Context, client ChatServiceClient, v any) er
 		**target = content
 		return nil
 	case map[string]interface{}:
-		// Try to parse as JSON
-		if err := json.Unmarshal([]byte(content), target); err != nil {
+		// Try to parse as JSON - need to pass pointer to target
+		targetPtr := &target
+		if err := json.Unmarshal([]byte(content), targetPtr); err != nil {
 			return fmt.Errorf("failed to parse JSON response: %w", err)
 		}
 		return nil
 	case *map[string]interface{}:
-		// Try to parse as JSON
-		if err := json.Unmarshal([]byte(content), *target); err != nil {
+		// Try to parse as JSON - target is already a pointer
+		if err := json.Unmarshal([]byte(content), target); err != nil {
 			return fmt.Errorf("failed to parse JSON response: %w", err)
 		}
 		return nil

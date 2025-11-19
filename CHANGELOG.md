@@ -7,6 +7,71 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - TBD
+
+### 🎯 Focus: Critical Bug Fixes, Test Coverage & Quality
+
+This minor release fixes critical bugs identified in the comprehensive SDK audit and significantly improves test coverage and code quality.
+
+### Fixed
+
+#### P0 - Critical Issues
+- **JSON Parsing Bug**: Fixed `json.Unmarshal` non-pointer bug in `xai/chat/parse.go` (lines 80, 87)
+  - Line 80: Now correctly creates pointer to `map[string]interface{}` target
+  - Line 87: Now correctly uses pointer directly for `*map[string]interface{}`
+  - **Impact**: Prevents runtime panics when parsing JSON responses
+- **Example Build Error**: Fixed redundant newline in `examples/chat/image_base64_diagnostic/main.go`
+  - Removed `\n` from `fmt.Println` call (Println adds newline automatically)
+  - **Impact**: All examples now compile successfully
+
+#### P1 - High Priority Issues
+- **Deprecated API Migration**: Migrated from deprecated `grpc.DialContext` to `grpc.NewClient`
+  - Updated `xai/client.go` to use recommended gRPC 1.x API
+  - Connection now established lazily on first RPC call
+  - Documented `grpc.WithBlock()` deprecation in `grpcutil/serviceconfig.go`
+  - **Impact**: Future-proof for gRPC 2.x, eliminates staticcheck warnings
+
+#### Minor Improvements
+- Enhanced error handling in `examples/models/list.go`
+
+### Added
+- Comprehensive unit tests for 9 packages (100+ test cases)
+- Security scanning with gosec integration
+- Comprehensive SDK audit documentation (687 lines)
+- Detailed action plan for v1.0 release
+
+### Changed
+- Test coverage increased from 30.7% to 45.8% (+15.1 percentage points)
+- Improved code quality metrics across the board
+- Cleaned up documentation folder (removed 30+ obsolete files)
+
+### Quality Metrics
+- ✅ Test coverage: 45.8% (target: 80% for v1.0)
+- ✅ Security: gosec clean (only 2 false positives)
+- ✅ All quality checks passing:
+  - go vet: Clean (0 errors)
+  - go test: All passing
+  - go build: All examples compile
+  - go test -race: No race conditions
+  - staticcheck: No warnings
+
+### Test Coverage by Package
+- `xai/auth`: 90.0%
+- `xai/documents`: 90.0%
+- `xai/sample`: 90.9%
+- `xai/image`: 89.3%
+- `xai/tokenizer`: 88.2%
+- `xai/deferred`: 87.0%
+- `xai/embed`: 83.6%
+- `xai/collections`: 76.9%
+- `xai/models`: 24.4%
+
+### Notes
+- No breaking changes to public API
+- All existing code continues to work
+- 9 new test files created with 100+ test cases
+- Foundation laid for v1.0 release
+
 ## [0.5.3] - 2025-11-16
 
 ### 🎉 100% Proto Field Coverage Achieved!

@@ -109,13 +109,10 @@ func (c *Client) createGRPCConnection() error {
 		return fmt.Errorf("failed to create gRPC dial options: %w", err)
 	}
 
-	// Set up context with timeout for connection
-	ctx, cancel := context.WithTimeout(context.Background(), c.config.ConnectTimeout)
-	defer cancel()
-
-	// Create gRPC connection
-	grpcConn, err := grpc.DialContext(
-		ctx,
+	// Create gRPC connection using NewClient (replaces deprecated DialContext)
+	// Note: NewClient doesn't establish connection immediately - it's lazy
+	// Connection happens on first RPC call
+	grpcConn, err := grpc.NewClient(
 		c.config.GRPCAddress(),
 		dialOptions...,
 	)

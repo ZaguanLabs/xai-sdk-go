@@ -198,8 +198,12 @@ func (dob *DialOptionBuilder) Build() ([]grpc.DialOption, error) {
 	}
 	opts = append(opts, grpc.WithDefaultServiceConfig(string(retryConfigJSON)))
 
-	// Block until connected
+	// Note: grpc.WithBlock() is deprecated in gRPC 1.x
+	// With grpc.NewClient(), connections are established lazily on first RPC
+	// If blocking behavior is needed, use WaitForReady in call options instead
 	if dob.block {
+		// Deprecated: grpc.WithBlock() is not supported with grpc.NewClient()
+		// Users should handle connection readiness at the RPC level
 		opts = append(opts, grpc.WithBlock())
 	}
 

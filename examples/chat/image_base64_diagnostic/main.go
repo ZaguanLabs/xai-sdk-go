@@ -29,7 +29,7 @@ func main() {
 	// Small 1x1 red pixel PNG in base64 (like OpenWebUI would send)
 	base64Image := "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg=="
 
-	fmt.Println("=== Image Base64 Diagnostic Test ===\n")
+	fmt.Println("=== Image Base64 Diagnostic Test ===")
 	fmt.Printf("Base64 image length: %d characters\n", len(base64Image))
 	fmt.Printf("Image prefix: %s...\n\n", base64Image[:50])
 

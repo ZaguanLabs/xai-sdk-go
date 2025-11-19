@@ -36,7 +36,9 @@ func main() {
 	}
 	defer func() {
 		log.Printf("[DEBUG] Closing client...")
-		client.Close()
+		if err := client.Close(); err != nil {
+			log.Printf("[WARN] Error closing client: %v", err)
+		}
 	}()
 
 	log.Printf("[DEBUG] Client created successfully")
