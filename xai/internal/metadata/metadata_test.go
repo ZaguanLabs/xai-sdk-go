@@ -13,7 +13,8 @@ func TestNewSDKMetadata(t *testing.T) {
 	md := NewSDKMetadata(apiKey)
 
 	if md == nil {
-		t.Error("NewSDKMetadata should not return nil")
+		t.Fatal("NewSDKMetadata should not return nil")
+		return
 	}
 
 	if md.APIKey != apiKey {

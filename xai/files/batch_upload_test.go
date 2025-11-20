@@ -291,7 +291,7 @@ func TestBatchUpload_CallbackInvocation(t *testing.T) {
 	successCount := 0
 	failureCount := 0
 
-	callback := func(index int, reader io.Reader, result interface{}) {
+	callback := func(_ int, _ io.Reader, result interface{}) {
 		callCount++
 
 		if res, ok := result.(*BatchUploadResult); ok {
