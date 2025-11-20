@@ -1,6 +1,6 @@
 # xAI SDK for Go
 
-[![Go Version](https://img.shields.io/badge/Go-1.22+-blue.svg)](https://golang.org)
+[![Go Version](https://img.shields.io/badge/Go-1.24+-blue.svg)](https://golang.org)
 [![Release](https://img.shields.io/github/v/release/ZaguanLabs/xai-sdk-go)](https://github.com/ZaguanLabs/xai-sdk-go/releases/latest)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -8,7 +8,7 @@
 
 > **Note**: This is an unofficial, community-maintained SDK and is not affiliated with or endorsed by xAI.
 
-> **Status**: **v0.6.0 Released** - Production-ready with critical bug fixes, 45.8% test coverage (+15.1pp), 100% API coverage (11/11 APIs), 100% Proto field coverage (64/64 fields), security hardened (gosec clean), and all quality checks passing!
+> **Status**: **v0.7.0 Released** - Code quality improvements, reduced cyclomatic complexity, and API naming fixes following Go best practices. **Requires Go 1.24+** due to gRPC v1.76.0 dependency.
 
 ## ✨ Features
 
@@ -44,8 +44,10 @@
 
 ### Installation
 
+**Requirements**: Go 1.24 or later (required by gRPC v1.76.0)
+
 ```bash
-go get github.com/ZaguanLabs/xai-sdk-go@v0.6.0
+go get github.com/ZaguanLabs/xai-sdk-go@v0.7.0
 ```
 
 ### Basic Usage

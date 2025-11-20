@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 This release improves code quality through comprehensive linting fixes, reduces cyclomatic complexity, and makes intentional breaking changes to follow Go naming best practices.
 
+**⚠️ Requirements**: Go 1.24+ is now required due to `google.golang.org/grpc@v1.76.0` dependency.
+
 ### Added
 - **Tool Call Status Tracking**: Added status field to tool call entries for tracking server-side tool execution lifecycle
   - `ToolCall.Status()`: Returns current state (IN_PROGRESS, COMPLETED, INCOMPLETE, FAILED)
