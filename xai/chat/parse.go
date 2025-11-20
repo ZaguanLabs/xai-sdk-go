@@ -40,7 +40,7 @@ func NewResponseFormatJSONSchema(schema map[string]interface{}) *ResponseFormatO
 }
 
 // Parse performs a chat completion request and parses the response into the provided type.
-func (r *Request) Parse(ctx context.Context, client ChatServiceClient, v any) error {
+func (r *Request) Parse(ctx context.Context, client ServiceClient, v any) error {
 	if client == nil {
 		return fmt.Errorf("chat client is nil")
 	}
@@ -94,12 +94,12 @@ func (r *Request) Parse(ctx context.Context, client ChatServiceClient, v any) er
 }
 
 // ParseJSON performs a chat completion request and parses the response as JSON.
-func (r *Request) ParseJSON(ctx context.Context, client ChatServiceClient, result interface{}) error {
+func (r *Request) ParseJSON(ctx context.Context, client ServiceClient, result interface{}) error {
 	return r.Parse(ctx, client, result)
 }
 
 // ParseString performs a chat completion request and parses the response as a string.
-func (r *Request) ParseString(ctx context.Context, client ChatServiceClient) (string, error) {
+func (r *Request) ParseString(ctx context.Context, client ServiceClient) (string, error) {
 	var result string
 	err := r.Parse(ctx, client, &result)
 	if err != nil {

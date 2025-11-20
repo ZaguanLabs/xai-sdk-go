@@ -124,6 +124,14 @@ func NewConfigWithAPIKey(apiKey string) *Config {
 
 // LoadFromEnvironment loads configuration from environment variables.
 func (c *Config) LoadFromEnvironment() {
+	c.loadHostConfig()
+	c.loadTimeoutConfig()
+	c.loadSecurityConfig()
+	c.loadRetryConfig()
+	c.loadOtherConfig()
+}
+
+func (c *Config) loadHostConfig() {
 	// API Key
 	if apiKey := os.Getenv("XAI_API_KEY"); apiKey != "" {
 		c.APIKey = apiKey
@@ -145,7 +153,9 @@ func (c *Config) LoadFromEnvironment() {
 	if httpPort := os.Getenv("XAI_HTTP_PORT"); httpPort != "" {
 		c.HTTPPort = httpPort
 	}
+}
 
+func (c *Config) loadTimeoutConfig() {
 	// Timeouts
 	if timeoutStr := os.Getenv("XAI_TIMEOUT"); timeoutStr != "" {
 		if timeout, err := parseDuration(timeoutStr); err == nil {
@@ -170,7 +180,9 @@ func (c *Config) LoadFromEnvironment() {
 			c.StreamTimeout = timeout
 		}
 	}
+}
 
+func (c *Config) loadSecurityConfig() {
 	// Security settings
 	if insecureStr := os.Getenv("XAI_INSECURE"); insecureStr != "" {
 		if insecure, err := strconv.ParseBool(insecureStr); err == nil {
@@ -183,7 +195,9 @@ func (c *Config) LoadFromEnvironment() {
 			c.SkipVerify = skipVerify
 		}
 	}
+}
 
+func (c *Config) loadRetryConfig() {
 	// Retry settings
 	if maxRetriesStr := os.Getenv("XAI_MAX_RETRIES"); maxRetriesStr != "" {
 		if maxRetries, err := strconv.Atoi(maxRetriesStr); err == nil && maxRetries >= 0 {
@@ -202,7 +216,9 @@ func (c *Config) LoadFromEnvironment() {
 			c.MaxBackoff = backoff
 		}
 	}
+}
 
+func (c *Config) loadOtherConfig() {
 	// Other settings
 	if environment := os.Getenv("XAI_ENVIRONMENT"); environment != "" {
 		c.Environment = environment
@@ -225,6 +241,32 @@ func (c *Config) Validate() error {
 		return errors.NewConfigError("API key is required. Set XAI_API_KEY environment variable or call WithAPIKey().")
 	}
 
+	if err := c.validateHost(); err != nil {
+		return err
+	}
+
+	if err := c.validateTimeouts(); err != nil {
+		return err
+	}
+
+	if err := c.validateRetries(); err != nil {
+		return err
+	}
+
+	// Validate environment
+	if c.Environment == "" {
+		c.Environment = "production"
+	}
+
+	// Validate user agent
+	if c.UserAgent == "" {
+		c.UserAgent = constants.DefaultUserAgent
+	}
+
+	return nil
+}
+
+func (c *Config) validateHost() error {
 	// Validate host configuration
 	if c.Host == "" {
 		c.Host = constants.DefaultAPIV1Host
@@ -241,7 +283,10 @@ func (c *Config) Validate() error {
 	if c.HTTPPort == "" {
 		c.HTTPPort = "80"
 	}
+	return nil
+}
 
+func (c *Config) validateTimeouts() error {
 	// Validate timeouts
 	if c.Timeout <= 0 {
 		return errors.NewConfigError("timeout must be positive")
@@ -258,7 +303,10 @@ func (c *Config) Validate() error {
 	if c.StreamTimeout <= 0 {
 		return errors.NewConfigError("stream_timeout must be positive")
 	}
+	return nil
+}
 
+func (c *Config) validateRetries() error {
 	// Validate retry settings
 	if c.MaxRetries < 0 {
 		return errors.NewConfigError("max_retries must be non-negative")
@@ -275,17 +323,6 @@ func (c *Config) Validate() error {
 	if c.MaxBackoff < c.RetryBackoff {
 		return errors.NewConfigError("max_backoff must be greater than or equal to retry_backoff")
 	}
-
-	// Validate environment
-	if c.Environment == "" {
-		c.Environment = "production"
-	}
-
-	// Validate user agent
-	if c.UserAgent == "" {
-		c.UserAgent = constants.DefaultUserAgent
-	}
-
 	return nil
 }
 
@@ -347,7 +384,7 @@ func (c *Config) CreateGRPCDialOptions() ([]grpc.DialOption, error) {
 		if tlsConfig == nil {
 			tlsConfig = &tls.Config{
 				MinVersion:         tls.VersionTLS12,
-				InsecureSkipVerify: c.SkipVerify,
+				InsecureSkipVerify: c.SkipVerify, //nolint:gosec
 			}
 		}
 		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))

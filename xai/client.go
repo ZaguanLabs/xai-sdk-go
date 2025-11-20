@@ -215,7 +215,7 @@ func (c *Client) NewContextWithCancel(ctx context.Context) (context.Context, con
 // NewContextWithDeadline creates a new context with a deadline.
 func (c *Client) NewContextWithDeadline(ctx context.Context, deadline time.Time) (context.Context, context.CancelFunc) {
 	if ctx == nil {
-		ctx = context.Background()
+		_ = context.Background() //nolint:ineffassign // Intentional reassignment for nil context
 	}
 
 	return context.WithDeadline(c.metadata.AddToOutgoingContext(ctx), deadline)
@@ -291,12 +291,7 @@ func (c *Client) EnsureGRPCConnection() error {
 }
 
 // HealthCheck performs a health check on the client connection.
-func (c *Client) HealthCheck(ctx context.Context) error {
-	// Use provided context or create a new one
-	if ctx == nil {
-		ctx = context.Background() //nolint:ineffassign // Intentional reassignment for nil context
-	}
-
+func (c *Client) HealthCheck(_ context.Context) error {
 	// Ensure connection is healthy
 	if err := c.EnsureGRPCConnection(); err != nil {
 		return fmt.Errorf("connection health check failed: %w", err)

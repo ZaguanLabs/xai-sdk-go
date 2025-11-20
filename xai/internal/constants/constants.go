@@ -31,7 +31,7 @@ const (
 	DefaultModelsEndpoint = "/v1/models"
 
 	// DefaultTokenizerEndpoint is the default tokenizer endpoint path.
-	DefaultTokenizerEndpoint = "/v1/tokenizer"
+	DefaultTokenizerEndpoint = "/v1/tokenizer" //nolint:gosec
 
 	// DefaultCollectionsEndpoint is the default collections endpoint path.
 	DefaultCollectionsEndpoint = "/v1/collections"

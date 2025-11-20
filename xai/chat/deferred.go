@@ -97,7 +97,7 @@ func (r *DeferredRequest) Proto() *xaiv1.GetCompletionsRequest {
 }
 
 // Submit submits a deferred chat completion request.
-func (r *DeferredRequest) Submit(ctx context.Context, client ChatServiceClient) (*DeferredResponse, error) {
+func (r *DeferredRequest) Submit(ctx context.Context, client ServiceClient) (*DeferredResponse, error) {
 	if client == nil {
 		return nil, fmt.Errorf("chat client is nil")
 	}
@@ -192,7 +192,7 @@ type PollResult struct {
 }
 
 // Poll polls a deferred request until completion or timeout.
-func (r *DeferredRequest) Poll(ctx context.Context, client ChatServiceClient, interval time.Duration, timeout time.Duration) (*PollResult, error) {
+func (r *DeferredRequest) Poll(ctx context.Context, client ServiceClient, interval time.Duration, timeout time.Duration) (*PollResult, error) {
 	if client == nil {
 		return nil, fmt.Errorf("chat client is nil")
 	}
@@ -255,7 +255,7 @@ func (r *DeferredRequest) Poll(ctx context.Context, client ChatServiceClient, in
 }
 
 // GetStoredCompletion retrieves a stored completion by ID.
-func GetStoredCompletion(ctx context.Context, client ChatServiceClient, completionID string) (*StoredCompletion, error) {
+func GetStoredCompletion(ctx context.Context, client ServiceClient, completionID string) (*StoredCompletion, error) {
 	if client == nil {
 		return nil, fmt.Errorf("chat client is nil")
 	}
@@ -269,7 +269,7 @@ func GetStoredCompletion(ctx context.Context, client ChatServiceClient, completi
 }
 
 // DeleteStoredCompletion deletes a stored completion by ID.
-func DeleteStoredCompletion(ctx context.Context, client ChatServiceClient, completionID string) error {
+func DeleteStoredCompletion(ctx context.Context, client ServiceClient, completionID string) error {
 	if client == nil {
 		return fmt.Errorf("chat client is nil")
 	}
@@ -305,7 +305,7 @@ func (sc *StoredCompletion) CreatedAt() time.Time {
 }
 
 // ListStoredCompletions retrieves a list of stored completions.
-func ListStoredCompletions(ctx context.Context, client ChatServiceClient, opts ...ListOption) ([]*StoredCompletion, error) {
+func ListStoredCompletions(ctx context.Context, client ServiceClient, opts ...ListOption) ([]*StoredCompletion, error) {
 	if client == nil {
 		return nil, fmt.Errorf("chat client is nil")
 	}

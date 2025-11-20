@@ -16,22 +16,24 @@ func TestSDKVersionMetadata(t *testing.T) {
 
 	// Check xai-sdk-version
 	sdkVersion := md.Get(SDKVersionKey)
-	if len(sdkVersion) == 0 {
+	switch {
+	case len(sdkVersion) == 0:
 		t.Error("xai-sdk-version should be set")
-	} else if !strings.HasPrefix(sdkVersion[0], "go/") {
+	case !strings.HasPrefix(sdkVersion[0], "go/"):
 		t.Errorf("xai-sdk-version should start with %q, got %q", "go/", sdkVersion[0])
-	} else if !strings.Contains(sdkVersion[0], version.GetSDKVersion()) {
+	case !strings.Contains(sdkVersion[0], version.GetSDKVersion()):
 		// Should contain the actual version
 		t.Errorf("xai-sdk-version should contain %q, got %q", version.GetSDKVersion(), sdkVersion[0])
 	}
 
 	// Check xai-sdk-language
 	sdkLanguage := md.Get(SDKLanguageKey)
-	if len(sdkLanguage) == 0 {
+	switch {
+	case len(sdkLanguage) == 0:
 		t.Error("xai-sdk-language should be set")
-	} else if !strings.HasPrefix(sdkLanguage[0], "go/") {
+	case !strings.HasPrefix(sdkLanguage[0], "go/"):
 		t.Errorf("xai-sdk-language should start with %q, got %q", "go/", sdkLanguage[0])
-	} else if !strings.Contains(sdkLanguage[0], runtime.Version()) {
+	case !strings.Contains(sdkLanguage[0], runtime.Version()):
 		// Should contain the Go version
 		t.Errorf("xai-sdk-language should contain %q, got %q", runtime.Version(), sdkLanguage[0])
 	}
@@ -52,20 +54,16 @@ func TestSDKVersionInContext(t *testing.T) {
 	sdkVersion := md.Get(SDKVersionKey)
 	if len(sdkVersion) == 0 {
 		t.Error("xai-sdk-version should be set in context")
-	} else {
-		if !strings.HasPrefix(sdkVersion[0], "go/") {
-			t.Errorf("xai-sdk-version should start with 'go/', got %q", sdkVersion[0])
-		}
+	} else if !strings.HasPrefix(sdkVersion[0], "go/") {
+		t.Errorf("xai-sdk-version should start with 'go/', got %q", sdkVersion[0])
 	}
 
 	// Check xai-sdk-language
 	sdkLanguage := md.Get(SDKLanguageKey)
 	if len(sdkLanguage) == 0 {
 		t.Error("xai-sdk-language should be set in context")
-	} else {
-		if !strings.HasPrefix(sdkLanguage[0], "go/") {
-			t.Errorf("xai-sdk-language should start with 'go/', got %q", sdkLanguage[0])
-		}
+	} else if !strings.HasPrefix(sdkLanguage[0], "go/") {
+		t.Errorf("xai-sdk-language should start with 'go/', got %q", sdkLanguage[0])
 	}
 }
 

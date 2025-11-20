@@ -273,41 +273,30 @@ func FromGRPC(err error) error {
 }
 
 // mapGRPCCodeToErrorType maps gRPC codes to xAI SDK error types.
+var grpcCodeToErrorType = map[codes.Code]ErrorType{
+	codes.InvalidArgument:    ErrorTypeValidation,
+	codes.Unauthenticated:    ErrorTypeAuth,
+	codes.PermissionDenied:   ErrorTypeAuth,
+	codes.NotFound:           ErrorTypeAPI,
+	codes.AlreadyExists:      ErrorTypeAPI,
+	codes.ResourceExhausted:  ErrorTypeRateLimit,
+	codes.FailedPrecondition: ErrorTypeValidation,
+	codes.Aborted:            ErrorTypeAPI,
+	codes.OutOfRange:         ErrorTypeValidation,
+	codes.Unimplemented:      ErrorTypeAPI,
+	codes.Internal:           ErrorTypeInternal,
+	codes.Unavailable:        ErrorTypeService,
+	codes.DataLoss:           ErrorTypeInternal,
+	codes.DeadlineExceeded:   ErrorTypeTimeout,
+	codes.Canceled:           ErrorTypeCanceled,
+}
+
+// mapGRPCCodeToErrorType maps gRPC codes to xAI SDK error types.
 func mapGRPCCodeToErrorType(code codes.Code) ErrorType {
-	switch code {
-	case codes.InvalidArgument:
-		return ErrorTypeValidation
-	case codes.Unauthenticated:
-		return ErrorTypeAuth
-	case codes.PermissionDenied:
-		return ErrorTypeAuth
-	case codes.NotFound:
-		return ErrorTypeAPI
-	case codes.AlreadyExists:
-		return ErrorTypeAPI
-	case codes.ResourceExhausted:
-		return ErrorTypeRateLimit
-	case codes.FailedPrecondition:
-		return ErrorTypeValidation
-	case codes.Aborted:
-		return ErrorTypeAPI
-	case codes.OutOfRange:
-		return ErrorTypeValidation
-	case codes.Unimplemented:
-		return ErrorTypeAPI
-	case codes.Internal:
-		return ErrorTypeInternal
-	case codes.Unavailable:
-		return ErrorTypeService
-	case codes.DataLoss:
-		return ErrorTypeInternal
-	case codes.DeadlineExceeded:
-		return ErrorTypeTimeout
-	case codes.Canceled:
-		return ErrorTypeCanceled
-	default:
-		return ErrorTypeAPI
+	if t, ok := grpcCodeToErrorType[code]; ok {
+		return t
 	}
+	return ErrorTypeAPI
 }
 
 // getStackTrace returns the current stack trace.

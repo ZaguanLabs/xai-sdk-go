@@ -152,8 +152,8 @@ type Chunk struct {
 // RequestOption is a functional option for configuring a Request.
 type RequestOption func(*Request)
 
-// ChatServiceClient is an interface for the chat service client.
-type ChatServiceClient = xaiv1.ChatClient
+// ServiceClient is an interface for the chat service client.
+type ServiceClient = xaiv1.ChatClient
 
 // Stream represents a streaming chat completion response.
 type Stream struct {
@@ -639,7 +639,7 @@ func (r *Request) Proto() *xaiv1.GetCompletionsRequest {
 }
 
 // Sample performs a synchronous chat completion request.
-func (r *Request) Sample(ctx context.Context, client ChatServiceClient) (*Response, error) {
+func (r *Request) Sample(ctx context.Context, client ServiceClient) (*Response, error) {
 	if client == nil {
 		return nil, fmt.Errorf("chat client is nil")
 	}
@@ -689,7 +689,7 @@ func (r *Request) Sample(ctx context.Context, client ChatServiceClient) (*Respon
 }
 
 // Stream performs a streaming chat completion request.
-func (r *Request) Stream(ctx context.Context, client ChatServiceClient) (*Stream, error) {
+func (r *Request) Stream(ctx context.Context, client ServiceClient) (*Stream, error) {
 	if client == nil {
 		return nil, fmt.Errorf("chat client is nil")
 	}

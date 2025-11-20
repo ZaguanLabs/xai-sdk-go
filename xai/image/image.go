@@ -27,12 +27,12 @@ type GenerateRequest struct {
 	Model  string
 	N      int32
 	User   string
-	Image  *ImageInput
+	Image  *Input
 	Format xaiv1.ImageFormat
 }
 
-// ImageInput represents an input image for image-to-image generation.
-type ImageInput struct {
+// Input represents an input image for image-to-image generation.
+type Input struct {
 	ImageURL string
 	Detail   xaiv1.ImageDetail
 }
@@ -81,7 +81,7 @@ func (r *GenerateRequest) WithFormat(format xaiv1.ImageFormat) *GenerateRequest 
 
 // WithImage sets an input image for image-to-image generation.
 func (r *GenerateRequest) WithImage(imageURL string, detail xaiv1.ImageDetail) *GenerateRequest {
-	r.Image = &ImageInput{
+	r.Image = &Input{
 		ImageURL: imageURL,
 		Detail:   detail,
 	}

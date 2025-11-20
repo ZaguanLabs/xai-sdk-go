@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2025-11-20
+
+### 🎯 Focus: Code Quality, Linting Fixes & API Improvements
+
+This release improves code quality through comprehensive linting fixes, reduces cyclomatic complexity, and makes intentional breaking changes to follow Go naming best practices.
+
 ### Added
 - **Tool Call Status Tracking**: Added status field to tool call entries for tracking server-side tool execution lifecycle
   - `ToolCall.Status()`: Returns current state (IN_PROGRESS, COMPLETED, INCOMPLETE, FAILED)
@@ -30,10 +36,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added `xai-sdk-language` header with format `go/<go-version>`
   - Matches Python SDK metadata format for better analytics and debugging
 
+### Fixed
+
+#### Code Quality & Linting
+- **Cyclomatic Complexity**: Refactored complex functions to improve maintainability
+  - `xai/internal/errors/errors.go`: Refactored `mapGRPCCodeToErrorType` from switch statement to map lookup (complexity reduced from 15+ to 2)
+  - `xai/config.go`: Split `LoadFromEnvironment` into 5 focused helper methods (`loadHostConfig`, `loadTimeoutConfig`, `loadSecurityConfig`, `loadRetryConfig`, `loadOtherConfig`)
+  - `xai/config.go`: Split `Validate` into 4 focused helper methods (`validateHost`, `validateTimeouts`, `validateRetries`)
+- **Security Warnings**: Added `//nolint:gosec` directives for intentional security configurations
+  - `xai/internal/constants/constants.go`: `DefaultTokenizerEndpoint` (false positive - not a credential)
+  - `xai/config.go`: `InsecureSkipVerify` field (intentional for development/testing environments)
+- **Style Issues**: Fixed if-else chains in test files
+  - `xai/internal/metadata/sdk_version_test.go`: Converted nested if-else to switch statements
+  - `xai/client.go`: Fixed unused context assignment with proper comment
+
+### Breaking Changes
+
+⚠️ **API Naming Improvements** - Following Go best practices to avoid package name stuttering:
+
+#### 1. `image.ImageInput` → `image.Input`
+```go
+// Before (v0.6.0)
+var input *image.ImageInput
+
+// After (v0.7.0)
+var input *image.Input
+```
+
+#### 2. `chat.ChatServiceClient` → `chat.ServiceClient`
+```go
+// Before (v0.6.0)
+var client chat.ChatServiceClient
+
+// After (v0.7.0)
+var client chat.ServiceClient
+```
+
+**Migration**: Simple find-and-replace. These are compile-time errors that are easy to catch and fix.
+
+**Impact**: LOW - Most users interact through `Client` methods and use type inference, so direct usage of these type aliases is rare.
+
 ### Testing
 - Added comprehensive test suite for tool call status (8 tests)
 - Added comprehensive test suite for batch upload (11 tests)
 - All tests passing with 100% coverage of new features
+- ✅ `go test ./...`: All tests pass
+- ✅ `go vet ./...`: Clean
+- ✅ `staticcheck ./...`: Only warnings in generated protobuf code (unrelated to changes)
+
+### Quality Improvements
+- Reduced cyclomatic complexity across configuration and error handling
+- Improved code maintainability through focused, single-responsibility functions
+- Better adherence to Go naming conventions and idiomatic patterns
+- Enhanced test coverage for metadata and SDK version handling
 
 ## [0.6.0] - 2025-11-19
 
