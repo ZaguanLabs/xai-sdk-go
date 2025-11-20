@@ -4,6 +4,7 @@ package metadata
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"strings"
 
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/version"
@@ -21,6 +22,12 @@ const (
 
 	// ClientVersionKey is the metadata key for the client version.
 	ClientVersionKey = "x-client-version"
+
+	// SDKVersionKey is the metadata key for the SDK version (matches Python SDK).
+	SDKVersionKey = "xai-sdk-version"
+
+	// SDKLanguageKey is the metadata key for the SDK language and runtime version.
+	SDKLanguageKey = "xai-sdk-language"
 
 	// EnvironmentKey is the metadata key for the environment.
 	EnvironmentKey = "x-environment"
@@ -73,6 +80,10 @@ func (m *SDKMetadata) ToMetadata() metadata.MD {
 		md.Set(ClientVersionKey, m.ClientVersion)
 	}
 
+	// Add SDK version and language (matching Python SDK format)
+	md.Set(SDKVersionKey, fmt.Sprintf("go/%s", version.GetSDKVersion()))
+	md.Set(SDKLanguageKey, fmt.Sprintf("go/%s", runtime.Version()))
+
 	if m.Environment != "" {
 		md.Set(EnvironmentKey, m.Environment)
 	}
@@ -105,6 +116,12 @@ func (m *SDKMetadata) AddToOutgoingContext(ctx context.Context) context.Context 
 	if m.ClientVersion != "" {
 		pairs = append(pairs, ClientVersionKey, m.ClientVersion)
 	}
+
+	// Add SDK version and language (matching Python SDK format)
+	pairs = append(pairs,
+		SDKVersionKey, fmt.Sprintf("go/%s", version.GetSDKVersion()),
+		SDKLanguageKey, fmt.Sprintf("go/%s", runtime.Version()),
+	)
 
 	if m.Environment != "" {
 		pairs = append(pairs, EnvironmentKey, m.Environment)

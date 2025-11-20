@@ -364,6 +364,59 @@ func (ToolCallType) EnumDescriptor() ([]byte, []int) {
 	return file_xai_v1_chat_proto_rawDescGZIP(), []int{5}
 }
 
+// ToolCallStatus indicates the status of a tool call
+type ToolCallStatus int32
+
+const (
+	ToolCallStatus_TOOL_CALL_STATUS_IN_PROGRESS ToolCallStatus = 0
+	ToolCallStatus_TOOL_CALL_STATUS_COMPLETED   ToolCallStatus = 1
+	ToolCallStatus_TOOL_CALL_STATUS_INCOMPLETE  ToolCallStatus = 2
+	ToolCallStatus_TOOL_CALL_STATUS_FAILED      ToolCallStatus = 3
+)
+
+// Enum value maps for ToolCallStatus.
+var (
+	ToolCallStatus_name = map[int32]string{
+		0: "TOOL_CALL_STATUS_IN_PROGRESS",
+		1: "TOOL_CALL_STATUS_COMPLETED",
+		2: "TOOL_CALL_STATUS_INCOMPLETE",
+		3: "TOOL_CALL_STATUS_FAILED",
+	}
+	ToolCallStatus_value = map[string]int32{
+		"TOOL_CALL_STATUS_IN_PROGRESS": 0,
+		"TOOL_CALL_STATUS_COMPLETED":   1,
+		"TOOL_CALL_STATUS_INCOMPLETE":  2,
+		"TOOL_CALL_STATUS_FAILED":      3,
+	}
+)
+
+func (x ToolCallStatus) Enum() *ToolCallStatus {
+	p := new(ToolCallStatus)
+	*p = x
+	return p
+}
+
+func (x ToolCallStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ToolCallStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_xai_v1_chat_proto_enumTypes[6].Descriptor()
+}
+
+func (ToolCallStatus) Type() protoreflect.EnumType {
+	return &file_xai_v1_chat_proto_enumTypes[6]
+}
+
+func (x ToolCallStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ToolCallStatus.Descriptor instead.
+func (ToolCallStatus) EnumDescriptor() ([]byte, []int) {
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{6}
+}
+
 // ToolMode controls tool usage behavior
 type ToolMode int32
 
@@ -401,11 +454,11 @@ func (x ToolMode) String() string {
 }
 
 func (ToolMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_xai_v1_chat_proto_enumTypes[6].Descriptor()
+	return file_xai_v1_chat_proto_enumTypes[7].Descriptor()
 }
 
 func (ToolMode) Type() protoreflect.EnumType {
-	return &file_xai_v1_chat_proto_enumTypes[6]
+	return &file_xai_v1_chat_proto_enumTypes[7]
 }
 
 func (x ToolMode) Number() protoreflect.EnumNumber {
@@ -414,7 +467,7 @@ func (x ToolMode) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ToolMode.Descriptor instead.
 func (ToolMode) EnumDescriptor() ([]byte, []int) {
-	return file_xai_v1_chat_proto_rawDescGZIP(), []int{6}
+	return file_xai_v1_chat_proto_rawDescGZIP(), []int{7}
 }
 
 // CodeExecution enables code execution tool
@@ -2644,6 +2697,8 @@ type ToolCall struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Type          ToolCallType           `protobuf:"varint,2,opt,name=type,proto3,enum=xai_api.ToolCallType" json:"type,omitempty"`
+	Status        ToolCallStatus         `protobuf:"varint,3,opt,name=status,proto3,enum=xai_api.ToolCallStatus" json:"status,omitempty"`
+	ErrorMessage  string                 `protobuf:"bytes,4,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
 	Function      *FunctionCall          `protobuf:"bytes,10,opt,name=function,proto3" json:"function,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2691,6 +2746,20 @@ func (x *ToolCall) GetType() ToolCallType {
 		return x.Type
 	}
 	return ToolCallType_TOOL_CALL_TYPE_INVALID
+}
+
+func (x *ToolCall) GetStatus() ToolCallStatus {
+	if x != nil {
+		return x.Status
+	}
+	return ToolCallStatus_TOOL_CALL_STATUS_IN_PROGRESS
+}
+
+func (x *ToolCall) GetErrorMessage() string {
+	if x != nil {
+		return x.ErrorMessage
+	}
+	return ""
 }
 
 func (x *ToolCall) GetFunction() *FunctionCall {
@@ -3349,10 +3418,12 @@ const file_xai_v1_chat_proto_rawDesc = "" +
 	"\x0ecode_execution\x18\x05 \x01(\v2\x16.xai_api.CodeExecutionR\rcodeExecution\x12I\n" +
 	"\x12collections_search\x18\x06 \x01(\v2\x1a.xai_api.CollectionsSearchR\x11collectionsSearch\x12\x1e\n" +
 	"\x03mcp\x18\a \x01(\v2\f.xai_api.MCPR\x03mcp\x12@\n" +
-	"\x0fdocument_search\x18\b \x01(\v2\x17.xai_api.DocumentSearchR\x0edocumentSearch\"x\n" +
+	"\x0fdocument_search\x18\b \x01(\v2\x17.xai_api.DocumentSearchR\x0edocumentSearch\"\xce\x01\n" +
 	"\bToolCall\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12)\n" +
-	"\x04type\x18\x02 \x01(\x0e2\x15.xai_api.ToolCallTypeR\x04type\x121\n" +
+	"\x04type\x18\x02 \x01(\x0e2\x15.xai_api.ToolCallTypeR\x04type\x12/\n" +
+	"\x06status\x18\x03 \x01(\x0e2\x17.xai_api.ToolCallStatusR\x06status\x12#\n" +
+	"\rerror_message\x18\x04 \x01(\tR\ferrorMessage\x121\n" +
 	"\bfunction\x18\n" +
 	" \x01(\v2\x15.xai_api.FunctionCallR\bfunction\"X\n" +
 	"\n" +
@@ -3427,7 +3498,12 @@ const file_xai_v1_chat_proto_rawDesc = "" +
 	"\"TOOL_CALL_TYPE_CODE_EXECUTION_TOOL\x10\x04\x12*\n" +
 	"&TOOL_CALL_TYPE_COLLECTIONS_SEARCH_TOOL\x10\x05\x12\x1b\n" +
 	"\x17TOOL_CALL_TYPE_MCP_TOOL\x10\x06\x12'\n" +
-	"#TOOL_CALL_TYPE_DOCUMENT_SEARCH_TOOL\x10\a*a\n" +
+	"#TOOL_CALL_TYPE_DOCUMENT_SEARCH_TOOL\x10\a*\x90\x01\n" +
+	"\x0eToolCallStatus\x12 \n" +
+	"\x1cTOOL_CALL_STATUS_IN_PROGRESS\x10\x00\x12\x1e\n" +
+	"\x1aTOOL_CALL_STATUS_COMPLETED\x10\x01\x12\x1f\n" +
+	"\x1bTOOL_CALL_STATUS_INCOMPLETE\x10\x02\x12\x1b\n" +
+	"\x17TOOL_CALL_STATUS_FAILED\x10\x03*a\n" +
 	"\bToolMode\x12\x15\n" +
 	"\x11TOOL_MODE_INVALID\x10\x00\x12\x12\n" +
 	"\x0eTOOL_MODE_AUTO\x10\x01\x12\x12\n" +
@@ -3449,7 +3525,7 @@ func file_xai_v1_chat_proto_rawDescGZIP() []byte {
 	return file_xai_v1_chat_proto_rawDescData
 }
 
-var file_xai_v1_chat_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
+var file_xai_v1_chat_proto_enumTypes = make([]protoimpl.EnumInfo, 8)
 var file_xai_v1_chat_proto_msgTypes = make([]protoimpl.MessageInfo, 38)
 var file_xai_v1_chat_proto_goTypes = []any{
 	(FinishReason)(0),                      // 0: xai_api.FinishReason
@@ -3458,120 +3534,122 @@ var file_xai_v1_chat_proto_goTypes = []any{
 	(ReasoningEffort)(0),                   // 3: xai_api.ReasoningEffort
 	(SearchMode)(0),                        // 4: xai_api.SearchMode
 	(ToolCallType)(0),                      // 5: xai_api.ToolCallType
-	(ToolMode)(0),                          // 6: xai_api.ToolMode
-	(*CodeExecution)(nil),                  // 7: xai_api.CodeExecution
-	(*CollectionsSearch)(nil),              // 8: xai_api.CollectionsSearch
-	(*CompletionMessage)(nil),              // 9: xai_api.CompletionMessage
-	(*CompletionOutput)(nil),               // 10: xai_api.CompletionOutput
-	(*CompletionOutputChunk)(nil),          // 11: xai_api.CompletionOutputChunk
-	(*Content)(nil),                        // 12: xai_api.Content
-	(*DebugOutput)(nil),                    // 13: xai_api.DebugOutput
-	(*DeleteStoredCompletionRequest)(nil),  // 14: xai_api.DeleteStoredCompletionRequest
-	(*DeleteStoredCompletionResponse)(nil), // 15: xai_api.DeleteStoredCompletionResponse
-	(*Delta)(nil),                          // 16: xai_api.Delta
-	(*DocumentSearch)(nil),                 // 17: xai_api.DocumentSearch
-	(*FileContent)(nil),                    // 18: xai_api.FileContent
-	(*Function)(nil),                       // 19: xai_api.Function
-	(*FunctionCall)(nil),                   // 20: xai_api.FunctionCall
-	(*GetChatCompletionChunk)(nil),         // 21: xai_api.GetChatCompletionChunk
-	(*GetChatCompletionResponse)(nil),      // 22: xai_api.GetChatCompletionResponse
-	(*GetCompletionsRequest)(nil),          // 23: xai_api.GetCompletionsRequest
-	(*GetDeferredCompletionResponse)(nil),  // 24: xai_api.GetDeferredCompletionResponse
-	(*GetStoredCompletionRequest)(nil),     // 25: xai_api.GetStoredCompletionRequest
-	(*LogProb)(nil),                        // 26: xai_api.LogProb
-	(*LogProbs)(nil),                       // 27: xai_api.LogProbs
-	(*MCP)(nil),                            // 28: xai_api.MCP
-	(*Message)(nil),                        // 29: xai_api.Message
-	(*NewsSource)(nil),                     // 30: xai_api.NewsSource
-	(*RequestSettings)(nil),                // 31: xai_api.RequestSettings
-	(*ResponseFormat)(nil),                 // 32: xai_api.ResponseFormat
-	(*RssSource)(nil),                      // 33: xai_api.RssSource
-	(*SearchParameters)(nil),               // 34: xai_api.SearchParameters
-	(*Source)(nil),                         // 35: xai_api.Source
-	(*Tool)(nil),                           // 36: xai_api.Tool
-	(*ToolCall)(nil),                       // 37: xai_api.ToolCall
-	(*ToolChoice)(nil),                     // 38: xai_api.ToolChoice
-	(*TopLogProb)(nil),                     // 39: xai_api.TopLogProb
-	(*WebSearch)(nil),                      // 40: xai_api.WebSearch
-	(*WebSource)(nil),                      // 41: xai_api.WebSource
-	(*XSearch)(nil),                        // 42: xai_api.XSearch
-	(*XSource)(nil),                        // 43: xai_api.XSource
-	(*MCP_ExtraHeadersEntry)(nil),          // 44: xai_api.MCP.ExtraHeadersEntry
-	(*ImageUrlContent)(nil),                // 45: xai_api.ImageUrlContent
-	(*timestamppb.Timestamp)(nil),          // 46: google.protobuf.Timestamp
-	(*SamplingUsage)(nil),                  // 47: xai_api.SamplingUsage
-	(DeferredStatus)(0),                    // 48: xai_api.DeferredStatus
+	(ToolCallStatus)(0),                    // 6: xai_api.ToolCallStatus
+	(ToolMode)(0),                          // 7: xai_api.ToolMode
+	(*CodeExecution)(nil),                  // 8: xai_api.CodeExecution
+	(*CollectionsSearch)(nil),              // 9: xai_api.CollectionsSearch
+	(*CompletionMessage)(nil),              // 10: xai_api.CompletionMessage
+	(*CompletionOutput)(nil),               // 11: xai_api.CompletionOutput
+	(*CompletionOutputChunk)(nil),          // 12: xai_api.CompletionOutputChunk
+	(*Content)(nil),                        // 13: xai_api.Content
+	(*DebugOutput)(nil),                    // 14: xai_api.DebugOutput
+	(*DeleteStoredCompletionRequest)(nil),  // 15: xai_api.DeleteStoredCompletionRequest
+	(*DeleteStoredCompletionResponse)(nil), // 16: xai_api.DeleteStoredCompletionResponse
+	(*Delta)(nil),                          // 17: xai_api.Delta
+	(*DocumentSearch)(nil),                 // 18: xai_api.DocumentSearch
+	(*FileContent)(nil),                    // 19: xai_api.FileContent
+	(*Function)(nil),                       // 20: xai_api.Function
+	(*FunctionCall)(nil),                   // 21: xai_api.FunctionCall
+	(*GetChatCompletionChunk)(nil),         // 22: xai_api.GetChatCompletionChunk
+	(*GetChatCompletionResponse)(nil),      // 23: xai_api.GetChatCompletionResponse
+	(*GetCompletionsRequest)(nil),          // 24: xai_api.GetCompletionsRequest
+	(*GetDeferredCompletionResponse)(nil),  // 25: xai_api.GetDeferredCompletionResponse
+	(*GetStoredCompletionRequest)(nil),     // 26: xai_api.GetStoredCompletionRequest
+	(*LogProb)(nil),                        // 27: xai_api.LogProb
+	(*LogProbs)(nil),                       // 28: xai_api.LogProbs
+	(*MCP)(nil),                            // 29: xai_api.MCP
+	(*Message)(nil),                        // 30: xai_api.Message
+	(*NewsSource)(nil),                     // 31: xai_api.NewsSource
+	(*RequestSettings)(nil),                // 32: xai_api.RequestSettings
+	(*ResponseFormat)(nil),                 // 33: xai_api.ResponseFormat
+	(*RssSource)(nil),                      // 34: xai_api.RssSource
+	(*SearchParameters)(nil),               // 35: xai_api.SearchParameters
+	(*Source)(nil),                         // 36: xai_api.Source
+	(*Tool)(nil),                           // 37: xai_api.Tool
+	(*ToolCall)(nil),                       // 38: xai_api.ToolCall
+	(*ToolChoice)(nil),                     // 39: xai_api.ToolChoice
+	(*TopLogProb)(nil),                     // 40: xai_api.TopLogProb
+	(*WebSearch)(nil),                      // 41: xai_api.WebSearch
+	(*WebSource)(nil),                      // 42: xai_api.WebSource
+	(*XSearch)(nil),                        // 43: xai_api.XSearch
+	(*XSource)(nil),                        // 44: xai_api.XSource
+	(*MCP_ExtraHeadersEntry)(nil),          // 45: xai_api.MCP.ExtraHeadersEntry
+	(*ImageUrlContent)(nil),                // 46: xai_api.ImageUrlContent
+	(*timestamppb.Timestamp)(nil),          // 47: google.protobuf.Timestamp
+	(*SamplingUsage)(nil),                  // 48: xai_api.SamplingUsage
+	(DeferredStatus)(0),                    // 49: xai_api.DeferredStatus
 }
 var file_xai_v1_chat_proto_depIdxs = []int32{
 	2,  // 0: xai_api.CompletionMessage.role:type_name -> xai_api.MessageRole
-	37, // 1: xai_api.CompletionMessage.tool_calls:type_name -> xai_api.ToolCall
+	38, // 1: xai_api.CompletionMessage.tool_calls:type_name -> xai_api.ToolCall
 	0,  // 2: xai_api.CompletionOutput.finish_reason:type_name -> xai_api.FinishReason
-	9,  // 3: xai_api.CompletionOutput.message:type_name -> xai_api.CompletionMessage
-	27, // 4: xai_api.CompletionOutput.logprobs:type_name -> xai_api.LogProbs
-	16, // 5: xai_api.CompletionOutputChunk.delta:type_name -> xai_api.Delta
-	27, // 6: xai_api.CompletionOutputChunk.logprobs:type_name -> xai_api.LogProbs
+	10, // 3: xai_api.CompletionOutput.message:type_name -> xai_api.CompletionMessage
+	28, // 4: xai_api.CompletionOutput.logprobs:type_name -> xai_api.LogProbs
+	17, // 5: xai_api.CompletionOutputChunk.delta:type_name -> xai_api.Delta
+	28, // 6: xai_api.CompletionOutputChunk.logprobs:type_name -> xai_api.LogProbs
 	0,  // 7: xai_api.CompletionOutputChunk.finish_reason:type_name -> xai_api.FinishReason
-	45, // 8: xai_api.Content.image_url:type_name -> xai_api.ImageUrlContent
-	18, // 9: xai_api.Content.file:type_name -> xai_api.FileContent
+	46, // 8: xai_api.Content.image_url:type_name -> xai_api.ImageUrlContent
+	19, // 9: xai_api.Content.file:type_name -> xai_api.FileContent
 	2,  // 10: xai_api.Delta.role:type_name -> xai_api.MessageRole
-	37, // 11: xai_api.Delta.tool_calls:type_name -> xai_api.ToolCall
-	11, // 12: xai_api.GetChatCompletionChunk.outputs:type_name -> xai_api.CompletionOutputChunk
-	46, // 13: xai_api.GetChatCompletionChunk.created:type_name -> google.protobuf.Timestamp
-	47, // 14: xai_api.GetChatCompletionChunk.usage:type_name -> xai_api.SamplingUsage
-	10, // 15: xai_api.GetChatCompletionResponse.outputs:type_name -> xai_api.CompletionOutput
-	46, // 16: xai_api.GetChatCompletionResponse.created:type_name -> google.protobuf.Timestamp
-	47, // 17: xai_api.GetChatCompletionResponse.usage:type_name -> xai_api.SamplingUsage
-	31, // 18: xai_api.GetChatCompletionResponse.settings:type_name -> xai_api.RequestSettings
-	13, // 19: xai_api.GetChatCompletionResponse.debug_output:type_name -> xai_api.DebugOutput
-	29, // 20: xai_api.GetCompletionsRequest.messages:type_name -> xai_api.Message
-	32, // 21: xai_api.GetCompletionsRequest.response_format:type_name -> xai_api.ResponseFormat
-	36, // 22: xai_api.GetCompletionsRequest.tools:type_name -> xai_api.Tool
-	38, // 23: xai_api.GetCompletionsRequest.tool_choice:type_name -> xai_api.ToolChoice
+	38, // 11: xai_api.Delta.tool_calls:type_name -> xai_api.ToolCall
+	12, // 12: xai_api.GetChatCompletionChunk.outputs:type_name -> xai_api.CompletionOutputChunk
+	47, // 13: xai_api.GetChatCompletionChunk.created:type_name -> google.protobuf.Timestamp
+	48, // 14: xai_api.GetChatCompletionChunk.usage:type_name -> xai_api.SamplingUsage
+	11, // 15: xai_api.GetChatCompletionResponse.outputs:type_name -> xai_api.CompletionOutput
+	47, // 16: xai_api.GetChatCompletionResponse.created:type_name -> google.protobuf.Timestamp
+	48, // 17: xai_api.GetChatCompletionResponse.usage:type_name -> xai_api.SamplingUsage
+	32, // 18: xai_api.GetChatCompletionResponse.settings:type_name -> xai_api.RequestSettings
+	14, // 19: xai_api.GetChatCompletionResponse.debug_output:type_name -> xai_api.DebugOutput
+	30, // 20: xai_api.GetCompletionsRequest.messages:type_name -> xai_api.Message
+	33, // 21: xai_api.GetCompletionsRequest.response_format:type_name -> xai_api.ResponseFormat
+	37, // 22: xai_api.GetCompletionsRequest.tools:type_name -> xai_api.Tool
+	39, // 23: xai_api.GetCompletionsRequest.tool_choice:type_name -> xai_api.ToolChoice
 	3,  // 24: xai_api.GetCompletionsRequest.reasoning_effort:type_name -> xai_api.ReasoningEffort
-	34, // 25: xai_api.GetCompletionsRequest.search_parameters:type_name -> xai_api.SearchParameters
-	22, // 26: xai_api.GetDeferredCompletionResponse.response:type_name -> xai_api.GetChatCompletionResponse
-	48, // 27: xai_api.GetDeferredCompletionResponse.status:type_name -> xai_api.DeferredStatus
-	39, // 28: xai_api.LogProb.top_logprobs:type_name -> xai_api.TopLogProb
-	26, // 29: xai_api.LogProbs.content:type_name -> xai_api.LogProb
-	44, // 30: xai_api.MCP.extra_headers:type_name -> xai_api.MCP.ExtraHeadersEntry
-	12, // 31: xai_api.Message.content:type_name -> xai_api.Content
+	35, // 25: xai_api.GetCompletionsRequest.search_parameters:type_name -> xai_api.SearchParameters
+	23, // 26: xai_api.GetDeferredCompletionResponse.response:type_name -> xai_api.GetChatCompletionResponse
+	49, // 27: xai_api.GetDeferredCompletionResponse.status:type_name -> xai_api.DeferredStatus
+	40, // 28: xai_api.LogProb.top_logprobs:type_name -> xai_api.TopLogProb
+	27, // 29: xai_api.LogProbs.content:type_name -> xai_api.LogProb
+	45, // 30: xai_api.MCP.extra_headers:type_name -> xai_api.MCP.ExtraHeadersEntry
+	13, // 31: xai_api.Message.content:type_name -> xai_api.Content
 	2,  // 32: xai_api.Message.role:type_name -> xai_api.MessageRole
-	37, // 33: xai_api.Message.tool_calls:type_name -> xai_api.ToolCall
+	38, // 33: xai_api.Message.tool_calls:type_name -> xai_api.ToolCall
 	3,  // 34: xai_api.RequestSettings.reasoning_effort:type_name -> xai_api.ReasoningEffort
-	32, // 35: xai_api.RequestSettings.response_format:type_name -> xai_api.ResponseFormat
-	38, // 36: xai_api.RequestSettings.tool_choice:type_name -> xai_api.ToolChoice
-	36, // 37: xai_api.RequestSettings.tools:type_name -> xai_api.Tool
-	34, // 38: xai_api.RequestSettings.search_parameters:type_name -> xai_api.SearchParameters
+	33, // 35: xai_api.RequestSettings.response_format:type_name -> xai_api.ResponseFormat
+	39, // 36: xai_api.RequestSettings.tool_choice:type_name -> xai_api.ToolChoice
+	37, // 37: xai_api.RequestSettings.tools:type_name -> xai_api.Tool
+	35, // 38: xai_api.RequestSettings.search_parameters:type_name -> xai_api.SearchParameters
 	1,  // 39: xai_api.ResponseFormat.format_type:type_name -> xai_api.FormatType
 	4,  // 40: xai_api.SearchParameters.mode:type_name -> xai_api.SearchMode
-	46, // 41: xai_api.SearchParameters.from_date:type_name -> google.protobuf.Timestamp
-	46, // 42: xai_api.SearchParameters.to_date:type_name -> google.protobuf.Timestamp
-	35, // 43: xai_api.SearchParameters.sources:type_name -> xai_api.Source
-	41, // 44: xai_api.Source.web:type_name -> xai_api.WebSource
-	30, // 45: xai_api.Source.news:type_name -> xai_api.NewsSource
-	43, // 46: xai_api.Source.x:type_name -> xai_api.XSource
-	33, // 47: xai_api.Source.rss:type_name -> xai_api.RssSource
-	19, // 48: xai_api.Tool.function:type_name -> xai_api.Function
-	40, // 49: xai_api.Tool.web_search:type_name -> xai_api.WebSearch
-	42, // 50: xai_api.Tool.x_search:type_name -> xai_api.XSearch
-	7,  // 51: xai_api.Tool.code_execution:type_name -> xai_api.CodeExecution
-	8,  // 52: xai_api.Tool.collections_search:type_name -> xai_api.CollectionsSearch
-	28, // 53: xai_api.Tool.mcp:type_name -> xai_api.MCP
-	17, // 54: xai_api.Tool.document_search:type_name -> xai_api.DocumentSearch
+	47, // 41: xai_api.SearchParameters.from_date:type_name -> google.protobuf.Timestamp
+	47, // 42: xai_api.SearchParameters.to_date:type_name -> google.protobuf.Timestamp
+	36, // 43: xai_api.SearchParameters.sources:type_name -> xai_api.Source
+	42, // 44: xai_api.Source.web:type_name -> xai_api.WebSource
+	31, // 45: xai_api.Source.news:type_name -> xai_api.NewsSource
+	44, // 46: xai_api.Source.x:type_name -> xai_api.XSource
+	34, // 47: xai_api.Source.rss:type_name -> xai_api.RssSource
+	20, // 48: xai_api.Tool.function:type_name -> xai_api.Function
+	41, // 49: xai_api.Tool.web_search:type_name -> xai_api.WebSearch
+	43, // 50: xai_api.Tool.x_search:type_name -> xai_api.XSearch
+	8,  // 51: xai_api.Tool.code_execution:type_name -> xai_api.CodeExecution
+	9,  // 52: xai_api.Tool.collections_search:type_name -> xai_api.CollectionsSearch
+	29, // 53: xai_api.Tool.mcp:type_name -> xai_api.MCP
+	18, // 54: xai_api.Tool.document_search:type_name -> xai_api.DocumentSearch
 	5,  // 55: xai_api.ToolCall.type:type_name -> xai_api.ToolCallType
-	20, // 56: xai_api.ToolCall.function:type_name -> xai_api.FunctionCall
-	6,  // 57: xai_api.ToolChoice.mode:type_name -> xai_api.ToolMode
-	46, // 58: xai_api.XSearch.from_date:type_name -> google.protobuf.Timestamp
-	46, // 59: xai_api.XSearch.to_date:type_name -> google.protobuf.Timestamp
-	23, // 60: xai_api.Chat.GetCompletion:input_type -> xai_api.GetCompletionsRequest
-	23, // 61: xai_api.Chat.GetCompletionChunk:input_type -> xai_api.GetCompletionsRequest
-	22, // 62: xai_api.Chat.GetCompletion:output_type -> xai_api.GetChatCompletionResponse
-	21, // 63: xai_api.Chat.GetCompletionChunk:output_type -> xai_api.GetChatCompletionChunk
-	62, // [62:64] is the sub-list for method output_type
-	60, // [60:62] is the sub-list for method input_type
-	60, // [60:60] is the sub-list for extension type_name
-	60, // [60:60] is the sub-list for extension extendee
-	0,  // [0:60] is the sub-list for field type_name
+	6,  // 56: xai_api.ToolCall.status:type_name -> xai_api.ToolCallStatus
+	21, // 57: xai_api.ToolCall.function:type_name -> xai_api.FunctionCall
+	7,  // 58: xai_api.ToolChoice.mode:type_name -> xai_api.ToolMode
+	47, // 59: xai_api.XSearch.from_date:type_name -> google.protobuf.Timestamp
+	47, // 60: xai_api.XSearch.to_date:type_name -> google.protobuf.Timestamp
+	24, // 61: xai_api.Chat.GetCompletion:input_type -> xai_api.GetCompletionsRequest
+	24, // 62: xai_api.Chat.GetCompletionChunk:input_type -> xai_api.GetCompletionsRequest
+	23, // 63: xai_api.Chat.GetCompletion:output_type -> xai_api.GetChatCompletionResponse
+	22, // 64: xai_api.Chat.GetCompletionChunk:output_type -> xai_api.GetChatCompletionChunk
+	63, // [63:65] is the sub-list for method output_type
+	61, // [61:63] is the sub-list for method input_type
+	61, // [61:61] is the sub-list for extension type_name
+	61, // [61:61] is the sub-list for extension extendee
+	0,  // [0:61] is the sub-list for field type_name
 }
 
 func init() { file_xai_v1_chat_proto_init() }
@@ -3587,7 +3665,7 @@ func file_xai_v1_chat_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_xai_v1_chat_proto_rawDesc), len(file_xai_v1_chat_proto_rawDesc)),
-			NumEnums:      7,
+			NumEnums:      8,
 			NumMessages:   38,
 			NumExtensions: 0,
 			NumServices:   1,

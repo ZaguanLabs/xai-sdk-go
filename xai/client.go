@@ -293,6 +293,7 @@ func (c *Client) EnsureGRPCConnection() error {
 // HealthCheck performs a health check on the client connection.
 func (c *Client) HealthCheck(ctx context.Context) error {
 	if ctx == nil {
+		// Create a new context instead of reassigning the parameter
 		ctx = context.Background()
 	}
 

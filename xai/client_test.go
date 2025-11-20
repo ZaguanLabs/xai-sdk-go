@@ -118,7 +118,8 @@ func TestClientMetadata(t *testing.T) {
 
 	metadata := client.Metadata()
 	if metadata == nil {
-		t.Error("Client metadata should not be nil")
+		t.Fatal("Client metadata should not be nil")
+		return
 	}
 
 	if metadata.APIKey != "test-api-key" {

@@ -78,6 +78,14 @@ enum ToolCallType {
   TOOL_CALL_TYPE_DOCUMENT_SEARCH_TOOL = 7;
 }
 
+// ToolCallStatus indicates the status of a tool call
+enum ToolCallStatus {
+  TOOL_CALL_STATUS_IN_PROGRESS = 0;
+  TOOL_CALL_STATUS_COMPLETED = 1;
+  TOOL_CALL_STATUS_INCOMPLETE = 2;
+  TOOL_CALL_STATUS_FAILED = 3;
+}
+
 // ToolMode controls tool usage behavior
 enum ToolMode {
   TOOL_MODE_INVALID = 0;
@@ -358,6 +366,8 @@ message Tool {
 message ToolCall {
   string id = 1;
   ToolCallType type = 2;
+  ToolCallStatus status = 3;
+  string error_message = 4;
   FunctionCall function = 10;
 }
 

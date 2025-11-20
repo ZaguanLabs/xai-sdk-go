@@ -904,9 +904,11 @@ func parseToolCall(protoCall *xaiv1.ToolCall) *ToolCall {
 	}
 
 	return &ToolCall{
-		id:        protoCall.Id,
-		name:      name,
-		arguments: arguments,
+		id:           protoCall.Id,
+		name:         name,
+		arguments:    arguments,
+		status:       protoCall.Status.String(),
+		errorMessage: protoCall.ErrorMessage,
 	}
 }
 

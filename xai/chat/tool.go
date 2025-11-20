@@ -163,9 +163,11 @@ func (t *Tool) Validate() error {
 
 // ToolCall represents a call to a tool.
 type ToolCall struct {
-	id        string
-	name      string
-	arguments map[string]interface{}
+	id           string
+	name         string
+	arguments    map[string]interface{}
+	status       string
+	errorMessage string
 }
 
 // NewToolCall creates a new tool call.
@@ -193,6 +195,16 @@ func (tc *ToolCall) Arguments() map[string]interface{} {
 		return make(map[string]interface{})
 	}
 	return tc.arguments
+}
+
+// Status returns the tool call status.
+func (tc *ToolCall) Status() string {
+	return tc.status
+}
+
+// ErrorMessage returns the tool call error message.
+func (tc *ToolCall) ErrorMessage() string {
+	return tc.errorMessage
 }
 
 // Function returns a function representation of the tool call.

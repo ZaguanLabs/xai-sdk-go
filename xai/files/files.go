@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"sync"
 	"time"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
@@ -242,4 +243,95 @@ func (c *Client) Delete(ctx context.Context, fileID string) error {
 
 	_, err := c.restClient.Delete(ctx, fmt.Sprintf("/files/%s", fileID))
 	return err
+}
+
+// BatchUploadCallback is called after each file upload completes (success or failure).
+// The callback receives the file index, reader, and result (File or error).
+type BatchUploadCallback func(index int, reader io.Reader, result interface{})
+
+// BatchUploadResult contains the result of a single file upload in a batch.
+type BatchUploadResult struct {
+	Index int
+	File  *File
+	Error error
+}
+
+// BatchUpload uploads multiple files concurrently with controlled concurrency.
+// Returns a map of file indices to results (File or error).
+// This method handles partial failures gracefully - successful uploads are returned
+// even if some uploads fail.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeouts
+//   - readers: Slice of io.Readers containing file data
+//   - opts: Slice of UploadOptions (must match length of readers)
+//   - batchSize: Maximum number of concurrent uploads (default: 50 if <= 0)
+//   - callback: Optional callback invoked after each file completes
+//
+// Returns:
+//   - map[int]*BatchUploadResult: Map of file indices to results
+//   - error: Only returns error for invalid parameters, not upload failures
+//
+// Example:
+//
+//	results, err := client.BatchUpload(ctx, readers, opts, 10, func(idx int, r io.Reader, result interface{}) {
+//	    if res, ok := result.(*BatchUploadResult); ok {
+//	        if res.Error != nil {
+//	            fmt.Printf("File %d failed: %v\n", idx, res.Error)
+//	        } else {
+//	            fmt.Printf("File %d uploaded: %s\n", idx, res.File.ID)
+//	        }
+//	    }
+//	})
+func (c *Client) BatchUpload(
+	ctx context.Context,
+	readers []io.Reader,
+	opts []UploadOptions,
+	batchSize int,
+	callback BatchUploadCallback,
+) (map[int]*BatchUploadResult, error) {
+	if len(readers) == 0 {
+		return nil, fmt.Errorf("readers cannot be empty - please provide at least one file to upload")
+	}
+	if len(opts) != len(readers) {
+		return nil, fmt.Errorf("opts length (%d) must match readers length (%d)", len(opts), len(readers))
+	}
+	if batchSize <= 0 {
+		batchSize = 50 // default
+	}
+
+	results := make(map[int]*BatchUploadResult)
+	var mu sync.Mutex
+
+	// Use semaphore pattern for concurrency control
+	sem := make(chan struct{}, batchSize)
+	var wg sync.WaitGroup
+
+	for i := range readers {
+		wg.Add(1)
+		go func(idx int) {
+			defer wg.Done()
+			sem <- struct{}{}        // Acquire
+			defer func() { <-sem }() // Release
+
+			file, err := c.Upload(ctx, readers[idx], opts[idx])
+
+			result := &BatchUploadResult{
+				Index: idx,
+				File:  file,
+				Error: err,
+			}
+
+			mu.Lock()
+			results[idx] = result
+			mu.Unlock()
+
+			if callback != nil {
+				callback(idx, readers[idx], result)
+			}
+		}(i)
+	}
+
+	wg.Wait()
+	return results, nil
 }

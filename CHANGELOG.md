@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Tool Call Status Tracking**: Added status field to tool call entries for tracking server-side tool execution lifecycle
+  - `ToolCall.Status()`: Returns current state (IN_PROGRESS, COMPLETED, INCOMPLETE, FAILED)
+  - `ToolCall.ErrorMessage()`: Returns error details when status is FAILED
+  - Multiple entries for same tool call ID can represent different execution stages
+  - Enables real-time tracking of server-side tool execution progress
+  - Proto updated with `ToolCallStatus` enum and new fields in `ToolCall` message
+- **Batch File Upload**: Added `BatchUpload` method to Files client for concurrent uploads
+  - Upload multiple files concurrently with controlled concurrency (default: 50)
+  - Progress tracking via optional `BatchUploadCallback`
+  - Graceful partial failure handling - returns all results (successes and failures)
+  - Returns `map[int]*BatchUploadResult` mapping file indices to results
+  - Semaphore-based concurrency control for efficient resource usage
+
+### Changed
+- **Proto**: Updated `chat.proto` to match Python SDK with ToolCallStatus enum
+- **ToolCall**: Added `status` and `errorMessage` fields to track tool execution state
+- **Files Client**: Enhanced with batch upload capabilities for improved performance
+- **Metadata**: Updated gRPC metadata to include SDK version and language information
+  - Added `xai-sdk-version` header with format `go/<version>`
+  - Added `xai-sdk-language` header with format `go/<go-version>`
+  - Matches Python SDK metadata format for better analytics and debugging
+
+### Testing
+- Added comprehensive test suite for tool call status (8 tests)
+- Added comprehensive test suite for batch upload (11 tests)
+- All tests passing with 100% coverage of new features
+
 ## [0.6.0] - 2025-11-19
 
 ### 🎯 Focus: Critical Bug Fixes, Test Coverage & Quality

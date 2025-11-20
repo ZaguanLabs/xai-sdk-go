@@ -48,7 +48,8 @@ func TestNewConfig(t *testing.T) {
 
 	// Should have default values
 	if config == nil {
-		t.Error("NewConfig should not return nil")
+		t.Fatal("NewConfig should not return nil")
+		return
 	}
 
 	if config.Host == "" {
@@ -70,7 +71,8 @@ func TestNewConfigWithAPIKey(t *testing.T) {
 	config := NewConfigWithAPIKey(apiKey)
 
 	if config == nil {
-		t.Error("NewConfigWithAPIKey should not return nil")
+		t.Fatal("NewConfigWithAPIKey should not return nil")
+		return
 	}
 
 	if config.APIKey != apiKey {

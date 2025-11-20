@@ -85,20 +85,6 @@ func toolModeToProto(mode string) xaiv1.ToolMode {
 	}
 }
 
-// formatTypeToProto converts a string to FormatType enum
-func formatTypeToProto(format string) xaiv1.FormatType {
-	switch format {
-	case "text":
-		return xaiv1.FormatType_FORMAT_TYPE_TEXT
-	case "json_object":
-		return xaiv1.FormatType_FORMAT_TYPE_JSON_OBJECT
-	case "json_schema":
-		return xaiv1.FormatType_FORMAT_TYPE_JSON_SCHEMA
-	default:
-		return xaiv1.FormatType_FORMAT_TYPE_INVALID
-	}
-}
-
 // searchModeToProto converts a string to SearchMode enum
 func searchModeToProto(mode string) xaiv1.SearchMode {
 	switch mode {

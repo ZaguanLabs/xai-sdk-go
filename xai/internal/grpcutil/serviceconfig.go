@@ -178,11 +178,12 @@ func (dob *DialOptionBuilder) Build() ([]grpc.DialOption, error) {
 	var opts []grpc.DialOption
 
 	// Transport credentials
-	if dob.insecure {
+	switch {
+	case dob.insecure:
 		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	} else if dob.customTLS != nil {
+	case dob.customTLS != nil:
 		opts = append(opts, grpc.WithTransportCredentials(dob.customTLS))
-	} else {
+	default:
 		// Use default TLS
 		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(nil)))
 	}
@@ -204,6 +205,7 @@ func (dob *DialOptionBuilder) Build() ([]grpc.DialOption, error) {
 	if dob.block {
 		// Deprecated: grpc.WithBlock() is not supported with grpc.NewClient()
 		// Users should handle connection readiness at the RPC level
+		//nolint:staticcheck // SA1019: Keeping for backwards compatibility during transition
 		opts = append(opts, grpc.WithBlock())
 	}
 

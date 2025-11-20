@@ -167,8 +167,10 @@ func (m *Message) WithToolCalls(toolCalls []*ToolCall) *Message {
 		// Convert to proto ToolCall
 		argsJSON, _ := json.Marshal(tc.Arguments())
 		m.proto.ToolCalls = append(m.proto.ToolCalls, &xaiv1.ToolCall{
-			Id:   tc.ID(),
-			Type: xaiv1.ToolCallType_TOOL_CALL_TYPE_CLIENT_SIDE_TOOL,
+			Id:           tc.ID(),
+			Type:         xaiv1.ToolCallType_TOOL_CALL_TYPE_CLIENT_SIDE_TOOL,
+			Status:       parseToolCallStatus(tc.Status()),
+			ErrorMessage: tc.ErrorMessage(),
 			Function: &xaiv1.FunctionCall{
 				Name:      tc.Name(),
 				Arguments: string(argsJSON),
@@ -176,6 +178,22 @@ func (m *Message) WithToolCalls(toolCalls []*ToolCall) *Message {
 		})
 	}
 	return m
+}
+
+// parseToolCallStatus converts a status string to ToolCallStatus enum.
+func parseToolCallStatus(status string) xaiv1.ToolCallStatus {
+	switch status {
+	case "TOOL_CALL_STATUS_IN_PROGRESS":
+		return xaiv1.ToolCallStatus_TOOL_CALL_STATUS_IN_PROGRESS
+	case "TOOL_CALL_STATUS_COMPLETED":
+		return xaiv1.ToolCallStatus_TOOL_CALL_STATUS_COMPLETED
+	case "TOOL_CALL_STATUS_INCOMPLETE":
+		return xaiv1.ToolCallStatus_TOOL_CALL_STATUS_INCOMPLETE
+	case "TOOL_CALL_STATUS_FAILED":
+		return xaiv1.ToolCallStatus_TOOL_CALL_STATUS_FAILED
+	default:
+		return xaiv1.ToolCallStatus_TOOL_CALL_STATUS_IN_PROGRESS
+	}
 }
 
 // WithReasoningContent sets the reasoning content for the message.
