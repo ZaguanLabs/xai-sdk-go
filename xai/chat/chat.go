@@ -771,11 +771,31 @@ func (r *Request) validate() error {
 		return fmt.Errorf("request proto is nil")
 	}
 
-	// Validate model
+	if err := r.validateModel(); err != nil {
+		return err
+	}
+
+	if err := r.validateParameters(); err != nil {
+		return err
+	}
+
+	if err := r.validateMessages(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// validateModel validates the model field.
+func (r *Request) validateModel() error {
 	if r.proto.Model == "" {
 		return fmt.Errorf("model is required")
 	}
+	return nil
+}
 
+// validateParameters validates temperature and max_tokens.
+func (r *Request) validateParameters() error {
 	// Validate temperature if set
 	if r.proto.Temperature != nil && *r.proto.Temperature != 0 {
 		temp := *r.proto.Temperature
@@ -792,32 +812,45 @@ func (r *Request) validate() error {
 		}
 	}
 
-	// Validate messages
+	return nil
+}
+
+// validateMessages validates the messages array.
+func (r *Request) validateMessages() error {
 	if len(r.proto.Messages) == 0 {
 		return fmt.Errorf("at least one message is required")
 	}
 
 	for i, msg := range r.proto.Messages {
-		if msg == nil {
-			return fmt.Errorf("message at index %d is nil", i)
+		if err := r.validateMessage(msg, i); err != nil {
+			return err
 		}
-		if msg.Role == xaiv1.MessageRole_INVALID_ROLE {
-			return fmt.Errorf("message at index %d has invalid role", i)
-		}
-		if len(msg.Content) == 0 {
-			return fmt.Errorf("message at index %d has empty content", i)
-		}
+	}
 
-		// Validate role
-		validRoles := map[xaiv1.MessageRole]bool{
-			xaiv1.MessageRole_ROLE_SYSTEM:    true,
-			xaiv1.MessageRole_ROLE_USER:      true,
-			xaiv1.MessageRole_ROLE_ASSISTANT: true,
-			xaiv1.MessageRole_ROLE_TOOL:      true,
-		}
-		if !validRoles[msg.Role] {
-			return fmt.Errorf("invalid role '%s' in message at index %d", roleFromProto(msg.Role), i)
-		}
+	return nil
+}
+
+// validateMessage validates a single message.
+func (r *Request) validateMessage(msg *xaiv1.Message, index int) error {
+	if msg == nil {
+		return fmt.Errorf("message at index %d is nil", index)
+	}
+	if msg.Role == xaiv1.MessageRole_INVALID_ROLE {
+		return fmt.Errorf("message at index %d has invalid role", index)
+	}
+	if len(msg.Content) == 0 {
+		return fmt.Errorf("message at index %d has empty content", index)
+	}
+
+	// Validate role
+	validRoles := map[xaiv1.MessageRole]bool{
+		xaiv1.MessageRole_ROLE_SYSTEM:    true,
+		xaiv1.MessageRole_ROLE_USER:      true,
+		xaiv1.MessageRole_ROLE_ASSISTANT: true,
+		xaiv1.MessageRole_ROLE_TOOL:      true,
+	}
+	if !validRoles[msg.Role] {
+		return fmt.Errorf("invalid role '%s' in message at index %d", roleFromProto(msg.Role), index)
 	}
 
 	return nil

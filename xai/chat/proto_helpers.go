@@ -17,7 +17,7 @@ func roleToProto(role string) xaiv1.MessageRole {
 	case "assistant":
 		return xaiv1.MessageRole_ROLE_ASSISTANT
 	case "function":
-		return xaiv1.MessageRole_ROLE_FUNCTION
+		return xaiv1.MessageRole_ROLE_FUNCTION //nolint:staticcheck // Deprecated but kept for backward compatibility
 	case "tool":
 		return xaiv1.MessageRole_ROLE_TOOL
 	default:
@@ -34,7 +34,7 @@ func roleFromProto(role xaiv1.MessageRole) string {
 		return "user"
 	case xaiv1.MessageRole_ROLE_ASSISTANT:
 		return "assistant"
-	case xaiv1.MessageRole_ROLE_FUNCTION:
+	case xaiv1.MessageRole_ROLE_FUNCTION: //nolint:staticcheck // Deprecated but kept for backward compatibility
 		return "function"
 	case xaiv1.MessageRole_ROLE_TOOL:
 		return "tool"
