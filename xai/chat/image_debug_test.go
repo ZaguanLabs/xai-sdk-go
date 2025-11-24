@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
@@ -29,32 +29,32 @@ func TestImageProtoSerialization(t *testing.T) {
 
 	// Verify text content
 	textContent := msg.proto.Content[0]
-	if textContent.Text != "What's in this image?" {
-		t.Errorf("Text content mismatch: got %q", textContent.Text)
+	if textContent.GetText() != "What's in this image?" {
+		t.Errorf("Text content mismatch: got %q", textContent.GetText())
 	}
-	if textContent.ImageUrl != nil {
+	if textContent.GetImageUrl() != nil {
 		t.Error("Text content should not have ImageUrl")
 	}
-	if textContent.File != nil {
+	if textContent.GetFile() != nil {
 		t.Error("Text content should not have File")
 	}
 
 	// Verify image content
 	imageContent := msg.proto.Content[1]
-	if imageContent.Text != "" {
-		t.Errorf("Image content should not have text, got %q", imageContent.Text)
+	if imageContent.GetText() != "" {
+		t.Errorf("Image content should not have text, got %q", imageContent.GetText())
 	}
-	if imageContent.File != nil {
+	if imageContent.GetFile() != nil {
 		t.Error("Image content should not have File")
 	}
-	if imageContent.ImageUrl == nil {
+	if imageContent.GetImageUrl() == nil {
 		t.Fatal("Image content should have ImageUrl")
 	}
-	if imageContent.ImageUrl.ImageUrl != base64Image {
-		t.Errorf("ImageUrl mismatch:\nExpected: %q\nGot: %q", base64Image, imageContent.ImageUrl.ImageUrl)
+	if imageContent.GetImageUrl().ImageUrl != base64Image {
+		t.Errorf("ImageUrl mismatch:\nExpected: %q\nGot: %q", base64Image, imageContent.GetImageUrl().ImageUrl)
 	}
-	if imageContent.ImageUrl.Detail != xaiv1.ImageDetail_DETAIL_HIGH {
-		t.Errorf("Expected DETAIL_HIGH, got %v", imageContent.ImageUrl.Detail)
+	if imageContent.GetImageUrl().Detail != xaiv1.ImageDetail_DETAIL_HIGH {
+		t.Errorf("Expected DETAIL_HIGH, got %v", imageContent.GetImageUrl().Detail)
 	}
 
 	// Serialize to JSON to see what gets sent
@@ -122,10 +122,10 @@ func TestRequestWithImageProto(t *testing.T) {
 
 	// Verify the image content
 	imageContent := msg.Content[1]
-	if imageContent.ImageUrl == nil {
+	if imageContent.GetImageUrl() == nil {
 		t.Fatal("ImageUrl is nil in request proto")
 	}
-	if imageContent.ImageUrl.ImageUrl != base64Image {
+	if imageContent.GetImageUrl().ImageUrl != base64Image {
 		t.Error("Base64 image not preserved in request proto")
 	}
 

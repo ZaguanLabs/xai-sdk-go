@@ -2,7 +2,7 @@
 package chat
 
 import (
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 )
 
 // Helper functions to convert between user-friendly strings and proto enums

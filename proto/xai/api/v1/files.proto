@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package xai_api;
+
+import "google/protobuf/timestamp.proto";
+
+service Files {
+  rpc UploadFile(stream UploadFileChunk) returns (File) {}
+  rpc ListFiles(ListFilesRequest) returns (ListFilesResponse) {}
+  rpc GetFile(GetFileRequest) returns (File) {}
+  rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse) {}
+  rpc GetFileContent(GetFileContentRequest) returns (stream FileContentChunk) {}
+  rpc RetrieveFileURL(RetrieveFileURLRequest) returns (RetrieveFileURLResponse) {}
+}
+
+message File {
+  string id = 1;
+  string filename = 2;
+  int64 size = 3;
+  string team_id = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp expires_at = 6;
+}
+
+message UploadFileChunk {
+  UploadFileInit init = 1;
+  bytes data = 2;
+}
+
+message UploadFileInit {
+  string name = 1;
+  string purpose = 2;
+}
+
+message ListFilesRequest {
+  int32 limit = 1;
+  FilesOrdering order = 2;
+  string pagination_token = 3;
+  FilesSortBy sort_by = 4;
+}
+
+message ListFilesResponse {
+  repeated File data = 1;
+  string pagination_token = 2;
+}
+
+message GetFileRequest {
+  string file_id = 1;
+}
+
+message DeleteFileRequest {
+  string file_id = 1;
+}
+
+message DeleteFileResponse {}
+
+message GetFileContentRequest {
+  string file_id = 1;
+}
+
+message FileContentChunk {
+  bytes data = 1;
+}
+
+message RetrieveFileURLRequest {
+  string file_id = 1;
+}
+
+message RetrieveFileURLResponse {
+  string url = 1;
+}
+
+enum FilesOrdering {
+  FILES_ORDERING_DESC = 0;
+  FILES_ORDERING_ASC = 1;
+}
+
+enum FilesSortBy {
+  FILES_SORT_BY_CREATED_AT = 0;
+  FILES_SORT_BY_SIZE = 1;
+  FILES_SORT_BY_NAME = 2;
+}

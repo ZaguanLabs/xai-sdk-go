@@ -2,13 +2,13 @@ package image
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 func TestNewClient(t *testing.T) {
@@ -82,8 +82,9 @@ func TestGenerate(t *testing.T) {
 			response: &xaiv1.ImageResponse{
 				Images: []*xaiv1.GeneratedImage{
 					{
-						Url:               "http://example.com/cat.jpg",
-						Base64:            "",
+						Image: &xaiv1.GeneratedImage_Url{
+							Url: "http://example.com/cat.jpg",
+						},
 						UpSampledPrompt:   "A detailed cat",
 						RespectModeration: true,
 					},
@@ -98,8 +99,16 @@ func TestGenerate(t *testing.T) {
 			statusCode: http.StatusOK,
 			response: &xaiv1.ImageResponse{
 				Images: []*xaiv1.GeneratedImage{
-					{Url: "http://example.com/dog1.jpg"},
-					{Url: "http://example.com/dog2.jpg"},
+					{
+						Image: &xaiv1.GeneratedImage_Url{
+							Url: "http://example.com/dog1.jpg",
+						},
+					},
+					{
+						Image: &xaiv1.GeneratedImage_Url{
+							Url: "http://example.com/dog2.jpg",
+						},
+					},
 				},
 				Model: "image-model",
 			},
@@ -126,7 +135,8 @@ func TestGenerate(t *testing.T) {
 
 				w.WriteHeader(tt.statusCode)
 				if tt.response != nil {
-					json.NewEncoder(w).Encode(tt.response)
+					data, _ := protojson.Marshal(tt.response)
+					w.Write(data)
 				}
 			}))
 			defer server.Close()
@@ -171,22 +181,41 @@ func TestGenerateClientNotInitialized(t *testing.T) {
 
 func TestGeneratedImage(t *testing.T) {
 	img := &GeneratedImage{
-		Base64:            "base64data",
-		URL:               "http://example.com/img.jpg",
-		UpsampledPrompt:   "detailed prompt",
-		RespectModeration: true,
+		proto: &xaiv1.GeneratedImage{
+			Image: &xaiv1.GeneratedImage_Base64{
+				Base64: "base64data",
+			},
+			UpSampledPrompt:   "detailed prompt",
+			RespectModeration: true,
+		},
 	}
 
-	if img.Base64 != "base64data" {
-		t.Errorf("Base64 = %v, want base64data", img.Base64)
+	if img.Base64() != "base64data" {
+		t.Errorf("Base64 = %v, want base64data", img.Base64())
 	}
-	if img.URL != "http://example.com/img.jpg" {
-		t.Errorf("URL = %v, want http://example.com/img.jpg", img.URL)
+	// URL should be empty when Base64 is set
+	if img.URL() != "" {
+		t.Errorf("URL = %v, want empty", img.URL())
 	}
-	if img.UpsampledPrompt != "detailed prompt" {
-		t.Errorf("UpsampledPrompt = %v, want detailed prompt", img.UpsampledPrompt)
+
+	// Test with URL
+	imgUrl := &GeneratedImage{
+		proto: &xaiv1.GeneratedImage{
+			Image: &xaiv1.GeneratedImage_Url{
+				Url: "http://example.com/img.jpg",
+			},
+			UpSampledPrompt:   "detailed prompt",
+			RespectModeration: true,
+		},
 	}
-	if !img.RespectModeration {
+
+	if imgUrl.URL() != "http://example.com/img.jpg" {
+		t.Errorf("URL = %v, want http://example.com/img.jpg", imgUrl.URL())
+	}
+	if img.UpsampledPrompt() != "detailed prompt" {
+		t.Errorf("UpsampledPrompt = %v, want detailed prompt", img.UpsampledPrompt())
+	}
+	if !img.RespectModeration() {
 		t.Error("RespectModeration should be true")
 	}
 }
@@ -194,8 +223,20 @@ func TestGeneratedImage(t *testing.T) {
 func TestResponse(t *testing.T) {
 	resp := &Response{
 		Images: []*GeneratedImage{
-			{URL: "http://example.com/1.jpg"},
-			{URL: "http://example.com/2.jpg"},
+			{
+				proto: &xaiv1.GeneratedImage{
+					Image: &xaiv1.GeneratedImage_Url{
+						Url: "http://example.com/1.jpg",
+					},
+				},
+			},
+			{
+				proto: &xaiv1.GeneratedImage{
+					Image: &xaiv1.GeneratedImage_Url{
+						Url: "http://example.com/2.jpg",
+					},
+				},
+			},
 		},
 		Model: "image-model",
 	}

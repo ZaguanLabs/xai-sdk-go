@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
 )
 
@@ -29,8 +29,8 @@ func TestText(t *testing.T) {
 	if input.proto == nil {
 		t.Fatal("Text() returned nil proto")
 	}
-	if input.proto.String_ != "hello world" {
-		t.Errorf("String_ = %v, want hello world", input.proto.String_)
+	if input.proto.GetString_() != "hello world" {
+		t.Errorf("String_ = %v, want hello world", input.proto.GetString_())
 	}
 }
 
@@ -40,11 +40,11 @@ func TestImage(t *testing.T) {
 	if input.proto == nil {
 		t.Fatal("Image() returned nil proto")
 	}
-	if input.proto.ImageUrl == nil {
+	if input.proto.GetImageUrl() == nil {
 		t.Fatal("ImageUrl is nil")
 	}
-	if input.proto.ImageUrl.ImageUrl != "http://example.com/image.jpg" {
-		t.Errorf("ImageUrl = %v, want http://example.com/image.jpg", input.proto.ImageUrl.ImageUrl)
+	if input.proto.GetImageUrl().ImageUrl != "http://example.com/image.jpg" {
+		t.Errorf("ImageUrl = %v, want http://example.com/image.jpg", input.proto.GetImageUrl().ImageUrl)
 	}
 }
 

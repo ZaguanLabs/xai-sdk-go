@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 )
 
 // Message represents a chat message with role and content.
@@ -24,9 +24,11 @@ func NewMessage(role string, parts ...Part) *Message {
 			// Handle image parts
 			if img, ok := p.(*ImagePart); ok {
 				contents = append(contents, &xaiv1.Content{
-					ImageUrl: &xaiv1.ImageUrlContent{
-						ImageUrl: img.ImageURL(),
-						Detail:   img.Detail(),
+					Content: &xaiv1.Content_ImageUrl{
+						ImageUrl: &xaiv1.ImageUrlContent{
+							ImageUrl: img.ImageURL(),
+							Detail:   img.Detail(),
+						},
 					},
 				})
 			}
@@ -34,15 +36,19 @@ func NewMessage(role string, parts ...Part) *Message {
 			// Handle file parts
 			if file, ok := p.(*FilePart); ok {
 				contents = append(contents, &xaiv1.Content{
-					File: &xaiv1.FileContent{
-						FileId: file.FileID(),
+					Content: &xaiv1.Content_File{
+						File: &xaiv1.FileContent{
+							FileId: file.FileID(),
+						},
 					},
 				})
 			}
 		default:
 			// Handle text parts (default)
 			contents = append(contents, &xaiv1.Content{
-				Text: p.Content(),
+				Content: &xaiv1.Content_Text{
+					Text: p.Content(),
+				},
 			})
 		}
 	}
@@ -89,7 +95,7 @@ func (m *Message) Content() string {
 	// Concatenate all text content
 	var result strings.Builder
 	for _, c := range m.proto.Content {
-		result.WriteString(c.Text)
+		result.WriteString(c.GetText())
 	}
 	return result.String()
 }
@@ -140,10 +146,10 @@ func (m *Message) ToolCalls() []*ToolCall {
 
 // ReasoningContent returns the reasoning content of the message.
 func (m *Message) ReasoningContent() string {
-	if m.proto == nil {
+	if m.proto == nil || m.proto.ReasoningContent == nil {
 		return ""
 	}
-	return m.proto.ReasoningContent
+	return *m.proto.ReasoningContent
 }
 
 // EncryptedContent returns the encrypted content of the message.
@@ -166,14 +172,22 @@ func (m *Message) WithToolCalls(toolCalls []*ToolCall) *Message {
 		}
 		// Convert to proto ToolCall
 		argsJSON, _ := json.Marshal(tc.Arguments())
+		errorMsg := tc.ErrorMessage()
+		var errorMsgPtr *string
+		if errorMsg != "" {
+			errorMsgPtr = &errorMsg
+		}
+
 		m.proto.ToolCalls = append(m.proto.ToolCalls, &xaiv1.ToolCall{
 			Id:           tc.ID(),
 			Type:         xaiv1.ToolCallType_TOOL_CALL_TYPE_CLIENT_SIDE_TOOL,
 			Status:       parseToolCallStatus(tc.Status()),
-			ErrorMessage: tc.ErrorMessage(),
-			Function: &xaiv1.FunctionCall{
-				Name:      tc.Name(),
-				Arguments: string(argsJSON),
+			ErrorMessage: errorMsgPtr,
+			Tool: &xaiv1.ToolCall_Function{
+				Function: &xaiv1.FunctionCall{
+					Name:      tc.Name(),
+					Arguments: string(argsJSON),
+				},
 			},
 		})
 	}
@@ -199,7 +213,7 @@ func parseToolCallStatus(status string) xaiv1.ToolCallStatus {
 // WithReasoningContent sets the reasoning content for the message.
 func (m *Message) WithReasoningContent(reasoning string) *Message {
 	if m.proto != nil {
-		m.proto.ReasoningContent = reasoning
+		m.proto.ReasoningContent = &reasoning
 	}
 	return m
 }

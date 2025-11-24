@@ -1,7 +1,7 @@
 // Package chat provides chat completion functionality for the xAI SDK.
 package chat
 
-import xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+import xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 
 // PartType represents the type of content part.
 type PartType int

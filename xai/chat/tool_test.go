@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 )
 
 func TestToolJSONSchemaFormat(t *testing.T) {
@@ -207,13 +207,13 @@ func TestWithToolJSONSchemaFormat(t *testing.T) {
 
 	// Get the function parameters as JSON
 	protoTool := req.proto.Tools[0]
-	if protoTool.Function == nil {
+	if protoTool.GetFunction() == nil {
 		t.Fatal("Function should not be nil")
 	}
 
 	// Parse the parameters JSON
 	var params map[string]interface{}
-	if err := json.Unmarshal([]byte(protoTool.Function.Parameters), &params); err != nil {
+	if err := json.Unmarshal([]byte(protoTool.GetFunction().Parameters), &params); err != nil {
 		t.Fatalf("Failed to parse parameters JSON: %v", err)
 	}
 
@@ -261,7 +261,7 @@ func TestWithToolJSONSchemaFormat(t *testing.T) {
 		t.Errorf("Expected 'city' in required array, got %v", requiredArray[0])
 	}
 
-	t.Logf("✅ WithTool generates valid JSON Schema: %s", protoTool.Function.Parameters)
+	t.Logf("✅ WithTool generates valid JSON Schema: %s", protoTool.GetFunction().Parameters)
 }
 
 func TestResponseToolCalls(t *testing.T) {
@@ -318,9 +318,11 @@ func TestParseToolCall(t *testing.T) {
 			name: "valid tool call with arguments",
 			protoCall: &xaiv1.ToolCall{
 				Id: "call_123",
-				Function: &xaiv1.FunctionCall{
-					Name:      "get_weather",
-					Arguments: `{"city": "San Francisco", "units": "celsius"}`,
+				Tool: &xaiv1.ToolCall_Function{
+					Function: &xaiv1.FunctionCall{
+						Name:      "get_weather",
+						Arguments: `{"city": "San Francisco", "units": "celsius"}`,
+					},
 				},
 			},
 			wantNil:  false,
@@ -331,9 +333,11 @@ func TestParseToolCall(t *testing.T) {
 			name: "tool call with empty arguments",
 			protoCall: &xaiv1.ToolCall{
 				Id: "call_456",
-				Function: &xaiv1.FunctionCall{
-					Name:      "get_time",
-					Arguments: "",
+				Tool: &xaiv1.ToolCall_Function{
+					Function: &xaiv1.FunctionCall{
+						Name:      "get_time",
+						Arguments: "",
+					},
 				},
 			},
 			wantNil:  false,
@@ -344,9 +348,11 @@ func TestParseToolCall(t *testing.T) {
 			name: "tool call with invalid JSON arguments",
 			protoCall: &xaiv1.ToolCall{
 				Id: "call_789",
-				Function: &xaiv1.FunctionCall{
-					Name:      "test_func",
-					Arguments: `{invalid json}`,
+				Tool: &xaiv1.ToolCall_Function{
+					Function: &xaiv1.FunctionCall{
+						Name:      "test_func",
+						Arguments: `{invalid json}`,
+					},
 				},
 			},
 			wantNil:  false,

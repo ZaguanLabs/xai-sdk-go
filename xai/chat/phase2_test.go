@@ -3,22 +3,29 @@ package chat
 import (
 	"testing"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 )
 
 // Phase 2 Tests: RequestSettings, DebugOutput, LogProbs, Function.strict
 
 func TestResponseRequestSettings(t *testing.T) {
+	maxTokens := int32(1000)
+	prevRespID := "resp_123"
+	reasoningEffort := xaiv1.ReasoningEffort_EFFORT_HIGH
+	temp := float32(0.7)
+	topP := float32(0.9)
+	user := "user_456"
+
 	response := &Response{
 		proto: &xaiv1.GetChatCompletionResponse{
 			Settings: &xaiv1.RequestSettings{
-				MaxTokens:           1000,
+				MaxTokens:           &maxTokens,
 				ParallelToolCalls:   true,
-				PreviousResponseId:  "resp_123",
-				ReasoningEffort:     xaiv1.ReasoningEffort_EFFORT_HIGH,
-				Temperature:         0.7,
-				TopP:                0.9,
-				User:                "user_456",
+				PreviousResponseId:  &prevRespID,
+				ReasoningEffort:     &reasoningEffort,
+				Temperature:         &temp,
+				TopP:                &topP,
+				User:                user,
 				StoreMessages:       true,
 				UseEncryptedContent: true,
 			},

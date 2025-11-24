@@ -3,7 +3,7 @@ package chat
 import (
 	"testing"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 )
 
 // Phase 1 Tests: Message.Name, Response.Citations, Response.SystemFingerprint, Chunk.Citations, Chunk.SystemFingerprint

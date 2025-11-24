@@ -4,7 +4,7 @@ package image
 import (
 	"context"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
 	"google.golang.org/protobuf/encoding/protojson"
 )
@@ -39,10 +39,39 @@ type Input struct {
 
 // GeneratedImage represents a generated image.
 type GeneratedImage struct {
-	Base64            string
-	URL               string
-	UpsampledPrompt   string
-	RespectModeration bool
+	proto *xaiv1.GeneratedImage
+}
+
+// Base64 returns the base64 encoded image data.
+func (i *GeneratedImage) Base64() string {
+	if i.proto == nil {
+		return ""
+	}
+	return i.proto.GetBase64()
+}
+
+// URL returns the URL of the generated image.
+func (i *GeneratedImage) URL() string {
+	if i.proto == nil {
+		return ""
+	}
+	return i.proto.GetUrl()
+}
+
+// UpsampledPrompt returns the upsampled prompt.
+func (i *GeneratedImage) UpsampledPrompt() string {
+	if i.proto == nil {
+		return ""
+	}
+	return i.proto.UpSampledPrompt
+}
+
+// RespectModeration returns whether the image respects moderation.
+func (i *GeneratedImage) RespectModeration() bool {
+	if i.proto == nil {
+		return false
+	}
+	return i.proto.RespectModeration
 }
 
 // Response represents an image generation response.
@@ -97,7 +126,7 @@ func (c *Client) Generate(ctx context.Context, req *GenerateRequest) (*Response,
 	protoReq := &xaiv1.GenerateImageRequest{
 		Prompt: req.Prompt,
 		Model:  req.Model,
-		N:      req.N,
+		N:      &req.N,
 		User:   req.User,
 		Format: req.Format,
 	}
@@ -127,10 +156,7 @@ func (c *Client) Generate(ctx context.Context, req *GenerateRequest) (*Response,
 	images := make([]*GeneratedImage, len(imageResp.Images))
 	for i, img := range imageResp.Images {
 		images[i] = &GeneratedImage{
-			Base64:            img.Base64,
-			URL:               img.Url,
-			UpsampledPrompt:   img.UpSampledPrompt,
-			RespectModeration: img.RespectModeration,
+			proto: img,
 		}
 	}
 

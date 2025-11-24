@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -103,7 +103,11 @@ func (c *Choice) Message() *Message {
 	// Convert CompletionMessage (string content) to Message (Content array)
 	contents := make([]*xaiv1.Content, 0)
 	if c.proto.Message.Content != "" {
-		contents = append(contents, &xaiv1.Content{Text: c.proto.Message.Content})
+		contents = append(contents, &xaiv1.Content{
+			Content: &xaiv1.Content_Text{
+				Text: c.proto.Message.Content,
+			},
+		})
 	}
 	return &Message{
 		proto: &xaiv1.Message{
@@ -181,14 +185,21 @@ func NewRequest(model string, opts ...RequestOption) *Request {
 // WithTemperature sets the temperature for sampling.
 func WithTemperature(temp float32) RequestOption {
 	return func(r *Request) {
-		r.proto.Temperature = temp
+		r.proto.Temperature = &temp
 	}
 }
 
 // WithMaxTokens sets the maximum number of tokens.
 func WithMaxTokens(maxTokens int32) RequestOption {
 	return func(r *Request) {
-		r.proto.MaxTokens = maxTokens
+		r.proto.MaxTokens = &maxTokens
+	}
+}
+
+// WithMaxTurns sets the maximum number of turns.
+func WithMaxTurns(maxTurns int32) RequestOption {
+	return func(r *Request) {
+		r.proto.MaxTurns = &maxTurns
 	}
 }
 
@@ -202,7 +213,8 @@ func WithSearch(params *SearchParameters) RequestOption {
 // WithReasoningEffort adds reasoning effort to the request.
 func WithReasoningEffort(effort ReasoningEffort) RequestOption {
 	return func(r *Request) {
-		r.proto.ReasoningEffort = reasoningEffortToProto(string(effort))
+		effortProto := reasoningEffortToProto(string(effort))
+		r.proto.ReasoningEffort = &effortProto
 	}
 }
 
@@ -244,7 +256,7 @@ func (p *SearchParameters) WithReturnCitations(returnCitations bool) *SearchPara
 
 // WithMaxSearchResults sets the maximum number of search results.
 func (p *SearchParameters) WithMaxSearchResults(maxResults int32) *SearchParameters {
-	p.pb.MaxSearchResults = maxResults
+	p.pb.MaxSearchResults = &maxResults
 	return p
 }
 
@@ -266,11 +278,13 @@ func WithTool(tools ...*Tool) RequestOption {
 			// ToJSONSchema() strips "required" from properties and builds top-level required array
 			paramsJSON, _ := json.Marshal(tool.ToJSONSchema())
 			protoTools[i] = &xaiv1.Tool{
-				Function: &xaiv1.Function{
-					Name:        tool.Name(),
-					Description: tool.Description(),
-					Parameters:  string(paramsJSON),
-					Strict:      tool.Strict(),
+				Tool: &xaiv1.Tool_Function{
+					Function: &xaiv1.Function{
+						Name:        tool.Name(),
+						Description: tool.Description(),
+						Parameters:  string(paramsJSON),
+						Strict:      tool.Strict(),
+					},
 				},
 			}
 		}
@@ -311,8 +325,12 @@ func WithToolResults(results ...ToolResult) RequestOption {
 			}
 
 			msg := &xaiv1.Message{
-				Role:    xaiv1.MessageRole_ROLE_TOOL,
-				Content: []*xaiv1.Content{{Text: content}},
+				Role: xaiv1.MessageRole_ROLE_TOOL,
+				Content: []*xaiv1.Content{{
+					Content: &xaiv1.Content_Text{
+						Text: content,
+					},
+				}},
 				// Additional tool call info would be added here
 			}
 			r.proto.Messages = append(r.proto.Messages, msg)
@@ -356,7 +374,11 @@ func (r *Request) AppendResponse(resp *Response) *Request {
 		var contents []*xaiv1.Content
 		if output.Message.Content != "" {
 			contents = []*xaiv1.Content{
-				{Text: output.Message.Content},
+				{
+					Content: &xaiv1.Content_Text{
+						Text: output.Message.Content,
+					},
+				},
 			}
 		}
 
@@ -365,7 +387,7 @@ func (r *Request) AppendResponse(resp *Response) *Request {
 			Role:             output.Message.Role,
 			Content:          contents,
 			ToolCalls:        output.Message.ToolCalls,
-			ReasoningContent: output.Message.ReasoningContent,
+			ReasoningContent: &output.Message.ReasoningContent,
 			EncryptedContent: output.Message.EncryptedContent,
 		}
 
@@ -409,7 +431,7 @@ func WithMessage(msg *Message) RequestOption {
 // WithTopP sets the nucleus sampling parameter as a functional option.
 func WithTopP(topP float32) RequestOption {
 	return func(r *Request) {
-		r.proto.TopP = topP
+		r.proto.TopP = &topP
 	}
 }
 
@@ -423,21 +445,21 @@ func WithStop(stop ...string) RequestOption {
 // WithFrequencyPenalty sets the frequency penalty as a functional option.
 func WithFrequencyPenalty(penalty float32) RequestOption {
 	return func(r *Request) {
-		r.proto.FrequencyPenalty = penalty
+		r.proto.FrequencyPenalty = &penalty
 	}
 }
 
 // WithPresencePenalty sets the presence penalty as a functional option.
 func WithPresencePenalty(penalty float32) RequestOption {
 	return func(r *Request) {
-		r.proto.PresencePenalty = penalty
+		r.proto.PresencePenalty = &penalty
 	}
 }
 
 // WithSeed sets the seed for deterministic sampling as a functional option.
 func WithSeed(seed int32) RequestOption {
 	return func(r *Request) {
-		r.proto.Seed = seed
+		r.proto.Seed = &seed
 	}
 }
 
@@ -451,14 +473,14 @@ func WithLogprobs(logprobs bool) RequestOption {
 // WithTopLogprobs sets the number of top log probabilities as a functional option.
 func WithTopLogprobs(topLogprobs int32) RequestOption {
 	return func(r *Request) {
-		r.proto.TopLogprobs = topLogprobs
+		r.proto.TopLogprobs = &topLogprobs
 	}
 }
 
 // WithN sets the number of completions to generate as a functional option.
 func WithN(n int32) RequestOption {
 	return func(r *Request) {
-		r.proto.N = n
+		r.proto.N = &n
 	}
 }
 
@@ -472,14 +494,14 @@ func WithUser(user string) RequestOption {
 // WithParallelToolCalls sets whether to execute tool calls in parallel as a functional option.
 func WithParallelToolCalls(parallel bool) RequestOption {
 	return func(r *Request) {
-		r.proto.ParallelToolCalls = parallel
+		r.proto.ParallelToolCalls = &parallel
 	}
 }
 
 // WithPreviousResponseID sets the previous response ID as a functional option.
 func WithPreviousResponseID(responseID string) RequestOption {
 	return func(r *Request) {
-		r.proto.PreviousResponseId = responseID
+		r.proto.PreviousResponseId = &responseID
 	}
 }
 
@@ -499,19 +521,22 @@ func WithUseEncryptedContent(encrypted bool) RequestOption {
 
 // SetTemperature sets the temperature for sampling.
 func (r *Request) SetTemperature(temp float32) *Request {
-	r.proto.Temperature = temp
+	r.proto.Temperature = &temp
 	return r
 }
 
 // SetMaxTokens sets the maximum number of tokens.
 func (r *Request) SetMaxTokens(maxTokens int32) *Request {
-	r.proto.MaxTokens = maxTokens
+	r.proto.MaxTokens = &maxTokens
 	return r
 }
 
 // MaxTokens returns the max tokens setting.
 func (r *Request) MaxTokens() int32 {
-	return r.proto.MaxTokens
+	if r.proto.MaxTokens == nil {
+		return 0
+	}
+	return *r.proto.MaxTokens
 }
 
 // SetTopP sets the nucleus sampling parameter (top_p).
@@ -519,7 +544,7 @@ func (r *Request) MaxTokens() int32 {
 // the results of the tokens with top_p probability mass.
 // Values should be between 0 and 1.
 func (r *Request) SetTopP(topP float32) *Request {
-	r.proto.TopP = topP
+	r.proto.TopP = &topP
 	return r
 }
 
@@ -534,7 +559,7 @@ func (r *Request) SetStop(stop ...string) *Request {
 // decreasing the model's likelihood to repeat the same line verbatim.
 // Values typically range from 0 to 2.
 func (r *Request) SetFrequencyPenalty(penalty float32) *Request {
-	r.proto.FrequencyPenalty = penalty
+	r.proto.FrequencyPenalty = &penalty
 	return r
 }
 
@@ -543,7 +568,7 @@ func (r *Request) SetFrequencyPenalty(penalty float32) *Request {
 // increasing the model's likelihood to talk about new topics.
 // Values typically range from 0 to 2.
 func (r *Request) SetPresencePenalty(penalty float32) *Request {
-	r.proto.PresencePenalty = penalty
+	r.proto.PresencePenalty = &penalty
 	return r
 }
 
@@ -551,7 +576,7 @@ func (r *Request) SetPresencePenalty(penalty float32) *Request {
 // If specified, the system will make a best effort to sample deterministically,
 // such that repeated requests with the same seed and parameters should return the same result.
 func (r *Request) SetSeed(seed int32) *Request {
-	r.proto.Seed = seed
+	r.proto.Seed = &seed
 	return r
 }
 
@@ -566,7 +591,7 @@ func (r *Request) SetLogprobs(logprobs bool) *Request {
 // An integer between 0 and 8 specifying the number of most likely tokens to return.
 // logprobs must be set to true if this parameter is used.
 func (r *Request) SetTopLogprobs(topLogprobs int32) *Request {
-	r.proto.TopLogprobs = topLogprobs
+	r.proto.TopLogprobs = &topLogprobs
 	return r
 }
 
@@ -574,7 +599,7 @@ func (r *Request) SetTopLogprobs(topLogprobs int32) *Request {
 // How many chat completion choices to generate for each input message.
 // Note: Because this parameter generates many completions, it can quickly consume your token quota.
 func (r *Request) SetN(n int32) *Request {
-	r.proto.N = n
+	r.proto.N = &n
 	return r
 }
 
@@ -589,14 +614,14 @@ func (r *Request) SetUser(user string) *Request {
 // If true, the model can call multiple tools simultaneously.
 // If false, tool calls are executed sequentially.
 func (r *Request) SetParallelToolCalls(parallel bool) *Request {
-	r.proto.ParallelToolCalls = parallel
+	r.proto.ParallelToolCalls = &parallel
 	return r
 }
 
 // SetPreviousResponseID sets the ID of a previous response for conversation continuity.
 // This allows the model to reference and build upon previous interactions.
 func (r *Request) SetPreviousResponseID(responseID string) *Request {
-	r.proto.PreviousResponseId = responseID
+	r.proto.PreviousResponseId = &responseID
 	return r
 }
 
@@ -628,7 +653,9 @@ func (r *Request) SetTools(tools ...Tool) *Request {
 // SetToolChoice sets the tool choice for the request.
 func (r *Request) SetToolChoice(choice ToolChoice) *Request {
 	r.proto.ToolChoice = &xaiv1.ToolChoice{
-		Mode: toolModeToProto(string(choice)),
+		ToolChoice: &xaiv1.ToolChoice_Mode{
+			Mode: toolModeToProto(string(choice)),
+		},
 	}
 	return r
 }
@@ -750,16 +777,16 @@ func (r *Request) validate() error {
 	}
 
 	// Validate temperature if set
-	if r.proto.Temperature != 0 {
-		temp := r.proto.Temperature
+	if r.proto.Temperature != nil && *r.proto.Temperature != 0 {
+		temp := *r.proto.Temperature
 		if temp < 0.0 || temp > 2.0 {
 			return fmt.Errorf("temperature must be between 0.0 and 2.0, got %f", temp)
 		}
 	}
 
 	// Validate max_tokens if set
-	if r.proto.MaxTokens != 0 {
-		maxTokens := r.proto.MaxTokens
+	if r.proto.MaxTokens != nil && *r.proto.MaxTokens != 0 {
+		maxTokens := *r.proto.MaxTokens
 		if maxTokens < 1 || maxTokens > 8192 {
 			return fmt.Errorf("max_tokens must be between 1 and 8192, got %d", maxTokens)
 		}
@@ -861,7 +888,7 @@ func WithResponseFormatOption(option *ResponseFormatOption) RequestOption {
 			}
 			r.proto.ResponseFormat = &xaiv1.ResponseFormat{
 				FormatType: xaiv1.FormatType_FORMAT_TYPE_JSON_SCHEMA,
-				Schema:     schemaStr,
+				Schema:     &schemaStr,
 			}
 		}
 	}
@@ -888,8 +915,9 @@ func parseToolCall(protoCall *xaiv1.ToolCall) *ToolCall {
 
 	// Parse function arguments from JSON string
 	var arguments map[string]interface{}
-	if protoCall.Function != nil && protoCall.Function.Arguments != "" {
-		if err := json.Unmarshal([]byte(protoCall.Function.Arguments), &arguments); err != nil {
+	fn := protoCall.GetFunction()
+	if fn != nil && fn.Arguments != "" {
+		if err := json.Unmarshal([]byte(fn.Arguments), &arguments); err != nil {
 			// If parsing fails, create empty arguments map
 			arguments = make(map[string]interface{})
 		}
@@ -899,8 +927,14 @@ func parseToolCall(protoCall *xaiv1.ToolCall) *ToolCall {
 
 	// Get function name
 	name := ""
-	if protoCall.Function != nil {
-		name = protoCall.Function.Name
+	if fn != nil {
+		name = fn.Name
+	}
+
+	// Get error message
+	errorMessage := ""
+	if protoCall.ErrorMessage != nil {
+		errorMessage = *protoCall.ErrorMessage
 	}
 
 	return &ToolCall{
@@ -908,7 +942,7 @@ func parseToolCall(protoCall *xaiv1.ToolCall) *ToolCall {
 		name:         name,
 		arguments:    arguments,
 		status:       protoCall.Status.String(),
-		errorMessage: protoCall.ErrorMessage,
+		errorMessage: errorMessage,
 	}
 }
 

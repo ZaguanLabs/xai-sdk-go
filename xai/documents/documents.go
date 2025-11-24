@@ -4,7 +4,7 @@ package documents
 import (
 	"context"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
 	"google.golang.org/protobuf/encoding/protojson"
 )
@@ -68,7 +68,7 @@ func (c *Client) Search(ctx context.Context, req *SearchRequest) (*SearchRespons
 		Source: &xaiv1.DocumentsSource{
 			CollectionIds: req.CollectionIDs,
 		},
-		Limit: req.Limit,
+		Limit: &req.Limit,
 	}
 
 	jsonData, err := protojson.Marshal(protoReq)

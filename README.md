@@ -8,7 +8,7 @@
 
 > **Note**: This is an unofficial, community-maintained SDK and is not affiliated with or endorsed by xAI.
 
-> **Status**: **v0.7.0 Released** - Code quality improvements, reduced cyclomatic complexity, and API naming fixes following Go best practices. **Requires Go 1.24+** due to gRPC v1.76.0 dependency.
+> **Status**: **v0.8.0 Released** - Official xAI protobuf integration with enhanced type safety. Public SDK API unchanged - fully backward compatible. **Requires Go 1.24+** due to gRPC v1.76.0 dependency.
 
 ## ✨ Features
 
@@ -47,7 +47,7 @@
 **Requirements**: Go 1.24 or later (required by gRPC v1.76.0)
 
 ```bash
-go get github.com/ZaguanLabs/xai-sdk-go@v0.7.0
+go get github.com/ZaguanLabs/xai-sdk-go@v0.8.0
 ```
 
 ### Basic Usage
@@ -279,13 +279,13 @@ if err != nil {
 - ✅ **Security Hardened**: Audit completed with all P0-P1 issues resolved
 - ✅ **Well Documented**: Performance guide, testing guide, audit reports, and API docs
 
-### What's New in v0.6.0
-- 🐛 **Critical Bug Fixes**: Fixed JSON parsing panic and example compilation errors
-- ✅ **45.8% Test Coverage**: Added comprehensive unit tests for 9 packages (+15.1pp)
-- 🔒 **Security Hardened**: gosec scan clean, enhanced error handling
-- 🚀 **Future-Proof**: Migrated to non-deprecated gRPC APIs
-- 📊 **Quality Assured**: All checks passing (go vet, staticcheck, race detector)
-- 📚 **Well Documented**: Comprehensive audit report and release notes
+### What's New in v0.8.0
+- 🎯 **Official Proto Integration**: Integrated official xAI protobuf definitions from `xai-proto` repository
+- 🔒 **Enhanced Type Safety**: Proper optional field handling with pointer types and oneof discriminated unions
+- 📄 **New Proto Files**: Complete Files and Collections API service definitions
+- ✅ **Backward Compatible**: Public SDK API completely unchanged - no breaking changes for users
+- 🧪 **All Tests Passing**: 200+ tests updated and passing with new proto structures
+- 📚 **Better Alignment**: SDK now matches xAI's official API specifications exactly
 
 ### Test Coverage by Package
 - `xai/auth`: 90.0% | `xai/documents`: 90.0% | `xai/sample`: 90.9%
@@ -293,11 +293,12 @@ if err != nil {
 - `xai/embed`: 83.6% | `xai/collections`: 76.9% | `xai/models`: 24.4%
 
 ### Roadmap to v1.0
-- 🎯 **v0.7.0**: Increase test coverage to 60%
-- 🎯 **v0.8.0**: Achieve 70% test coverage + performance benchmarks
+- ✅ **v0.7.0**: Code quality improvements and API naming fixes
+- ✅ **v0.8.0**: Official proto integration with enhanced type safety
+- 🎯 **v0.9.0**: Increase test coverage to 70% + performance benchmarks
 - 🎯 **v1.0.0**: 80%+ coverage, complete docs, production-ready
 
-See [`CHANGELOG.md`](CHANGELOG.md) for detailed release notes and [`docs/RELEASE_v0.6.0.md`](docs/RELEASE_v0.6.0.md) for comprehensive release information.
+See [`CHANGELOG.md`](CHANGELOG.md) for detailed release notes and [`docs/v0.8.0_RELEASE_NOTES.md`](docs/v0.8.0_RELEASE_NOTES.md) for comprehensive release information.
 
 ## 🤝 Contributing
 

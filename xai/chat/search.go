@@ -3,7 +3,7 @@ package chat
 import (
 	"time"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -33,7 +33,7 @@ func (ws *WebSource) WithAllowedWebsites(websites ...string) *WebSource {
 
 // WithCountry sets the country for search results.
 func (ws *WebSource) WithCountry(country string) *WebSource {
-	ws.proto.Country = country
+	ws.proto.Country = &country
 	return ws
 }
 
@@ -68,7 +68,7 @@ func (ns *NewsSource) WithExcludedWebsites(websites ...string) *NewsSource {
 
 // WithCountry sets the country for news results.
 func (ns *NewsSource) WithCountry(country string) *NewsSource {
-	ns.proto.Country = country
+	ns.proto.Country = &country
 	return ns
 }
 
@@ -109,13 +109,13 @@ func (xs *XSource) WithExcludedHandles(handles ...string) *XSource {
 
 // WithPostFavoriteCount sets minimum favorite count for posts.
 func (xs *XSource) WithPostFavoriteCount(count int32) *XSource {
-	xs.proto.PostFavoriteCount = count
+	xs.proto.PostFavoriteCount = &count
 	return xs
 }
 
 // WithPostViewCount sets minimum view count for posts.
 func (xs *XSource) WithPostViewCount(count int32) *XSource {
-	xs.proto.PostViewCount = count
+	xs.proto.PostViewCount = &count
 	return xs
 }
 
@@ -152,11 +152,45 @@ type Source struct {
 	proto *xaiv1.Source
 }
 
+// WithWeb sets the web source configuration.
+func (s *Source) WithWeb(web *WebSource) *Source {
+	s.proto.Source = &xaiv1.Source_Web{
+		Web: web.Proto(),
+	}
+	return s
+}
+
+// WithNews sets the news source configuration.
+func (s *Source) WithNews(news *NewsSource) *Source {
+	s.proto.Source = &xaiv1.Source_News{
+		News: news.Proto(),
+	}
+	return s
+}
+
+// WithX sets the X source configuration.
+func (s *Source) WithX(x *XSource) *Source {
+	s.proto.Source = &xaiv1.Source_X{
+		X: x.Proto(),
+	}
+	return s
+}
+
+// WithRss sets the RSS source configuration.
+func (s *Source) WithRss(rss *RssSource) *Source {
+	s.proto.Source = &xaiv1.Source_Rss{
+		Rss: rss.Proto(),
+	}
+	return s
+}
+
 // NewWebSearchSource creates a source with web search configuration.
 func NewWebSearchSource(web *WebSource) *Source {
 	return &Source{
 		proto: &xaiv1.Source{
-			Web: web.Proto(),
+			Source: &xaiv1.Source_Web{
+				Web: web.Proto(),
+			},
 		},
 	}
 }
@@ -165,7 +199,9 @@ func NewWebSearchSource(web *WebSource) *Source {
 func NewNewsSearchSource(news *NewsSource) *Source {
 	return &Source{
 		proto: &xaiv1.Source{
-			News: news.Proto(),
+			Source: &xaiv1.Source_News{
+				News: news.Proto(),
+			},
 		},
 	}
 }
@@ -174,7 +210,9 @@ func NewNewsSearchSource(news *NewsSource) *Source {
 func NewXSearchSource(x *XSource) *Source {
 	return &Source{
 		proto: &xaiv1.Source{
-			X: x.Proto(),
+			Source: &xaiv1.Source_X{
+				X: x.Proto(),
+			},
 		},
 	}
 }
@@ -183,7 +221,9 @@ func NewXSearchSource(x *XSource) *Source {
 func NewRssSearchSource(rss *RssSource) *Source {
 	return &Source{
 		proto: &xaiv1.Source{
-			Rss: rss.Proto(),
+			Source: &xaiv1.Source_Rss{
+				Rss: rss.Proto(),
+			},
 		},
 	}
 }

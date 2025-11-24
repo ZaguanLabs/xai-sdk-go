@@ -58,19 +58,19 @@ func main() {
 
 		for i, content := range msg.Content {
 			fmt.Printf("\nContent[%d]:\n", i)
-			if content.Text != "" {
+			if text := content.GetText(); text != "" {
 				fmt.Printf("  Type: Text\n")
-				fmt.Printf("  Text: %q\n", content.Text)
+				fmt.Printf("  Text: %q\n", text)
 			}
-			if content.ImageUrl != nil {
+			if img := content.GetImageUrl(); img != nil {
 				fmt.Printf("  Type: Image\n")
-				fmt.Printf("  ImageUrl length: %d\n", len(content.ImageUrl.ImageUrl))
-				fmt.Printf("  ImageUrl prefix: %s...\n", content.ImageUrl.ImageUrl[:50])
-				fmt.Printf("  Detail: %v\n", content.ImageUrl.Detail)
+				fmt.Printf("  ImageUrl length: %d\n", len(img.ImageUrl))
+				fmt.Printf("  ImageUrl prefix: %s...\n", img.ImageUrl[:50])
+				fmt.Printf("  Detail: %v\n", img.Detail)
 			}
-			if content.File != nil {
+			if file := content.GetFile(); file != nil {
 				fmt.Printf("  Type: File\n")
-				fmt.Printf("  FileId: %s\n", content.File.FileId)
+				fmt.Printf("  FileId: %s\n", file.FileId)
 			}
 		}
 	}

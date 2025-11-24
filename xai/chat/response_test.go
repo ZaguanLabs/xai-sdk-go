@@ -3,7 +3,7 @@ package chat
 import (
 	"testing"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 )
 
 func TestResponseReasoningContent(t *testing.T) {
@@ -192,9 +192,11 @@ func TestAppendResponse(t *testing.T) {
 							{
 								Id:   "call_123",
 								Type: xaiv1.ToolCallType_TOOL_CALL_TYPE_CLIENT_SIDE_TOOL,
-								Function: &xaiv1.FunctionCall{
-									Name:      "get_weather",
-									Arguments: `{"city": "SF"}`,
+								Tool: &xaiv1.ToolCall_Function{
+									Function: &xaiv1.FunctionCall{
+										Name:      "get_weather",
+										Arguments: `{"city": "SF"}`,
+									},
 								},
 							},
 						},
@@ -221,13 +223,17 @@ func TestAppendResponse(t *testing.T) {
 	}
 
 	// Verify content
-	if len(msg.Content) != 1 || msg.Content[0].Text != "I need to call a tool" {
+	if len(msg.Content) != 1 || msg.Content[0].GetText() != "I need to call a tool" {
 		t.Errorf("Content not preserved correctly")
 	}
 
 	// Verify reasoning content
-	if msg.ReasoningContent != "Let me think about this" {
-		t.Errorf("ReasoningContent = %q, want %q", msg.ReasoningContent, "Let me think about this")
+	if msg.ReasoningContent == nil || *msg.ReasoningContent != "Let me think about this" {
+		var val string
+		if msg.ReasoningContent != nil {
+			val = *msg.ReasoningContent
+		}
+		t.Errorf("ReasoningContent = %q, want %q", val, "Let me think about this")
 	}
 
 	// Verify encrypted content
@@ -276,11 +282,11 @@ func TestAppendResponseMultipleOutputs(t *testing.T) {
 		t.Fatalf("Expected 2 messages, got %d", len(req.proto.Messages))
 	}
 
-	if req.proto.Messages[0].Content[0].Text != "First response" {
+	if req.proto.Messages[0].Content[0].GetText() != "First response" {
 		t.Errorf("First message content incorrect")
 	}
 
-	if req.proto.Messages[1].Content[0].Text != "Second response" {
+	if req.proto.Messages[1].Content[0].GetText() != "Second response" {
 		t.Errorf("Second message content incorrect")
 	}
 

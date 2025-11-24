@@ -1,6 +1,6 @@
 package chat
 
-import xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+import xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 
 // RequestSettings represents the settings that were used for a request.
 // This is returned in the response to show what settings were actually applied.
@@ -10,10 +10,10 @@ type RequestSettings struct {
 
 // MaxTokens returns the max tokens setting.
 func (rs *RequestSettings) MaxTokens() int32 {
-	if rs.proto == nil {
+	if rs.proto == nil || rs.proto.MaxTokens == nil {
 		return 0
 	}
-	return rs.proto.MaxTokens
+	return *rs.proto.MaxTokens
 }
 
 // ParallelToolCalls returns whether parallel tool calls were enabled.
@@ -26,34 +26,34 @@ func (rs *RequestSettings) ParallelToolCalls() bool {
 
 // PreviousResponseID returns the previous response ID if set.
 func (rs *RequestSettings) PreviousResponseID() string {
-	if rs.proto == nil {
+	if rs.proto == nil || rs.proto.PreviousResponseId == nil {
 		return ""
 	}
-	return rs.proto.PreviousResponseId
+	return *rs.proto.PreviousResponseId
 }
 
 // ReasoningEffort returns the reasoning effort level.
 func (rs *RequestSettings) ReasoningEffort() string {
-	if rs.proto == nil {
+	if rs.proto == nil || rs.proto.ReasoningEffort == nil {
 		return ""
 	}
-	return reasoningEffortFromProto(rs.proto.ReasoningEffort)
+	return reasoningEffortFromProto(*rs.proto.ReasoningEffort)
 }
 
 // Temperature returns the temperature setting.
 func (rs *RequestSettings) Temperature() float32 {
-	if rs.proto == nil {
+	if rs.proto == nil || rs.proto.Temperature == nil {
 		return 0
 	}
-	return rs.proto.Temperature
+	return *rs.proto.Temperature
 }
 
 // TopP returns the top_p setting.
 func (rs *RequestSettings) TopP() float32 {
-	if rs.proto == nil {
+	if rs.proto == nil || rs.proto.TopP == nil {
 		return 0
 	}
-	return rs.proto.TopP
+	return *rs.proto.TopP
 }
 
 // User returns the user identifier.

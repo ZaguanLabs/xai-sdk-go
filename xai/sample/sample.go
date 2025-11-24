@@ -4,7 +4,7 @@ package sample
 import (
 	"context"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
 	"google.golang.org/protobuf/encoding/protojson"
 )
@@ -85,15 +85,15 @@ func (c *Client) Sample(ctx context.Context, req *Request) (*Response, error) {
 		Prompt:           req.Prompts,
 		Model:            req.Model,
 		Logprobs:         req.LogProbs,
-		TopLogprobs:      req.TopLogProbs,
-		MaxTokens:        req.MaxTokens,
-		N:                req.N,
-		PresencePenalty:  req.PresencePenalty,
-		Seed:             req.Seed,
+		TopLogprobs:      &req.TopLogProbs,
+		MaxTokens:        &req.MaxTokens,
+		N:                &req.N,
+		PresencePenalty:  &req.PresencePenalty,
+		Seed:             &req.Seed,
 		Stop:             req.Stop,
-		FrequencyPenalty: req.FrequencyPenalty,
-		Temperature:      req.Temperature,
-		TopP:             req.TopP,
+		FrequencyPenalty: &req.FrequencyPenalty,
+		Temperature:      &req.Temperature,
+		TopP:             &req.TopP,
 		User:             req.User,
 	}
 

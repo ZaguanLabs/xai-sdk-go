@@ -1,7 +1,7 @@
 package collections
 
 import (
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 )
 
 // fromProtoCollection converts a proto CollectionMetadata to a Collection.

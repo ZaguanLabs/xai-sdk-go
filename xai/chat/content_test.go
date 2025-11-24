@@ -3,7 +3,7 @@ package chat
 import (
 	"testing"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 )
 
 func TestTextPart(t *testing.T) {
@@ -129,21 +129,21 @@ func TestMessageWithImage(t *testing.T) {
 	}
 
 	// First part should be text
-	if proto.Content[0].Text != "What's in this image?" {
-		t.Errorf("Content[0].Text = %q, want %q", proto.Content[0].Text, "What's in this image?")
+	if proto.Content[0].GetText() != "What's in this image?" {
+		t.Errorf("Content[0].Text = %q, want %q", proto.Content[0].GetText(), "What's in this image?")
 	}
 
 	// Second part should be image
-	if proto.Content[1].ImageUrl == nil {
+	if proto.Content[1].GetImageUrl() == nil {
 		t.Fatal("Content[1].ImageUrl is nil")
 	}
 
-	if proto.Content[1].ImageUrl.ImageUrl != "https://example.com/photo.jpg" {
-		t.Errorf("ImageUrl = %q, want %q", proto.Content[1].ImageUrl.ImageUrl, "https://example.com/photo.jpg")
+	if proto.Content[1].GetImageUrl().ImageUrl != "https://example.com/photo.jpg" {
+		t.Errorf("ImageUrl = %q, want %q", proto.Content[1].GetImageUrl().ImageUrl, "https://example.com/photo.jpg")
 	}
 
-	if proto.Content[1].ImageUrl.Detail != xaiv1.ImageDetail_DETAIL_HIGH {
-		t.Errorf("Detail = %v, want %v", proto.Content[1].ImageUrl.Detail, xaiv1.ImageDetail_DETAIL_HIGH)
+	if proto.Content[1].GetImageUrl().Detail != xaiv1.ImageDetail_DETAIL_HIGH {
+		t.Errorf("Detail = %v, want %v", proto.Content[1].GetImageUrl().Detail, xaiv1.ImageDetail_DETAIL_HIGH)
 	}
 
 	t.Log("✅ Message with image content works correctly")
@@ -162,30 +162,30 @@ func TestMessageWithMultipleImages(t *testing.T) {
 	}
 
 	// First part: text
-	if proto.Content[0].Text != "Compare these images:" {
-		t.Errorf("Content[0].Text = %q, want %q", proto.Content[0].Text, "Compare these images:")
+	if proto.Content[0].GetText() != "Compare these images:" {
+		t.Errorf("Content[0].Text = %q, want %q", proto.Content[0].GetText(), "Compare these images:")
 	}
 
 	// Second part: first image (auto detail)
-	if proto.Content[1].ImageUrl == nil {
+	if proto.Content[1].GetImageUrl() == nil {
 		t.Fatal("Content[1].ImageUrl is nil")
 	}
-	if proto.Content[1].ImageUrl.ImageUrl != "https://example.com/photo1.jpg" {
-		t.Errorf("ImageUrl[1] = %q, want %q", proto.Content[1].ImageUrl.ImageUrl, "https://example.com/photo1.jpg")
+	if proto.Content[1].GetImageUrl().ImageUrl != "https://example.com/photo1.jpg" {
+		t.Errorf("ImageUrl[1] = %q, want %q", proto.Content[1].GetImageUrl().ImageUrl, "https://example.com/photo1.jpg")
 	}
-	if proto.Content[1].ImageUrl.Detail != xaiv1.ImageDetail_DETAIL_AUTO {
-		t.Errorf("Detail[1] = %v, want %v", proto.Content[1].ImageUrl.Detail, xaiv1.ImageDetail_DETAIL_AUTO)
+	if proto.Content[1].GetImageUrl().Detail != xaiv1.ImageDetail_DETAIL_AUTO {
+		t.Errorf("Detail[1] = %v, want %v", proto.Content[1].GetImageUrl().Detail, xaiv1.ImageDetail_DETAIL_AUTO)
 	}
 
 	// Third part: second image (low detail)
-	if proto.Content[2].ImageUrl == nil {
+	if proto.Content[2].GetImageUrl() == nil {
 		t.Fatal("Content[2].ImageUrl is nil")
 	}
-	if proto.Content[2].ImageUrl.ImageUrl != "https://example.com/photo2.jpg" {
-		t.Errorf("ImageUrl[2] = %q, want %q", proto.Content[2].ImageUrl.ImageUrl, "https://example.com/photo2.jpg")
+	if proto.Content[2].GetImageUrl().ImageUrl != "https://example.com/photo2.jpg" {
+		t.Errorf("ImageUrl[2] = %q, want %q", proto.Content[2].GetImageUrl().ImageUrl, "https://example.com/photo2.jpg")
 	}
-	if proto.Content[2].ImageUrl.Detail != xaiv1.ImageDetail_DETAIL_LOW {
-		t.Errorf("Detail[2] = %v, want %v", proto.Content[2].ImageUrl.Detail, xaiv1.ImageDetail_DETAIL_LOW)
+	if proto.Content[2].GetImageUrl().Detail != xaiv1.ImageDetail_DETAIL_LOW {
+		t.Errorf("Detail[2] = %v, want %v", proto.Content[2].GetImageUrl().Detail, xaiv1.ImageDetail_DETAIL_LOW)
 	}
 
 	t.Log("✅ Message with multiple images works correctly")
@@ -203,17 +203,17 @@ func TestMessageWithFile(t *testing.T) {
 	}
 
 	// First part: text
-	if proto.Content[0].Text != "Analyze this document:" {
-		t.Errorf("Content[0].Text = %q, want %q", proto.Content[0].Text, "Analyze this document:")
+	if proto.Content[0].GetText() != "Analyze this document:" {
+		t.Errorf("Content[0].Text = %q, want %q", proto.Content[0].GetText(), "Analyze this document:")
 	}
 
 	// Second part: file
-	if proto.Content[1].File == nil {
+	if proto.Content[1].GetFile() == nil {
 		t.Fatal("Content[1].File is nil")
 	}
 
-	if proto.Content[1].File.FileId != "file-xyz789" {
-		t.Errorf("FileId = %q, want %q", proto.Content[1].File.FileId, "file-xyz789")
+	if proto.Content[1].GetFile().FileId != "file-xyz789" {
+		t.Errorf("FileId = %q, want %q", proto.Content[1].GetFile().FileId, "file-xyz789")
 	}
 
 	t.Log("✅ Message with file content works correctly")
@@ -234,23 +234,23 @@ func TestMessageWithMixedContent(t *testing.T) {
 	}
 
 	// Verify each part type
-	if proto.Content[0].Text != "Here's my question:" {
+	if proto.Content[0].GetText() != "Here's my question:" {
 		t.Error("Content[0] should be text")
 	}
 
-	if proto.Content[1].ImageUrl == nil {
+	if proto.Content[1].GetImageUrl() == nil {
 		t.Error("Content[1] should be image")
 	}
 
-	if proto.Content[2].Text != "What does this chart show?" {
+	if proto.Content[2].GetText() != "What does this chart show?" {
 		t.Error("Content[2] should be text")
 	}
 
-	if proto.Content[3].File == nil {
+	if proto.Content[3].GetFile() == nil {
 		t.Error("Content[3] should be file")
 	}
 
-	if proto.Content[4].Text != "And compare it with this file." {
+	if proto.Content[4].GetText() != "And compare it with this file." {
 		t.Error("Content[4] should be text")
 	}
 
@@ -270,11 +270,11 @@ func TestBase64Image(t *testing.T) {
 		t.Fatalf("Expected 2 content parts, got %d", len(proto.Content))
 	}
 
-	if proto.Content[1].ImageUrl == nil {
+	if proto.Content[1].GetImageUrl() == nil {
 		t.Fatal("Content[1].ImageUrl is nil")
 	}
 
-	if proto.Content[1].ImageUrl.ImageUrl != base64Data {
+	if proto.Content[1].GetImageUrl().ImageUrl != base64Data {
 		t.Errorf("Base64 image URL not preserved correctly")
 	}
 

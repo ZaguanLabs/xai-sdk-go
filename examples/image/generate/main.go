@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/image"
 )
@@ -35,12 +35,14 @@ func main() {
 
 	fmt.Printf("Generated %d image(s)\n", len(resp.Images))
 	for i, img := range resp.Images {
-		if img.URL != "" {
-			fmt.Printf("Image %d URL: %s\n", i+1, img.URL)
+		fmt.Printf("\nImage %d:\n", i+1)
+		if img.URL() != "" {
+			fmt.Printf("  URL: %s\n", img.URL())
 		}
-		if img.UpsampledPrompt != "" {
-			fmt.Printf("Upsampled prompt: %s\n", img.UpsampledPrompt)
+		if img.UpsampledPrompt() != "" {
+			fmt.Printf("  Up-sampled prompt: %s\n", img.UpsampledPrompt())
 		}
+		fmt.Printf("  Respect moderation: %v\n", img.RespectModeration())
 	}
 
 	// Example 2: Multiple images with Base64 format
@@ -57,8 +59,10 @@ func main() {
 
 	fmt.Printf("Generated %d image(s) in Base64 format\n", len(resp2.Images))
 	for i, img := range resp2.Images {
-		if img.Base64 != "" {
-			fmt.Printf("Image %d: Base64 data (%d bytes)\n", i+1, len(img.Base64))
+		fmt.Printf("\nImage %d:\n", i+1)
+		if img.Base64() != "" {
+			fmt.Printf("  Base64 data length: %d chars\n", len(img.Base64()))
+			fmt.Printf("  Base64 prefix: %s...\n", img.Base64()[:50])
 		}
 	}
 
@@ -76,7 +80,7 @@ func main() {
 	if err != nil {
 		log.Printf("Image-to-image generation failed (expected if URL invalid): %v", err)
 	} else {
-		fmt.Printf("Generated image URL: %s\n", resp3.Images[0].URL)
+		fmt.Printf("Generated image URL: %s\n", resp3.Images[0].URL())
 	}
 
 	fmt.Println("\n✅ Image generation examples completed!")

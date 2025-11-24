@@ -127,7 +127,7 @@ def generate_proto_file(module_name, messages, enums, services):
     lines.append('')
     lines.append('package xai_api;')
     lines.append('')
-    lines.append('option go_package = "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1;xaiv1";')
+    lines.append('option go_package = "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1;xaiv1";')
     lines.append('')
     
     # Add imports (simplified - would need to detect actual imports)

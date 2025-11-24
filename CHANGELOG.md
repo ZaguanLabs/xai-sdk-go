@@ -7,6 +7,111 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2025-11-24
+
+### 🎯 Focus: Official Proto Integration & Type Safety
+
+This release integrates official xAI protobuf definitions from the `xai-proto` repository, bringing the SDK into full alignment with xAI's official API specifications. While the public SDK API remains unchanged, the underlying protobuf structures have been significantly enhanced for better type safety and correctness.
+
+### Added
+- **Official Proto Definitions**: Integrated complete protobuf definitions from xAI's official proto repository
+  - Enhanced type safety with proper optional field handling (pointer types)
+  - Proper `oneof` discriminated unions for variant types
+  - Complete gRPC service definitions with streaming support
+  - Better structured nested messages and enums
+- **New Proto Files**: Created complete service definitions for previously inferred APIs
+  - `files.proto`: Complete Files API service definition with streaming upload/download
+  - `collections.proto`: Complete Collections API service definition with document management
+- **Enhanced Message Structures**:
+  - `RequestSettings`: All optional fields properly typed as pointers
+  - `DebugOutput`: Enhanced debugging information structure
+  - `LogProbs`: Token-level log probability information
+  - `ToolCallStatus`: Enum for tracking tool execution status
+
+### Changed
+- **Proto Field Types**: Many fields converted to optional pointer types for better null handling
+  - `ReasoningContent`: `string` → `*string`
+  - `ErrorMessage` in `ToolCall`: `string` → `*string`
+  - `MaxTokens`, `Temperature`, `TopP`: direct values → pointers
+  - `Country`, `PostFavoriteCount`, `PostViewCount`: direct values → pointers
+- **Oneof Field Structures**: Proper discriminated unions for variant types
+  - `Content`: Now has `oneof content` with `Text`, `ImageUrl`, `File` variants
+  - `ToolCall`: Now has `oneof tool` with `Function` variant
+  - `Tool`: Now has `oneof tool` for different tool types (WebSearch, XSearch, etc.)
+  - `EmbedInput`: Now has `oneof input` for text vs. token array
+  - `Source`: Now has `oneof source` for Web, News, X, RSS sources
+- **Field Access**: Oneof fields now require getter methods
+  - Direct field access (e.g., `content.Text`) replaced with getters (e.g., `content.GetText()`)
+  - Safer access with automatic nil handling
+  - Better type safety and compile-time error detection
+
+### Fixed
+- **Type Safety**: All SDK code updated to properly handle pointer types and oneof fields
+  - Added nil checks before dereferencing pointer fields
+  - Used getter methods for safe oneof field access
+  - Proper oneof wrapper construction throughout codebase
+- **Proto Marshaling**: Fixed JSON marshaling for protobuf messages in tests
+  - Switched from `encoding/json` to `protojson` for proper oneof serialization
+  - Ensures correct wire format for API communication
+- **Test Coverage**: Updated all tests to work with new proto structures
+  - Fixed 50+ test files across the entire codebase
+  - All tests passing with new proto definitions
+  - Enhanced test coverage for edge cases
+
+### Internal Changes (No Public API Impact)
+
+⚠️ **Important**: The public SDK API is **completely unchanged**. All existing user code continues to work without modifications.
+
+These changes only affect users who directly access `.proto` fields (advanced/internal usage):
+
+#### Proto Structure Changes
+```go
+// BEFORE (v0.7.0) - Direct field access
+content := &xaiv1.Content{Text: "Hello"}
+text := content.Text
+
+// AFTER (v0.8.0) - Oneof wrapper + getter
+content := &xaiv1.Content{
+    Content: &xaiv1.Content_Text{Text: "Hello"},
+}
+text := content.GetText()
+```
+
+#### Pointer Type Handling
+```go
+// BEFORE (v0.7.0)
+msg.proto.ReasoningContent = "thinking..."
+
+// AFTER (v0.8.0)
+reasoning := "thinking..."
+msg.proto.ReasoningContent = &reasoning
+```
+
+**Migration**: Only needed if you directly construct or access protobuf messages. The high-level SDK API (builders, methods) handles all of this automatically.
+
+### Testing
+- ✅ All 200+ tests passing across entire codebase
+- ✅ `go test ./...`: PASS
+- ✅ `go build ./...`: Success
+- ✅ `go vet ./...`: Clean
+- ✅ All examples compile and run correctly
+
+### Quality Improvements
+- Better alignment with official xAI API specifications
+- Improved type safety through proper optional field handling
+- More robust error handling with nil-safe field access
+- Enhanced code maintainability with proper proto patterns
+
+### Upgrade Guide
+
+**For Normal SDK Users**: No changes needed! Your code will continue to work exactly as before.
+
+**For Advanced Users** (directly accessing `.proto` fields):
+1. Use getter methods for oneof fields: `.GetText()`, `.GetFunction()`, `.GetWeb()`, etc.
+2. Handle nil pointers for optional fields
+3. Use oneof wrappers when constructing proto messages directly
+4. Check for nil before dereferencing pointer fields
+
 ## [0.7.0] - 2025-11-20
 
 ### 🎯 Focus: Code Quality, Linting Fixes & API Improvements

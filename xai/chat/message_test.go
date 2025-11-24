@@ -3,7 +3,7 @@ package chat
 import (
 	"testing"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 )
 
 func TestMessageWithToolCalls(t *testing.T) {
@@ -51,8 +51,12 @@ func TestMessageWithReasoningContent(t *testing.T) {
 	}
 
 	// Verify proto was updated
-	if msg.proto.ReasoningContent != "Let me think about this..." {
-		t.Errorf("Proto ReasoningContent = %q, want %q", msg.proto.ReasoningContent, "Let me think about this...")
+	if msg.proto.ReasoningContent == nil || *msg.proto.ReasoningContent != "Let me think about this..." {
+		var val string
+		if msg.proto.ReasoningContent != nil {
+			val = *msg.proto.ReasoningContent
+		}
+		t.Errorf("Proto ReasoningContent = %q, want %q", val, "Let me think about this...")
 	}
 
 	t.Log("✅ Message.WithReasoningContent() works correctly")
@@ -81,15 +85,21 @@ func TestMessageToolCallsAccessor(t *testing.T) {
 		proto: &xaiv1.Message{
 			Role: xaiv1.MessageRole_ROLE_ASSISTANT,
 			Content: []*xaiv1.Content{
-				{Text: "I'll call a tool"},
+				{
+					Content: &xaiv1.Content_Text{
+						Text: "I'll call a tool",
+					},
+				},
 			},
 			ToolCalls: []*xaiv1.ToolCall{
 				{
 					Id:   "call_456",
 					Type: xaiv1.ToolCallType_TOOL_CALL_TYPE_CLIENT_SIDE_TOOL,
-					Function: &xaiv1.FunctionCall{
-						Name:      "get_time",
-						Arguments: `{"timezone": "UTC"}`,
+					Tool: &xaiv1.ToolCall_Function{
+						Function: &xaiv1.FunctionCall{
+							Name:      "get_time",
+							Arguments: `{"timezone": "UTC"}`,
+						},
 					},
 				},
 			},

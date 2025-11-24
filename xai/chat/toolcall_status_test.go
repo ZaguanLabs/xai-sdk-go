@@ -3,7 +3,7 @@ package chat
 import (
 	"testing"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 )
 
 func TestToolCallStatus(t *testing.T) {
@@ -19,9 +19,11 @@ func TestToolCallStatus(t *testing.T) {
 				Id:     "call_123",
 				Type:   xaiv1.ToolCallType_TOOL_CALL_TYPE_WEB_SEARCH_TOOL,
 				Status: xaiv1.ToolCallStatus_TOOL_CALL_STATUS_IN_PROGRESS,
-				Function: &xaiv1.FunctionCall{
-					Name:      "web_search",
-					Arguments: `{"query":"test"}`,
+				Tool: &xaiv1.ToolCall_Function{
+					Function: &xaiv1.FunctionCall{
+						Name:      "web_search",
+						Arguments: `{"query":"test"}`,
+					},
 				},
 			},
 			expectedStatus: "TOOL_CALL_STATUS_IN_PROGRESS",
@@ -33,9 +35,11 @@ func TestToolCallStatus(t *testing.T) {
 				Id:     "call_456",
 				Type:   xaiv1.ToolCallType_TOOL_CALL_TYPE_CODE_EXECUTION_TOOL,
 				Status: xaiv1.ToolCallStatus_TOOL_CALL_STATUS_COMPLETED,
-				Function: &xaiv1.FunctionCall{
-					Name:      "execute_code",
-					Arguments: `{"code":"print('hello')"}`,
+				Tool: &xaiv1.ToolCall_Function{
+					Function: &xaiv1.FunctionCall{
+						Name:      "execute_code",
+						Arguments: `{"code":"print('hello')"}`,
+					},
 				},
 			},
 			expectedStatus: "TOOL_CALL_STATUS_COMPLETED",
@@ -47,10 +51,12 @@ func TestToolCallStatus(t *testing.T) {
 				Id:           "call_789",
 				Type:         xaiv1.ToolCallType_TOOL_CALL_TYPE_CLIENT_SIDE_TOOL,
 				Status:       xaiv1.ToolCallStatus_TOOL_CALL_STATUS_FAILED,
-				ErrorMessage: "Connection timeout",
-				Function: &xaiv1.FunctionCall{
-					Name:      "get_weather",
-					Arguments: `{"city":"London"}`,
+				ErrorMessage: func() *string { s := "Connection timeout"; return &s }(),
+				Tool: &xaiv1.ToolCall_Function{
+					Function: &xaiv1.FunctionCall{
+						Name:      "get_weather",
+						Arguments: `{"city":"London"}`,
+					},
 				},
 			},
 			expectedStatus: "TOOL_CALL_STATUS_FAILED",
@@ -62,9 +68,11 @@ func TestToolCallStatus(t *testing.T) {
 				Id:     "call_abc",
 				Type:   xaiv1.ToolCallType_TOOL_CALL_TYPE_X_SEARCH_TOOL,
 				Status: xaiv1.ToolCallStatus_TOOL_CALL_STATUS_INCOMPLETE,
-				Function: &xaiv1.FunctionCall{
-					Name:      "x_search",
-					Arguments: `{"query":"#ai"}`,
+				Tool: &xaiv1.ToolCall_Function{
+					Function: &xaiv1.FunctionCall{
+						Name:      "x_search",
+						Arguments: `{"query":"#ai"}`,
+					},
 				},
 			},
 			expectedStatus: "TOOL_CALL_STATUS_INCOMPLETE",
@@ -93,8 +101,8 @@ func TestToolCallStatus(t *testing.T) {
 				t.Errorf("ID() = %q, want %q", toolCall.ID(), tt.protoCall.Id)
 			}
 
-			if toolCall.Name() != tt.protoCall.Function.Name {
-				t.Errorf("Name() = %q, want %q", toolCall.Name(), tt.protoCall.Function.Name)
+			if toolCall.Name() != tt.protoCall.GetFunction().Name {
+				t.Errorf("Name() = %q, want %q", toolCall.Name(), tt.protoCall.GetFunction().Name)
 			}
 		})
 	}
@@ -172,8 +180,12 @@ func TestMessageWithToolCallsStatus(t *testing.T) {
 		t.Errorf("Status = %v, want TOOL_CALL_STATUS_FAILED", protoCall.Status)
 	}
 
-	if protoCall.ErrorMessage != "API rate limit exceeded" {
-		t.Errorf("ErrorMessage = %q, want %q", protoCall.ErrorMessage, "API rate limit exceeded")
+	if protoCall.ErrorMessage == nil || *protoCall.ErrorMessage != "API rate limit exceeded" {
+		var val string
+		if protoCall.ErrorMessage != nil {
+			val = *protoCall.ErrorMessage
+		}
+		t.Errorf("ErrorMessage = %q, want %q", val, "API rate limit exceeded")
 	}
 
 	if protoCall.Id != "call_123" {
@@ -187,10 +199,12 @@ func TestToolCallStatusRoundTrip(t *testing.T) {
 		Id:           "call_xyz",
 		Type:         xaiv1.ToolCallType_TOOL_CALL_TYPE_WEB_SEARCH_TOOL,
 		Status:       xaiv1.ToolCallStatus_TOOL_CALL_STATUS_COMPLETED,
-		ErrorMessage: "",
-		Function: &xaiv1.FunctionCall{
-			Name:      "web_search",
-			Arguments: `{"query":"golang"}`,
+		ErrorMessage: nil,
+		Tool: &xaiv1.ToolCall_Function{
+			Function: &xaiv1.FunctionCall{
+				Name:      "web_search",
+				Arguments: `{"query":"golang"}`,
+			},
 		},
 	}
 
@@ -216,12 +230,14 @@ func TestToolCallStatusRoundTrip(t *testing.T) {
 		t.Errorf("Status mismatch: got %v, want %v", roundTripProto.Status, originalProto.Status)
 	}
 
-	if roundTripProto.ErrorMessage != originalProto.ErrorMessage {
-		t.Errorf("ErrorMessage mismatch: got %q, want %q", roundTripProto.ErrorMessage, originalProto.ErrorMessage)
+	if (roundTripProto.ErrorMessage == nil) != (originalProto.ErrorMessage == nil) {
+		t.Errorf("ErrorMessage nil mismatch")
+	} else if roundTripProto.ErrorMessage != nil && *roundTripProto.ErrorMessage != *originalProto.ErrorMessage {
+		t.Errorf("ErrorMessage mismatch: got %q, want %q", *roundTripProto.ErrorMessage, *originalProto.ErrorMessage)
 	}
 
-	if roundTripProto.Function.Name != originalProto.Function.Name {
-		t.Errorf("Function.Name mismatch: got %q, want %q", roundTripProto.Function.Name, originalProto.Function.Name)
+	if roundTripProto.GetFunction().Name != originalProto.GetFunction().Name {
+		t.Errorf("Function.Name mismatch: got %q, want %q", roundTripProto.GetFunction().Name, originalProto.GetFunction().Name)
 	}
 }
 
@@ -277,7 +293,11 @@ func TestMultipleToolCallsWithDifferentStatuses(t *testing.T) {
 		t.Errorf("Third call status = %v, want FAILED", msg.proto.ToolCalls[2].Status)
 	}
 
-	if msg.proto.ToolCalls[2].ErrorMessage != "Syntax error" {
-		t.Errorf("Third call error = %q, want %q", msg.proto.ToolCalls[2].ErrorMessage, "Syntax error")
+	if msg.proto.ToolCalls[2].ErrorMessage == nil || *msg.proto.ToolCalls[2].ErrorMessage != "Syntax error" {
+		var val string
+		if msg.proto.ToolCalls[2].ErrorMessage != nil {
+			val = *msg.proto.ToolCalls[2].ErrorMessage
+		}
+		t.Errorf("Third call error = %q, want %q", val, "Syntax error")
 	}
 }

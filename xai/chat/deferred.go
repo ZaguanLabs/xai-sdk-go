@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -43,7 +43,7 @@ func (r *DeferredRequest) WithStoreMessages(store bool) *DeferredRequest {
 
 // WithPreviousResponseID sets the previous response ID for conversation continuation.
 func (r *DeferredRequest) WithPreviousResponseID(responseID string) *DeferredRequest {
-	r.proto.PreviousResponseId = responseID
+	r.proto.PreviousResponseId = &responseID
 	return r
 }
 
@@ -81,13 +81,13 @@ func (r *DeferredRequest) SetMessages(messages ...Message) *DeferredRequest {
 
 // WithTemperature sets the temperature for the request.
 func (r *DeferredRequest) WithTemperature(temp float32) *DeferredRequest {
-	r.proto.Temperature = temp
+	r.proto.Temperature = &temp
 	return r
 }
 
 // WithMaxTokens sets the maximum number of tokens for the request.
 func (r *DeferredRequest) WithMaxTokens(maxTokens int32) *DeferredRequest {
-	r.proto.MaxTokens = maxTokens
+	r.proto.MaxTokens = &maxTokens
 	return r
 }
 

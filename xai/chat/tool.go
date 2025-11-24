@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -347,7 +347,9 @@ func WebSearchTool(opts ...WebSearchOption) *ServerTool {
 	}
 	return &ServerTool{
 		proto: &xaiv1.Tool{
-			WebSearch: ws,
+			Tool: &xaiv1.Tool_WebSearch{
+				WebSearch: ws,
+			},
 		},
 	}
 }
@@ -372,7 +374,7 @@ func WithAllowedDomains(domains ...string) WebSearchOption {
 // WithImageUnderstanding enables image understanding in web search results.
 func WithImageUnderstanding(enable bool) WebSearchOption {
 	return func(ws *xaiv1.WebSearch) {
-		ws.EnableImageUnderstanding = enable
+		ws.EnableImageUnderstanding = &enable
 	}
 }
 
@@ -385,7 +387,9 @@ func XSearchTool(opts ...XSearchOption) *ServerTool {
 	}
 	return &ServerTool{
 		proto: &xaiv1.Tool{
-			XSearch: xs,
+			Tool: &xaiv1.Tool_XSearch{
+				XSearch: xs,
+			},
 		},
 	}
 }
@@ -422,14 +426,14 @@ func WithExcludedXHandles(handles ...string) XSearchOption {
 // WithXImageUnderstanding enables image understanding in X search results.
 func WithXImageUnderstanding(enable bool) XSearchOption {
 	return func(xs *xaiv1.XSearch) {
-		xs.EnableImageUnderstanding = enable
+		xs.EnableImageUnderstanding = &enable
 	}
 }
 
 // WithXVideoUnderstanding enables video understanding in X search results.
 func WithXVideoUnderstanding(enable bool) XSearchOption {
 	return func(xs *xaiv1.XSearch) {
-		xs.EnableVideoUnderstanding = enable
+		xs.EnableVideoUnderstanding = &enable
 	}
 }
 
@@ -438,7 +442,9 @@ func WithXVideoUnderstanding(enable bool) XSearchOption {
 func CodeExecutionTool() *ServerTool {
 	return &ServerTool{
 		proto: &xaiv1.Tool{
-			CodeExecution: &xaiv1.CodeExecution{},
+			Tool: &xaiv1.Tool_CodeExecution{
+				CodeExecution: &xaiv1.CodeExecution{},
+			},
 		},
 	}
 }
@@ -454,7 +460,9 @@ func CollectionsSearchTool(collectionIDs []string, opts ...CollectionsSearchOpti
 	}
 	return &ServerTool{
 		proto: &xaiv1.Tool{
-			CollectionsSearch: cs,
+			Tool: &xaiv1.Tool_CollectionsSearch{
+				CollectionsSearch: cs,
+			},
 		},
 	}
 }
@@ -465,7 +473,7 @@ type CollectionsSearchOption func(*xaiv1.CollectionsSearch)
 // WithCollectionsLimit sets the maximum number of results.
 func WithCollectionsLimit(limit int32) CollectionsSearchOption {
 	return func(cs *xaiv1.CollectionsSearch) {
-		cs.Limit = limit
+		cs.Limit = &limit
 	}
 }
 
@@ -478,7 +486,9 @@ func DocumentSearchTool(opts ...DocumentSearchOption) *ServerTool {
 	}
 	return &ServerTool{
 		proto: &xaiv1.Tool{
-			DocumentSearch: ds,
+			Tool: &xaiv1.Tool_DocumentSearch{
+				DocumentSearch: ds,
+			},
 		},
 	}
 }
@@ -489,7 +499,7 @@ type DocumentSearchOption func(*xaiv1.DocumentSearch)
 // WithDocumentLimit sets the maximum number of document results.
 func WithDocumentLimit(limit int32) DocumentSearchOption {
 	return func(ds *xaiv1.DocumentSearch) {
-		ds.Limit = limit
+		ds.Limit = &limit
 	}
 }
 
@@ -505,7 +515,9 @@ func MCPTool(serverLabel, serverURL string, opts ...MCPOption) *ServerTool {
 	}
 	return &ServerTool{
 		proto: &xaiv1.Tool{
-			Mcp: mcp,
+			Tool: &xaiv1.Tool_Mcp{
+				Mcp: mcp,
+			},
 		},
 	}
 }
@@ -530,18 +542,18 @@ func WithMCPAllowedTools(toolNames ...string) MCPOption {
 // WithMCPAuthorization sets the authorization header for MCP server.
 func WithMCPAuthorization(auth string) MCPOption {
 	return func(mcp *xaiv1.MCP) {
-		mcp.Authorization = auth
+		mcp.Authorization = &auth
 	}
 }
 
 // WithMCPExtraHeaders adds extra headers for MCP server requests.
 func WithMCPExtraHeaders(headers map[string]string) MCPOption {
 	return func(mcp *xaiv1.MCP) {
+		if mcp.ExtraHeaders == nil {
+			mcp.ExtraHeaders = make(map[string]string)
+		}
 		for key, value := range headers {
-			mcp.ExtraHeaders = append(mcp.ExtraHeaders, &xaiv1.MCP_ExtraHeadersEntry{
-				Key:   key,
-				Value: value,
-			})
+			mcp.ExtraHeaders[key] = value
 		}
 	}
 }

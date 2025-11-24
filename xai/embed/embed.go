@@ -4,7 +4,7 @@ package embed
 import (
 	"context"
 
-	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/v1"
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
 	"google.golang.org/protobuf/encoding/protojson"
 )
@@ -67,7 +67,9 @@ type Input struct {
 func Text(text string) Input {
 	return Input{
 		proto: &xaiv1.EmbedInput{
-			String_: text,
+			Input: &xaiv1.EmbedInput_String_{
+				String_: text,
+			},
 		},
 	}
 }
@@ -76,9 +78,11 @@ func Text(text string) Input {
 func Image(imageURL string, detail xaiv1.ImageDetail) Input {
 	return Input{
 		proto: &xaiv1.EmbedInput{
-			ImageUrl: &xaiv1.ImageUrlContent{
-				ImageUrl: imageURL,
-				Detail:   detail,
+			Input: &xaiv1.EmbedInput_ImageUrl{
+				ImageUrl: &xaiv1.ImageUrlContent{
+					ImageUrl: imageURL,
+					Detail:   detail,
+				},
 			},
 		},
 	}

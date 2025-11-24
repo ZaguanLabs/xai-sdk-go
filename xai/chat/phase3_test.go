@@ -83,8 +83,12 @@ func TestWebSource(t *testing.T) {
 		t.Errorf("AllowedWebsites[0] = %q, want %q", proto.AllowedWebsites[0], "trusted.com")
 	}
 
-	if proto.Country != "US" {
-		t.Errorf("Country = %q, want %q", proto.Country, "US")
+	if proto.Country == nil || *proto.Country != "US" {
+		var val string
+		if proto.Country != nil {
+			val = *proto.Country
+		}
+		t.Errorf("Country = %q, want %q", val, "US")
 	}
 
 	if !proto.SafeSearch {
@@ -106,8 +110,12 @@ func TestNewsSource(t *testing.T) {
 		t.Errorf("ExcludedWebsites length = %d, want 1", len(proto.ExcludedWebsites))
 	}
 
-	if proto.Country != "UK" {
-		t.Errorf("Country = %q, want %q", proto.Country, "UK")
+	if proto.Country == nil || *proto.Country != "UK" {
+		var val string
+		if proto.Country != nil {
+			val = *proto.Country
+		}
+		t.Errorf("Country = %q, want %q", val, "UK")
 	}
 
 	if !proto.SafeSearch {
@@ -138,12 +146,20 @@ func TestXSource(t *testing.T) {
 		t.Errorf("ExcludedXHandles length = %d, want 1", len(proto.ExcludedXHandles))
 	}
 
-	if proto.PostFavoriteCount != 100 {
-		t.Errorf("PostFavoriteCount = %d, want 100", proto.PostFavoriteCount)
+	if proto.PostFavoriteCount == nil || *proto.PostFavoriteCount != 100 {
+		var val int32
+		if proto.PostFavoriteCount != nil {
+			val = *proto.PostFavoriteCount
+		}
+		t.Errorf("PostFavoriteCount = %d, want 100", val)
 	}
 
-	if proto.PostViewCount != 1000 {
-		t.Errorf("PostViewCount = %d, want 1000", proto.PostViewCount)
+	if proto.PostViewCount == nil || *proto.PostViewCount != 1000 {
+		var val int32
+		if proto.PostViewCount != nil {
+			val = *proto.PostViewCount
+		}
+		t.Errorf("PostViewCount = %d, want 1000", val)
 	}
 
 	t.Log("✅ XSource works correctly")
@@ -182,12 +198,12 @@ func TestSearchParametersWithWebSource(t *testing.T) {
 		t.Fatalf("Sources length = %d, want 1", len(proto.Sources))
 	}
 
-	if proto.Sources[0].Web == nil {
+	if proto.Sources[0].GetWeb() == nil {
 		t.Fatal("Web source is nil")
 	}
 
-	if len(proto.Sources[0].Web.AllowedWebsites) != 1 {
-		t.Errorf("AllowedWebsites length = %d, want 1", len(proto.Sources[0].Web.AllowedWebsites))
+	if len(proto.Sources[0].GetWeb().AllowedWebsites) != 1 {
+		t.Errorf("AllowedWebsites length = %d, want 1", len(proto.Sources[0].GetWeb().AllowedWebsites))
 	}
 
 	t.Log("✅ SearchParameters with WebSource works correctly")
@@ -214,19 +230,19 @@ func TestSearchParametersWithMultipleSources(t *testing.T) {
 	}
 
 	// Verify each source type
-	if proto.Sources[0].Web == nil {
+	if proto.Sources[0].GetWeb() == nil {
 		t.Error("First source should be Web")
 	}
 
-	if proto.Sources[1].News == nil {
+	if proto.Sources[1].GetNews() == nil {
 		t.Error("Second source should be News")
 	}
 
-	if proto.Sources[2].X == nil {
+	if proto.Sources[2].GetX() == nil {
 		t.Error("Third source should be X")
 	}
 
-	if proto.Sources[3].Rss == nil {
+	if proto.Sources[3].GetRss() == nil {
 		t.Error("Fourth source should be RSS")
 	}
 
@@ -265,8 +281,12 @@ func TestSearchParametersComplete(t *testing.T) {
 		t.Error("ReturnCitations = false, want true")
 	}
 
-	if proto.MaxSearchResults != 10 {
-		t.Errorf("MaxSearchResults = %d, want 10", proto.MaxSearchResults)
+	if proto.MaxSearchResults == nil || *proto.MaxSearchResults != 10 {
+		var val int32
+		if proto.MaxSearchResults != nil {
+			val = *proto.MaxSearchResults
+		}
+		t.Errorf("MaxSearchResults = %d, want 10", val)
 	}
 
 	if len(proto.Sources) != 1 {
