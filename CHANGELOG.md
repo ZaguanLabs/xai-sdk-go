@@ -7,6 +7,70 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2025-12-01
+
+### 🎯 Focus: Python SDK v1.4.1 Parity - Include Options & Inline Citations
+
+This release brings the Go SDK up to parity with Python SDK v1.4.1 by adding support for include options, inline citations, and tool call type tracking.
+
+### Added
+
+#### Include Options
+- **`IncludeOption` type**: New type for specifying additional output to include in responses
+  - `IncludeWebSearchCallOutput`: Include web search call output
+  - `IncludeXSearchCallOutput`: Include X search call output
+  - `IncludeCodeExecutionCallOutput`: Include code execution call output
+  - `IncludeCollectionsSearchCallOutput`: Include collections search call output
+  - `IncludeDocumentSearchCallOutput`: Include document search call output
+  - `IncludeMCPCallOutput`: Include MCP call output
+  - `IncludeInlineCitations`: Include inline citations in responses
+- **`WithInclude()`**: Functional option to set include options on requests
+- **`Request.SetInclude()`**: Method to set include options on requests
+
+#### Inline Citations
+- **`InlineCitation` type**: Represents inline citations in response content
+  - `ID()`: Unique identifier for the citation
+  - `StartIndex()`: Character index where the citation starts
+  - `WebCitation()`: Web citation details (URL)
+  - `XCitation()`: X/Twitter citation details (URL)
+  - `CollectionsCitation()`: Collections citation details (file ID, chunk ID, content, score)
+- **`WebCitationInfo` type**: Details about web citations
+- **`XCitationInfo` type**: Details about X/Twitter citations
+- **`CollectionsCitationInfo` type**: Details about collections citations
+- **`Response.InlineCitations()`**: Access inline citations from responses
+- **`Chunk.InlineCitations()`**: Access inline citations from streaming chunks
+
+#### Tool Call Type Tracking
+- **`ToolCallType` type**: Indicates whether a tool call is client-side or server-side
+  - `ToolCallTypeClientSide`: Client-side tool (needs client execution)
+  - `ToolCallTypeWebSearch`: Server-side web search tool
+  - `ToolCallTypeXSearch`: Server-side X search tool
+  - `ToolCallTypeCodeExecution`: Server-side code execution tool
+  - `ToolCallTypeCollectionsSearch`: Server-side collections search tool
+  - `ToolCallTypeMCP`: Server-side MCP tool
+  - `ToolCallTypeDocumentSearch`: Server-side document search tool
+- **`ToolCall.Type()`**: Returns the tool call type
+- **`ToolCall.IsClientSide()`**: Returns true if the tool call needs client execution
+- **`ToolCall.IsServerSide()`**: Returns true if the tool call was executed server-side
+
+### Proto Updates
+- Added `IncludeOption` enum to `chat.proto`
+- Added `include` field to `GetCompletionsRequest` and `RequestSettings`
+- Added `InlineCitation`, `WebCitation`, `XCitation`, `CollectionsCitation` messages
+- Added `citations` field to `CompletionMessage` and `Delta` messages
+
+### Testing
+- Added comprehensive tests for include options
+- Added comprehensive tests for inline citations
+- Added comprehensive tests for tool call type tracking
+- All 200+ tests passing
+
+### Python SDK Parity
+This release achieves parity with Python SDK v1.4.1 features:
+- ✅ Include options for response customization
+- ✅ Inline citations with web, X, and collections support
+- ✅ Tool call type tracking (client-side vs server-side)
+
 ## [0.8.0] - 2025-11-24
 
 ### 🎯 Focus: Official Proto Integration & Type Safety

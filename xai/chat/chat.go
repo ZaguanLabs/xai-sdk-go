@@ -519,6 +519,18 @@ func WithUseEncryptedContent(encrypted bool) RequestOption {
 	}
 }
 
+// WithInclude sets the include options for the request.
+// This allows requesting additional output like tool call outputs or inline citations.
+func WithInclude(options ...IncludeOption) RequestOption {
+	return func(r *Request) {
+		protoOpts := make([]xaiv1.IncludeOption, len(options))
+		for i, opt := range options {
+			protoOpts[i] = includeOptionToProto(opt)
+		}
+		r.proto.Include = protoOpts
+	}
+}
+
 // SetTemperature sets the temperature for sampling.
 func (r *Request) SetTemperature(temp float32) *Request {
 	r.proto.Temperature = &temp
@@ -636,6 +648,17 @@ func (r *Request) SetStoreMessages(store bool) *Request {
 // If true, content will be encrypted for enhanced security.
 func (r *Request) SetUseEncryptedContent(encrypted bool) *Request {
 	r.proto.UseEncryptedContent = encrypted
+	return r
+}
+
+// SetInclude sets the include options for the request.
+// This allows requesting additional output like tool call outputs or inline citations.
+func (r *Request) SetInclude(options ...IncludeOption) *Request {
+	protoOpts := make([]xaiv1.IncludeOption, len(options))
+	for i, opt := range options {
+		protoOpts[i] = includeOptionToProto(opt)
+	}
+	r.proto.Include = protoOpts
 	return r
 }
 
@@ -976,6 +999,7 @@ func parseToolCall(protoCall *xaiv1.ToolCall) *ToolCall {
 		arguments:    arguments,
 		status:       protoCall.Status.String(),
 		errorMessage: errorMessage,
+		toolType:     toolCallTypeFromProto(protoCall.Type),
 	}
 }
 
@@ -1142,6 +1166,28 @@ func (r *Response) DebugOutput() *DebugOutput {
 	return &DebugOutput{proto: r.proto.DebugOutput}
 }
 
+// InlineCitations returns the inline citations from the response.
+// Only present when INCLUDE_OPTION_INLINE_CITATIONS is requested.
+func (r *Response) InlineCitations() []*InlineCitation {
+	if r.proto == nil || len(r.proto.Outputs) == 0 {
+		return nil
+	}
+	if r.proto.Outputs[0] == nil || r.proto.Outputs[0].Message == nil {
+		return nil
+	}
+
+	protoCitations := r.proto.Outputs[0].Message.Citations
+	if len(protoCitations) == 0 {
+		return nil
+	}
+
+	citations := make([]*InlineCitation, len(protoCitations))
+	for i, pc := range protoCitations {
+		citations[i] = &InlineCitation{proto: pc}
+	}
+	return citations
+}
+
 // Chunk methods
 
 // Content returns the content of the chunk.
@@ -1252,6 +1298,28 @@ func (c *Chunk) SystemFingerprint() string {
 		return ""
 	}
 	return c.proto.SystemFingerprint
+}
+
+// InlineCitations returns the inline citations from the chunk.
+// Only present when INCLUDE_OPTION_INLINE_CITATIONS is requested.
+func (c *Chunk) InlineCitations() []*InlineCitation {
+	if c.proto == nil || len(c.proto.Outputs) == 0 {
+		return nil
+	}
+	if c.proto.Outputs[0] == nil || c.proto.Outputs[0].Delta == nil {
+		return nil
+	}
+
+	protoCitations := c.proto.Outputs[0].Delta.Citations
+	if len(protoCitations) == 0 {
+		return nil
+	}
+
+	citations := make([]*InlineCitation, len(protoCitations))
+	for i, pc := range protoCitations {
+		citations[i] = &InlineCitation{proto: pc}
+	}
+	return citations
 }
 
 // TokenUsage represents token usage information.

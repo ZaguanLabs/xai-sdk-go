@@ -8,7 +8,7 @@
 
 > **Note**: This is an unofficial, community-maintained SDK and is not affiliated with or endorsed by xAI.
 
-> **Status**: **v0.8.0 Released** - Official xAI protobuf integration with enhanced type safety. Public SDK API unchanged - fully backward compatible. **Requires Go 1.24+** due to gRPC v1.76.0 dependency.
+> **Status**: **v0.9.0 Released** - Python SDK v1.4.1 parity with include options, inline citations, and tool call type tracking. **Requires Go 1.24+** due to gRPC v1.76.0 dependency.
 
 ## ✨ Features
 
@@ -47,7 +47,7 @@
 **Requirements**: Go 1.24 or later (required by gRPC v1.76.0)
 
 ```bash
-go get github.com/ZaguanLabs/xai-sdk-go@v0.8.0
+go get github.com/ZaguanLabs/xai-sdk-go@v0.9.0
 ```
 
 ### Basic Usage

@@ -33,6 +33,25 @@ service Chat {
   rpc DeleteStoredCompletion(DeleteStoredCompletionRequest) returns (DeleteStoredCompletionResponse) {}
 }
 
+// Options for including additional output in responses.
+enum IncludeOption {
+  INCLUDE_OPTION_INVALID = 0;
+  // Include web search call output in the response.
+  INCLUDE_OPTION_WEB_SEARCH_CALL_OUTPUT = 1;
+  // Include X search call output in the response.
+  INCLUDE_OPTION_X_SEARCH_CALL_OUTPUT = 2;
+  // Include code execution call output in the response.
+  INCLUDE_OPTION_CODE_EXECUTION_CALL_OUTPUT = 3;
+  // Include collections search call output in the response.
+  INCLUDE_OPTION_COLLECTIONS_SEARCH_CALL_OUTPUT = 4;
+  // Include document search call output in the response.
+  INCLUDE_OPTION_DOCUMENT_SEARCH_CALL_OUTPUT = 5;
+  // Include MCP call output in the response.
+  INCLUDE_OPTION_MCP_CALL_OUTPUT = 6;
+  // Include inline citations in the response.
+  INCLUDE_OPTION_INLINE_CITATIONS = 7;
+}
+
 message GetCompletionsRequest {
   reserved 4;
 
@@ -161,6 +180,10 @@ message GetCompletionsRequest {
   // With parallel tool calls, multiple tool calls can occur within a single turn,
   // so max_turns does not necessarily equal the total number of tool calls.
   optional int32 max_turns = 25;
+
+  // A list of output options to include in the response.
+  // Use this to request additional data like tool call outputs or inline citations.
+  repeated IncludeOption include = 26;
 }
 
 message GetChatCompletionResponse {
@@ -279,6 +302,10 @@ message CompletionMessage {
 
   // The encrypted content.
   string encrypted_content = 5;
+
+  // Inline citations in the response content.
+  // Only present when INCLUDE_OPTION_INLINE_CITATIONS is requested.
+  repeated InlineCitation citations = 6;
 }
 
 // Holds the differences (deltas) that when concatenated make up the entire
@@ -314,6 +341,58 @@ message Delta {
 
   // The encrypted content.
   string encrypted_content = 5;
+
+  // Inline citations in the response content.
+  // Only present when INCLUDE_OPTION_INLINE_CITATIONS is requested.
+  repeated InlineCitation citations = 6;
+}
+
+// Represents an inline citation in the response content.
+message InlineCitation {
+  // Unique identifier for this citation.
+  string id = 1;
+
+  // The character index in the content where this citation starts.
+  int32 start_index = 2;
+
+  // Web citation details (if this is a web citation).
+  WebCitation web_citation = 3;
+
+  // X citation details (if this is an X/Twitter citation).
+  XCitation x_citation = 4;
+
+  // Collections citation details (if this is a collections citation).
+  CollectionsCitation collections_citation = 5;
+}
+
+// Citation from a web source.
+message WebCitation {
+  // The URL of the web source.
+  string url = 1;
+}
+
+// Citation from X (Twitter).
+message XCitation {
+  // The URL of the X post.
+  string url = 1;
+}
+
+// Citation from a collections search.
+message CollectionsCitation {
+  // The file ID of the cited document.
+  string file_id = 1;
+
+  // The chunk ID within the file.
+  string chunk_id = 2;
+
+  // The content of the cited chunk.
+  string chunk_content = 3;
+
+  // The relevance score of this citation.
+  float score = 4;
+
+  // The collection IDs this citation belongs to.
+  repeated string collection_ids = 5;
 }
 
 // Holding the log probabilities of the sampling.
@@ -878,6 +957,9 @@ message RequestSettings {
 
   // Whether to use encrypted thinking for thinking trace rehydration.
   bool use_encrypted_content = 13;
+
+  // A list of output options included in the response.
+  repeated IncludeOption include = 14;
 }
 
 // Request to retrieve a stored completion response.

@@ -168,6 +168,7 @@ type ToolCall struct {
 	arguments    map[string]interface{}
 	status       string
 	errorMessage string
+	toolType     ToolCallType
 }
 
 // NewToolCall creates a new tool call.
@@ -205,6 +206,21 @@ func (tc *ToolCall) Status() string {
 // ErrorMessage returns the tool call error message.
 func (tc *ToolCall) ErrorMessage() string {
 	return tc.errorMessage
+}
+
+// Type returns the tool call type (client-side or server-side tool type).
+func (tc *ToolCall) Type() ToolCallType {
+	return tc.toolType
+}
+
+// IsClientSide returns true if this is a client-side tool call that needs to be executed by the client.
+func (tc *ToolCall) IsClientSide() bool {
+	return tc.toolType == ToolCallTypeClientSide || tc.toolType == ""
+}
+
+// IsServerSide returns true if this is a server-side tool call that was executed by the server.
+func (tc *ToolCall) IsServerSide() bool {
+	return tc.toolType != "" && tc.toolType != ToolCallTypeClientSide
 }
 
 // Function returns a function representation of the tool call.
