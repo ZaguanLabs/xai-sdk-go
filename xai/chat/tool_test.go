@@ -428,3 +428,118 @@ func TestToolCallJSON(t *testing.T) {
 
 	t.Logf("✅ ToolCall JSON: %s", string(jsonBytes))
 }
+
+func TestCollectionsSearchToolOptions(t *testing.T) {
+	// Test basic collections search tool
+	tool := CollectionsSearchTool([]string{"col-1", "col-2"})
+	if tool.Proto() == nil {
+		t.Fatal("Expected non-nil proto")
+	}
+	cs := tool.Proto().GetCollectionsSearch()
+	if cs == nil {
+		t.Fatal("Expected CollectionsSearch tool")
+	}
+	if len(cs.CollectionIds) != 2 {
+		t.Errorf("Expected 2 collection IDs, got %d", len(cs.CollectionIds))
+	}
+
+	// Test with limit
+	tool = CollectionsSearchTool([]string{"col-1"}, WithCollectionsLimit(5))
+	cs = tool.Proto().GetCollectionsSearch()
+	if cs.Limit == nil || *cs.Limit != 5 {
+		t.Errorf("Expected limit 5, got %v", cs.Limit)
+	}
+
+	// Test with instructions
+	tool = CollectionsSearchTool([]string{"col-1"}, WithCollectionsInstructions("Focus on recent documents"))
+	cs = tool.Proto().GetCollectionsSearch()
+	if cs.Instructions == nil || *cs.Instructions != "Focus on recent documents" {
+		t.Errorf("Expected instructions 'Focus on recent documents', got %v", cs.Instructions)
+	}
+
+	// Test with hybrid retrieval
+	tool = CollectionsSearchTool([]string{"col-1"}, WithHybridRetrieval())
+	cs = tool.Proto().GetCollectionsSearch()
+	if cs.GetHybridRetrieval() == nil {
+		t.Error("Expected HybridRetrieval to be set")
+	}
+
+	// Test with semantic retrieval
+	tool = CollectionsSearchTool([]string{"col-1"}, WithSemanticRetrieval())
+	cs = tool.Proto().GetCollectionsSearch()
+	if cs.GetSemanticRetrieval() == nil {
+		t.Error("Expected SemanticRetrieval to be set")
+	}
+
+	// Test with keyword retrieval
+	tool = CollectionsSearchTool([]string{"col-1"}, WithKeywordRetrieval())
+	cs = tool.Proto().GetCollectionsSearch()
+	if cs.GetKeywordRetrieval() == nil {
+		t.Error("Expected KeywordRetrieval to be set")
+	}
+
+	// Test with multiple options
+	tool = CollectionsSearchTool([]string{"col-1", "col-2"},
+		WithCollectionsLimit(10),
+		WithCollectionsInstructions("Search for API documentation"),
+		WithSemanticRetrieval(),
+	)
+	cs = tool.Proto().GetCollectionsSearch()
+	if cs.Limit == nil || *cs.Limit != 10 {
+		t.Errorf("Expected limit 10, got %v", cs.Limit)
+	}
+	if cs.Instructions == nil || *cs.Instructions != "Search for API documentation" {
+		t.Errorf("Expected instructions 'Search for API documentation', got %v", cs.Instructions)
+	}
+	if cs.GetSemanticRetrieval() == nil {
+		t.Error("Expected SemanticRetrieval to be set")
+	}
+}
+
+func TestAttachmentSearchTool(t *testing.T) {
+	// Test basic attachment search tool
+	tool := AttachmentSearchTool()
+	if tool.Proto() == nil {
+		t.Fatal("Expected non-nil proto")
+	}
+	as := tool.Proto().GetAttachmentSearch()
+	if as == nil {
+		t.Fatal("Expected AttachmentSearch tool")
+	}
+
+	// Test with limit
+	tool = AttachmentSearchTool(WithAttachmentLimit(10))
+	as = tool.Proto().GetAttachmentSearch()
+	if as.Limit == nil || *as.Limit != 10 {
+		t.Errorf("Expected limit 10, got %v", as.Limit)
+	}
+}
+
+func TestGetToolCallType(t *testing.T) {
+	// Test with nil
+	result := GetToolCallType(nil)
+	if result != "" {
+		t.Errorf("Expected empty string for nil, got %q", result)
+	}
+
+	// Test with client-side tool
+	tc := &ToolCall{toolType: ToolCallTypeClientSide}
+	result = GetToolCallType(tc)
+	if result != "client_side" {
+		t.Errorf("Expected 'client_side', got %q", result)
+	}
+
+	// Test with web search tool
+	tc = &ToolCall{toolType: ToolCallTypeWebSearch}
+	result = GetToolCallType(tc)
+	if result != "web_search" {
+		t.Errorf("Expected 'web_search', got %q", result)
+	}
+
+	// Test with attachment search tool
+	tc = &ToolCall{toolType: ToolCallTypeAttachmentSearch}
+	result = GetToolCallType(tc)
+	if result != "attachment_search" {
+		t.Errorf("Expected 'attachment_search', got %q", result)
+	}
+}

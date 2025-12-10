@@ -16,7 +16,8 @@ func TestIncludeOptionConversion(t *testing.T) {
 		{"XSearchCallOutput", IncludeXSearchCallOutput, xaiv1.IncludeOption_INCLUDE_OPTION_X_SEARCH_CALL_OUTPUT},
 		{"CodeExecutionCallOutput", IncludeCodeExecutionCallOutput, xaiv1.IncludeOption_INCLUDE_OPTION_CODE_EXECUTION_CALL_OUTPUT},
 		{"CollectionsSearchCallOutput", IncludeCollectionsSearchCallOutput, xaiv1.IncludeOption_INCLUDE_OPTION_COLLECTIONS_SEARCH_CALL_OUTPUT},
-		{"DocumentSearchCallOutput", IncludeDocumentSearchCallOutput, xaiv1.IncludeOption_INCLUDE_OPTION_DOCUMENT_SEARCH_CALL_OUTPUT},
+		{"AttachmentSearchCallOutput", IncludeAttachmentSearchCallOutput, xaiv1.IncludeOption_INCLUDE_OPTION_ATTACHMENT_SEARCH_CALL_OUTPUT},
+		{"VerboseStreaming", IncludeVerboseStreaming, xaiv1.IncludeOption_INCLUDE_OPTION_VERBOSE_STREAMING},
 		{"MCPCallOutput", IncludeMCPCallOutput, xaiv1.IncludeOption_INCLUDE_OPTION_MCP_CALL_OUTPUT},
 		{"InlineCitations", IncludeInlineCitations, xaiv1.IncludeOption_INCLUDE_OPTION_INLINE_CITATIONS},
 		{"Invalid", IncludeOption("invalid"), xaiv1.IncludeOption_INCLUDE_OPTION_INVALID},
@@ -42,7 +43,8 @@ func TestIncludeOptionFromProtoConversion(t *testing.T) {
 		{"XSearchCallOutput", xaiv1.IncludeOption_INCLUDE_OPTION_X_SEARCH_CALL_OUTPUT, IncludeXSearchCallOutput},
 		{"CodeExecutionCallOutput", xaiv1.IncludeOption_INCLUDE_OPTION_CODE_EXECUTION_CALL_OUTPUT, IncludeCodeExecutionCallOutput},
 		{"CollectionsSearchCallOutput", xaiv1.IncludeOption_INCLUDE_OPTION_COLLECTIONS_SEARCH_CALL_OUTPUT, IncludeCollectionsSearchCallOutput},
-		{"DocumentSearchCallOutput", xaiv1.IncludeOption_INCLUDE_OPTION_DOCUMENT_SEARCH_CALL_OUTPUT, IncludeDocumentSearchCallOutput},
+		{"AttachmentSearchCallOutput", xaiv1.IncludeOption_INCLUDE_OPTION_ATTACHMENT_SEARCH_CALL_OUTPUT, IncludeAttachmentSearchCallOutput},
+		{"VerboseStreaming", xaiv1.IncludeOption_INCLUDE_OPTION_VERBOSE_STREAMING, IncludeVerboseStreaming},
 		{"MCPCallOutput", xaiv1.IncludeOption_INCLUDE_OPTION_MCP_CALL_OUTPUT, IncludeMCPCallOutput},
 		{"InlineCitations", xaiv1.IncludeOption_INCLUDE_OPTION_INLINE_CITATIONS, IncludeInlineCitations},
 		{"Invalid", xaiv1.IncludeOption_INCLUDE_OPTION_INVALID, ""},
@@ -112,10 +114,16 @@ func TestInlineCitation(t *testing.T) {
 		t.Error("Expected nil CollectionsCitation for nil proto")
 	}
 
+	// Test EndIndex with nil proto
+	if ic.EndIndex() != 0 {
+		t.Error("Expected 0 EndIndex for nil proto")
+	}
+
 	// Test with web citation
 	webCitation := &xaiv1.InlineCitation{
 		Id:         "cite-1",
 		StartIndex: 42,
+		EndIndex:   55,
 		WebCitation: &xaiv1.WebCitation{
 			Url: "https://example.com",
 		},
@@ -126,6 +134,9 @@ func TestInlineCitation(t *testing.T) {
 	}
 	if ic.StartIndex() != 42 {
 		t.Errorf("Expected StartIndex 42, got %d", ic.StartIndex())
+	}
+	if ic.EndIndex() != 55 {
+		t.Errorf("Expected EndIndex 55, got %d", ic.EndIndex())
 	}
 	if ic.WebCitation() == nil {
 		t.Error("Expected non-nil WebCitation")
@@ -244,7 +255,7 @@ func TestToolCallType(t *testing.T) {
 		{"CodeExecution", xaiv1.ToolCallType_TOOL_CALL_TYPE_CODE_EXECUTION_TOOL, ToolCallTypeCodeExecution},
 		{"CollectionsSearch", xaiv1.ToolCallType_TOOL_CALL_TYPE_COLLECTIONS_SEARCH_TOOL, ToolCallTypeCollectionsSearch},
 		{"MCP", xaiv1.ToolCallType_TOOL_CALL_TYPE_MCP_TOOL, ToolCallTypeMCP},
-		{"DocumentSearch", xaiv1.ToolCallType_TOOL_CALL_TYPE_DOCUMENT_SEARCH_TOOL, ToolCallTypeDocumentSearch},
+		{"AttachmentSearch", xaiv1.ToolCallType_TOOL_CALL_TYPE_ATTACHMENT_SEARCH_TOOL, ToolCallTypeAttachmentSearch},
 		{"Invalid", xaiv1.ToolCallType_TOOL_CALL_TYPE_INVALID, ""},
 	}
 

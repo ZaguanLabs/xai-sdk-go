@@ -294,12 +294,15 @@ const (
 	IncludeCodeExecutionCallOutput IncludeOption = "code_execution_call_output"
 	// IncludeCollectionsSearchCallOutput includes collections search call output in the response.
 	IncludeCollectionsSearchCallOutput IncludeOption = "collections_search_call_output"
-	// IncludeDocumentSearchCallOutput includes document search call output in the response.
-	IncludeDocumentSearchCallOutput IncludeOption = "document_search_call_output"
+	// IncludeAttachmentSearchCallOutput includes attachment search call output in the response.
+	IncludeAttachmentSearchCallOutput IncludeOption = "attachment_search_call_output"
 	// IncludeMCPCallOutput includes MCP call output in the response.
 	IncludeMCPCallOutput IncludeOption = "mcp_call_output"
 	// IncludeInlineCitations includes inline citations in the response.
 	IncludeInlineCitations IncludeOption = "inline_citations"
+	// IncludeVerboseStreaming includes verbose streaming output in the response.
+	// When enabled, provides more detailed streaming information during agentic tool calls.
+	IncludeVerboseStreaming IncludeOption = "verbose_streaming"
 )
 
 // includeOptionToProto converts an IncludeOption to its proto enum value.
@@ -313,12 +316,14 @@ func includeOptionToProto(opt IncludeOption) xaiv1.IncludeOption {
 		return xaiv1.IncludeOption_INCLUDE_OPTION_CODE_EXECUTION_CALL_OUTPUT
 	case IncludeCollectionsSearchCallOutput:
 		return xaiv1.IncludeOption_INCLUDE_OPTION_COLLECTIONS_SEARCH_CALL_OUTPUT
-	case IncludeDocumentSearchCallOutput:
-		return xaiv1.IncludeOption_INCLUDE_OPTION_DOCUMENT_SEARCH_CALL_OUTPUT
+	case IncludeAttachmentSearchCallOutput:
+		return xaiv1.IncludeOption_INCLUDE_OPTION_ATTACHMENT_SEARCH_CALL_OUTPUT
 	case IncludeMCPCallOutput:
 		return xaiv1.IncludeOption_INCLUDE_OPTION_MCP_CALL_OUTPUT
 	case IncludeInlineCitations:
 		return xaiv1.IncludeOption_INCLUDE_OPTION_INLINE_CITATIONS
+	case IncludeVerboseStreaming:
+		return xaiv1.IncludeOption_INCLUDE_OPTION_VERBOSE_STREAMING
 	default:
 		return xaiv1.IncludeOption_INCLUDE_OPTION_INVALID
 	}
@@ -335,12 +340,14 @@ func includeOptionFromProto(opt xaiv1.IncludeOption) IncludeOption {
 		return IncludeCodeExecutionCallOutput
 	case xaiv1.IncludeOption_INCLUDE_OPTION_COLLECTIONS_SEARCH_CALL_OUTPUT:
 		return IncludeCollectionsSearchCallOutput
-	case xaiv1.IncludeOption_INCLUDE_OPTION_DOCUMENT_SEARCH_CALL_OUTPUT:
-		return IncludeDocumentSearchCallOutput
+	case xaiv1.IncludeOption_INCLUDE_OPTION_ATTACHMENT_SEARCH_CALL_OUTPUT:
+		return IncludeAttachmentSearchCallOutput
 	case xaiv1.IncludeOption_INCLUDE_OPTION_MCP_CALL_OUTPUT:
 		return IncludeMCPCallOutput
 	case xaiv1.IncludeOption_INCLUDE_OPTION_INLINE_CITATIONS:
 		return IncludeInlineCitations
+	case xaiv1.IncludeOption_INCLUDE_OPTION_VERBOSE_STREAMING:
+		return IncludeVerboseStreaming
 	default:
 		return ""
 	}
@@ -369,6 +376,14 @@ func (ic *InlineCitation) StartIndex() int32 {
 		return 0
 	}
 	return ic.proto.StartIndex
+}
+
+// EndIndex returns the character index in the content where this citation ends (exclusive).
+func (ic *InlineCitation) EndIndex() int32 {
+	if ic.proto == nil {
+		return 0
+	}
+	return ic.proto.EndIndex
 }
 
 // WebCitation returns the web citation details if this is a web citation.
@@ -491,8 +506,8 @@ const (
 	ToolCallTypeCollectionsSearch ToolCallType = "collections_search"
 	// ToolCallTypeMCP indicates a server-side MCP tool.
 	ToolCallTypeMCP ToolCallType = "mcp"
-	// ToolCallTypeDocumentSearch indicates a server-side document search tool.
-	ToolCallTypeDocumentSearch ToolCallType = "document_search"
+	// ToolCallTypeAttachmentSearch indicates a server-side attachment search tool.
+	ToolCallTypeAttachmentSearch ToolCallType = "attachment_search"
 )
 
 // toolCallTypeFromProto converts a proto enum value to a ToolCallType.
@@ -510,8 +525,8 @@ func toolCallTypeFromProto(t xaiv1.ToolCallType) ToolCallType {
 		return ToolCallTypeCollectionsSearch
 	case xaiv1.ToolCallType_TOOL_CALL_TYPE_MCP_TOOL:
 		return ToolCallTypeMCP
-	case xaiv1.ToolCallType_TOOL_CALL_TYPE_DOCUMENT_SEARCH_TOOL:
-		return ToolCallTypeDocumentSearch
+	case xaiv1.ToolCallType_TOOL_CALL_TYPE_ATTACHMENT_SEARCH_TOOL:
+		return ToolCallTypeAttachmentSearch
 	default:
 		return ""
 	}

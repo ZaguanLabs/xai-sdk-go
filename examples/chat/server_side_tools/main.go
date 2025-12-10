@@ -1,5 +1,5 @@
 // Package main demonstrates server-side tool usage including web search,
-// X search, code execution, and document search.
+// X search, code execution, and attachment search.
 package main
 
 import (
@@ -43,9 +43,9 @@ func main() {
 	fmt.Println("\n=== Example 3: Code Execution Tool ===")
 	codeExecutionExample(ctx, client)
 
-	// Example 4: Document Search Tool
-	fmt.Println("\n=== Example 4: Document Search Tool ===")
-	documentSearchExample(ctx, client)
+	// Example 4: Attachment Search Tool
+	fmt.Println("\n=== Example 4: Attachment Search Tool ===")
+	attachmentSearchExample(ctx, client)
 
 	// Example 5: Multiple Server-Side Tools
 	fmt.Println("\n=== Example 5: Multiple Server-Side Tools ===")
@@ -129,13 +129,13 @@ func codeExecutionExample(ctx context.Context, client *xai.Client) {
 	fmt.Printf("Note: The model executed Python code to calculate the result\n")
 }
 
-func documentSearchExample(ctx context.Context, client *xai.Client) {
-	// Create a chat with document search enabled
+func attachmentSearchExample(ctx context.Context, client *xai.Client) {
+	// Create a chat with attachment search enabled
 	req := chat.NewRequest("grok-beta",
-		chat.WithMessage(chat.User(chat.Text("Search my documents for information about API keys"))),
+		chat.WithMessage(chat.User(chat.Text("Search my attachments for information about API keys"))),
 		chat.WithServerTool(
-			chat.DocumentSearchTool(
-				chat.WithDocumentLimit(5),
+			chat.AttachmentSearchTool(
+				chat.WithAttachmentLimit(5),
 			),
 		),
 	)
@@ -143,13 +143,13 @@ func documentSearchExample(ctx context.Context, client *xai.Client) {
 
 	resp, err := req.Sample(ctx, client.Chat())
 	if err != nil {
-		log.Printf("Document search example failed: %v", err)
+		log.Printf("Attachment search example failed: %v", err)
 		return
 	}
 
-	fmt.Printf("Q: Search my documents for information about API keys\n")
-	fmt.Printf("A (with document search): %s\n", resp.Content())
-	fmt.Printf("Note: The model searched uploaded documents\n")
+	fmt.Printf("Q: Search my attachments for information about API keys\n")
+	fmt.Printf("A (with attachment search): %s\n", resp.Content())
+	fmt.Printf("Note: The model searched uploaded file attachments\n")
 }
 
 func multipleToolsExample(ctx context.Context, client *xai.Client) {

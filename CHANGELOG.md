@@ -7,6 +7,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2025-12-10
+
+### 🎯 Focus: Python SDK v1.5.0 Parity
+
+This release brings the Go SDK up to parity with Python SDK v1.5.0 by adding support for verbose streaming, attachment search, enhanced inline citations, and new collections search options.
+
+### Added
+
+#### Include Options
+- **`IncludeVerboseStreaming`**: New include option for verbose streaming output during agentic tool calls
+- **`IncludeAttachmentSearchCallOutput`**: Include attachment search call output in responses (renamed from document search)
+
+#### Inline Citations Enhancement
+- **`InlineCitation.EndIndex()`**: Returns the character index where the citation ends (exclusive), enabling precise citation positioning
+
+#### Collections Search Enhancements
+- **`WithCollectionsInstructions()`**: Set user-defined instructions that guide how collections search should be interpreted and ranked
+- **`WithHybridRetrieval()`**: Use hybrid retrieval combining semantic and keyword search
+- **`WithSemanticRetrieval()`**: Use semantic retrieval based on embeddings
+- **`WithKeywordRetrieval()`**: Use keyword-based retrieval
+
+#### Attachment Search Tool
+- **`AttachmentSearchTool()`**: Creates an attachment search server-side tool for searching within uploaded file attachments (renamed from DocumentSearchTool)
+- **`WithAttachmentLimit()`**: Set the maximum number of attachment search results
+
+#### Utility Functions
+- **`GetToolCallType()`**: Utility function to retrieve the type of a tool call as a string
+
+### Changed
+
+#### Breaking Changes
+- **Renamed `DocumentSearchTool` to `AttachmentSearchTool`**: The document search tool has been renamed to attachment search to better reflect its purpose
+- **Renamed `WithDocumentLimit` to `WithAttachmentLimit`**: Option renamed to match the tool rename
+- **Renamed `IncludeDocumentSearchCallOutput` to `IncludeAttachmentSearchCallOutput`**: Include option renamed
+- **Renamed `ToolCallTypeDocumentSearch` to `ToolCallTypeAttachmentSearch`**: Tool call type renamed
+
+### Proto Updates
+- Added `end_index` field to `InlineCitation` message
+- Added `INCLUDE_OPTION_VERBOSE_STREAMING` to `IncludeOption` enum
+- Renamed `INCLUDE_OPTION_DOCUMENT_SEARCH_CALL_OUTPUT` to `INCLUDE_OPTION_ATTACHMENT_SEARCH_CALL_OUTPUT`
+- Renamed `DocumentSearch` message to `AttachmentSearch`
+- Renamed `TOOL_CALL_TYPE_DOCUMENT_SEARCH_TOOL` to `TOOL_CALL_TYPE_ATTACHMENT_SEARCH_TOOL`
+- Added `instructions` field to `CollectionsSearch` message
+- Added `retrieval_mode` oneof to `CollectionsSearch` with `HybridRetrieval`, `SemanticRetrieval`, and `KeywordRetrieval` options
+
+### Testing
+- Added tests for new include options (VerboseStreaming, AttachmentSearchCallOutput)
+- Added tests for InlineCitation.EndIndex()
+- Added tests for CollectionsSearch retrieval mode options
+- Added tests for AttachmentSearchTool
+- Added tests for GetToolCallType utility function
+- All tests passing
+
+### Python SDK Parity
+This release achieves parity with Python SDK v1.5.0 features:
+- ✅ Verbose streaming include option
+- ✅ Attachment search tool (renamed from document search)
+- ✅ Inline citations with end_index support
+- ✅ Collections search with instructions and retrieval modes
+- ✅ GetToolCallType utility function
+
 ## [0.9.0] - 2025-12-01
 
 ### 🎯 Focus: Python SDK v1.4.1 Parity - Include Options & Inline Citations
@@ -21,7 +82,6 @@ This release brings the Go SDK up to parity with Python SDK v1.4.1 by adding sup
   - `IncludeXSearchCallOutput`: Include X search call output
   - `IncludeCodeExecutionCallOutput`: Include code execution call output
   - `IncludeCollectionsSearchCallOutput`: Include collections search call output
-  - `IncludeDocumentSearchCallOutput`: Include document search call output
   - `IncludeMCPCallOutput`: Include MCP call output
   - `IncludeInlineCitations`: Include inline citations in responses
 - **`WithInclude()`**: Functional option to set include options on requests
@@ -48,7 +108,6 @@ This release brings the Go SDK up to parity with Python SDK v1.4.1 by adding sup
   - `ToolCallTypeCodeExecution`: Server-side code execution tool
   - `ToolCallTypeCollectionsSearch`: Server-side collections search tool
   - `ToolCallTypeMCP`: Server-side MCP tool
-  - `ToolCallTypeDocumentSearch`: Server-side document search tool
 - **`ToolCall.Type()`**: Returns the tool call type
 - **`ToolCall.IsClientSide()`**: Returns true if the tool call needs client execution
 - **`ToolCall.IsServerSide()`**: Returns true if the tool call was executed server-side

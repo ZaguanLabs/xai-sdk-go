@@ -44,12 +44,15 @@ enum IncludeOption {
   INCLUDE_OPTION_CODE_EXECUTION_CALL_OUTPUT = 3;
   // Include collections search call output in the response.
   INCLUDE_OPTION_COLLECTIONS_SEARCH_CALL_OUTPUT = 4;
-  // Include document search call output in the response.
-  INCLUDE_OPTION_DOCUMENT_SEARCH_CALL_OUTPUT = 5;
+  // Include attachment search call output in the response.
+  INCLUDE_OPTION_ATTACHMENT_SEARCH_CALL_OUTPUT = 5;
   // Include MCP call output in the response.
   INCLUDE_OPTION_MCP_CALL_OUTPUT = 6;
   // Include inline citations in the response.
   INCLUDE_OPTION_INLINE_CITATIONS = 7;
+  // Include verbose streaming output in the response.
+  // When enabled, provides more detailed streaming information during agentic tool calls.
+  INCLUDE_OPTION_VERBOSE_STREAMING = 8;
 }
 
 message GetCompletionsRequest {
@@ -355,6 +358,9 @@ message InlineCitation {
   // The character index in the content where this citation starts.
   int32 start_index = 2;
 
+  // The character index in the content where this citation ends (exclusive).
+  int32 end_index = 6;
+
   // Web citation details (if this is a web citation).
   WebCitation web_citation = 3;
 
@@ -559,8 +565,8 @@ message Tool {
     CollectionsSearch collections_search = 6;
     // A remote MCP server to use.
     MCP mcp = 7;
-    // Built in document search.
-    DocumentSearch document_search = 8;
+    // Built in attachment search for searching within uploaded file attachments.
+    AttachmentSearch attachment_search = 8;
   }
 }
 
@@ -640,11 +646,35 @@ message CollectionsSearch {
   // Optional number of chunks to be returned for each collections search.
   // Defaults to 10.
   optional int32 limit = 2;
+  // Optional, user-defined instructions that guide how the collections
+  // search should be interpreted and ranked. If not provided, the server will use
+  // its default generic search instructions.
+  optional string instructions = 3;
+  // Retrieval mode configuration. Only one can be set.
+  // When omitted, the server defaults to hybrid retrieval.
+  oneof retrieval_mode {
+    // Use hybrid retrieval combining semantic and keyword search.
+    HybridRetrieval hybrid_retrieval = 4;
+    // Use semantic retrieval based on embeddings.
+    SemanticRetrieval semantic_retrieval = 5;
+    // Use keyword-based retrieval.
+    KeywordRetrieval keyword_retrieval = 6;
+  }
 }
 
-message DocumentSearch {
-  // Optional number of files to limit the search to.
-  optional int32 limit = 2;
+// Configuration for hybrid retrieval combining semantic and keyword search.
+message HybridRetrieval {}
+
+// Configuration for semantic retrieval based on embeddings.
+message SemanticRetrieval {}
+
+// Configuration for keyword-based retrieval.
+message KeywordRetrieval {}
+
+// Built-in attachment search tool for searching within uploaded file attachments.
+message AttachmentSearch {
+  // Optional number of results to limit the search to.
+  optional int32 limit = 1;
 }
 
 message Function {
@@ -688,8 +718,8 @@ enum ToolCallType {
   // Maps to `mcp_call` type in OAI Responses API.
   TOOL_CALL_TYPE_MCP_TOOL = 6;
 
-  // Indicates the tool is a server-side document_search tool, and client side won't need to execute.
-  TOOL_CALL_TYPE_DOCUMENT_SEARCH_TOOL = 7;
+  // Indicates the tool is a server-side attachment_search tool, and client side won't need to execute.
+  TOOL_CALL_TYPE_ATTACHMENT_SEARCH_TOOL = 7;
 }
 
 enum ToolCallStatus {

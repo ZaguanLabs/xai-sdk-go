@@ -493,29 +493,64 @@ func WithCollectionsLimit(limit int32) CollectionsSearchOption {
 	}
 }
 
-// DocumentSearchTool creates a document search server-side tool.
-// This enables the model to search within uploaded documents.
-func DocumentSearchTool(opts ...DocumentSearchOption) *ServerTool {
-	ds := &xaiv1.DocumentSearch{}
+// WithCollectionsInstructions sets user-defined instructions that guide how the collections
+// search should be interpreted and ranked.
+func WithCollectionsInstructions(instructions string) CollectionsSearchOption {
+	return func(cs *xaiv1.CollectionsSearch) {
+		cs.Instructions = &instructions
+	}
+}
+
+// WithHybridRetrieval sets hybrid retrieval mode combining semantic and keyword search.
+func WithHybridRetrieval() CollectionsSearchOption {
+	return func(cs *xaiv1.CollectionsSearch) {
+		cs.RetrievalMode = &xaiv1.CollectionsSearch_HybridRetrieval{
+			HybridRetrieval: &xaiv1.HybridRetrieval{},
+		}
+	}
+}
+
+// WithSemanticRetrieval sets semantic retrieval mode based on embeddings.
+func WithSemanticRetrieval() CollectionsSearchOption {
+	return func(cs *xaiv1.CollectionsSearch) {
+		cs.RetrievalMode = &xaiv1.CollectionsSearch_SemanticRetrieval{
+			SemanticRetrieval: &xaiv1.SemanticRetrieval{},
+		}
+	}
+}
+
+// WithKeywordRetrieval sets keyword-based retrieval mode.
+func WithKeywordRetrieval() CollectionsSearchOption {
+	return func(cs *xaiv1.CollectionsSearch) {
+		cs.RetrievalMode = &xaiv1.CollectionsSearch_KeywordRetrieval{
+			KeywordRetrieval: &xaiv1.KeywordRetrieval{},
+		}
+	}
+}
+
+// AttachmentSearchTool creates an attachment search server-side tool.
+// This enables the model to search within uploaded file attachments.
+func AttachmentSearchTool(opts ...AttachmentSearchOption) *ServerTool {
+	as := &xaiv1.AttachmentSearch{}
 	for _, opt := range opts {
-		opt(ds)
+		opt(as)
 	}
 	return &ServerTool{
 		proto: &xaiv1.Tool{
-			Tool: &xaiv1.Tool_DocumentSearch{
-				DocumentSearch: ds,
+			Tool: &xaiv1.Tool_AttachmentSearch{
+				AttachmentSearch: as,
 			},
 		},
 	}
 }
 
-// DocumentSearchOption configures document search tool.
-type DocumentSearchOption func(*xaiv1.DocumentSearch)
+// AttachmentSearchOption configures attachment search tool.
+type AttachmentSearchOption func(*xaiv1.AttachmentSearch)
 
-// WithDocumentLimit sets the maximum number of document results.
-func WithDocumentLimit(limit int32) DocumentSearchOption {
-	return func(ds *xaiv1.DocumentSearch) {
-		ds.Limit = &limit
+// WithAttachmentLimit sets the maximum number of attachment search results.
+func WithAttachmentLimit(limit int32) AttachmentSearchOption {
+	return func(as *xaiv1.AttachmentSearch) {
+		as.Limit = &limit
 	}
 }
 
@@ -572,4 +607,19 @@ func WithMCPExtraHeaders(headers map[string]string) MCPOption {
 			mcp.ExtraHeaders[key] = value
 		}
 	}
+}
+
+// ============================================================================
+// Utility Functions for Server-Side Tool Outputs
+// ============================================================================
+
+// GetToolCallType returns the type of a tool call as a string.
+// Valid return values are: "client_side_tool", "web_search_tool",
+// "x_search_tool", "code_execution_tool", "collections_search_tool",
+// "mcp_tool", "attachment_search_tool".
+func GetToolCallType(tc *ToolCall) string {
+	if tc == nil {
+		return ""
+	}
+	return string(tc.Type())
 }
