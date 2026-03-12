@@ -8,8 +8,10 @@ import (
 	"io"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 )
 
 // OutputChunk represents a completion output chunk in streaming response.
@@ -140,7 +142,8 @@ func (c *Choice) LogProbs() *LogProbs {
 
 // Request represents a chat completion request.
 type Request struct {
-	proto *xaiv1.GetCompletionsRequest
+	proto          *xaiv1.GetCompletionsRequest
+	batchRequestID *string
 }
 
 // Response represents a chat completion response.
@@ -156,14 +159,28 @@ type Chunk struct {
 // RequestOption is a functional option for configuring a Request.
 type RequestOption func(*Request)
 
-// ServiceClient is an interface for the chat service client.
-type ServiceClient = xaiv1.ChatClient
+// ServiceClient is the subset of chat RPCs required by the request/deferred helpers.
+type ServiceClient interface {
+	GetCompletion(ctx context.Context, in *xaiv1.GetCompletionsRequest, opts ...grpc.CallOption) (*xaiv1.GetChatCompletionResponse, error)
+	GetCompletionChunk(ctx context.Context, in *xaiv1.GetCompletionsRequest, opts ...grpc.CallOption) (xaiv1.Chat_GetCompletionChunkClient, error)
+	StartDeferredCompletion(ctx context.Context, in *xaiv1.GetCompletionsRequest, opts ...grpc.CallOption) (*xaiv1.StartDeferredResponse, error)
+	GetDeferredCompletion(ctx context.Context, in *xaiv1.GetDeferredRequest, opts ...grpc.CallOption) (*xaiv1.GetDeferredCompletionResponse, error)
+}
 
 // Stream represents a streaming chat completion response.
 type Stream struct {
 	stream  xaiv1.Chat_GetCompletionChunkClient
 	err     error
 	current *Chunk
+}
+
+// BatchStream represents a multi-output streaming chat completion response.
+type BatchStream struct {
+	stream        xaiv1.Chat_GetCompletionChunkClient
+	err           error
+	responses     []*Response
+	currentChunks []*Chunk
+	count         int32
 }
 
 // NewRequest creates a new chat completion request.
@@ -531,6 +548,27 @@ func WithInclude(options ...IncludeOption) RequestOption {
 	}
 }
 
+type AgentCount = xaiv1.AgentCount
+
+const (
+	AgentCountUnspecified = xaiv1.AgentCount_AGENT_COUNT_UNSPECIFIED
+	AgentCount4           = xaiv1.AgentCount_AGENT_COUNT_4
+	AgentCount16          = xaiv1.AgentCount_AGENT_COUNT_16
+)
+
+func WithAgentCount(agentCount AgentCount) RequestOption {
+	return func(r *Request) {
+		value := xaiv1.AgentCount(agentCount)
+		r.proto.AgentCount = &value
+	}
+}
+
+func WithBatchRequestID(batchRequestID string) RequestOption {
+	return func(r *Request) {
+		r.batchRequestID = &batchRequestID
+	}
+}
+
 // SetTemperature sets the temperature for sampling.
 func (r *Request) SetTemperature(temp float32) *Request {
 	r.proto.Temperature = &temp
@@ -590,6 +628,28 @@ func (r *Request) SetPresencePenalty(penalty float32) *Request {
 func (r *Request) SetSeed(seed int32) *Request {
 	r.proto.Seed = &seed
 	return r
+}
+
+func (r *Request) SetAgentCount(agentCount AgentCount) *Request {
+	value := xaiv1.AgentCount(agentCount)
+	r.proto.AgentCount = &value
+	return r
+}
+
+func (r *Request) AgentCount() AgentCount {
+	return AgentCount(r.proto.GetAgentCount())
+}
+
+func (r *Request) SetBatchRequestID(batchRequestID string) *Request {
+	r.batchRequestID = &batchRequestID
+	return r
+}
+
+func (r *Request) BatchRequestID() string {
+	if r.batchRequestID == nil {
+		return ""
+	}
+	return *r.batchRequestID
 }
 
 // SetLogprobs enables or disables returning log probabilities.
@@ -688,6 +748,43 @@ func (r *Request) Proto() *xaiv1.GetCompletionsRequest {
 	return r.proto
 }
 
+func (r *Request) cloneWithN(n int32) (*xaiv1.GetCompletionsRequest, error) {
+	if r.proto == nil {
+		return nil, fmt.Errorf("request proto is nil")
+	}
+	cloned, ok := proto.Clone(r.proto).(*xaiv1.GetCompletionsRequest)
+	if !ok {
+		return nil, fmt.Errorf("failed to clone request proto")
+	}
+	cloned.N = &n
+	return cloned, nil
+}
+
+func splitResponses(resp *xaiv1.GetChatCompletionResponse) []*Response {
+	if resp == nil {
+		return nil
+	}
+	if len(resp.Outputs) == 0 {
+		return []*Response{{proto: resp}}
+	}
+	responses := make([]*Response, 0, len(resp.Outputs))
+	for _, output := range resp.Outputs {
+		responseProto := &xaiv1.GetChatCompletionResponse{
+			Id:                resp.Id,
+			Model:             resp.Model,
+			Created:           resp.Created,
+			SystemFingerprint: resp.SystemFingerprint,
+			Usage:             resp.Usage,
+			Settings:          resp.Settings,
+			DebugOutput:       resp.DebugOutput,
+			Citations:         resp.Citations,
+			Outputs:           []*xaiv1.CompletionOutput{output},
+		}
+		responses = append(responses, &Response{proto: responseProto})
+	}
+	return responses
+}
+
 // Sample performs a synchronous chat completion request.
 func (r *Request) Sample(ctx context.Context, client ServiceClient) (*Response, error) {
 	if client == nil {
@@ -738,6 +835,33 @@ func (r *Request) Sample(ctx context.Context, client ServiceClient) (*Response, 
 	return &Response{proto: resp}, nil
 }
 
+// SampleBatch performs a synchronous chat completion request requesting multiple outputs.
+func (r *Request) SampleBatch(ctx context.Context, client ServiceClient, n int32) ([]*Response, error) {
+	if n <= 0 {
+		return nil, fmt.Errorf("n must be greater than 0")
+	}
+	if client == nil {
+		return nil, fmt.Errorf("chat client is nil")
+	}
+	if err := r.validate(); err != nil {
+		return nil, fmt.Errorf("invalid request: %w", err)
+	}
+
+	reqProto, err := r.cloneWithN(n)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := client.GetCompletion(ctx, reqProto)
+	if err != nil {
+		return nil, fmt.Errorf("chat batch completion failed: %w", err)
+	}
+	if resp == nil {
+		return nil, fmt.Errorf("received nil response")
+	}
+	return splitResponses(resp), nil
+}
+
 // Stream performs a streaming chat completion request.
 func (r *Request) Stream(ctx context.Context, client ServiceClient) (*Stream, error) {
 	if client == nil {
@@ -786,6 +910,53 @@ func (r *Request) Stream(ctx context.Context, client ServiceClient) (*Stream, er
 	}
 
 	return &Stream{stream: stream}, nil
+}
+
+// StreamBatch performs a multi-output streaming chat completion request.
+func (r *Request) StreamBatch(ctx context.Context, client ServiceClient, n int32) (*BatchStream, error) {
+	if n <= 0 {
+		return nil, fmt.Errorf("n must be greater than 0")
+	}
+	if client == nil {
+		return nil, fmt.Errorf("chat client is nil")
+	}
+	if r.proto == nil {
+		return nil, fmt.Errorf("request proto is nil")
+	}
+	if r.proto.Model == "" {
+		return nil, fmt.Errorf("model is required")
+	}
+	if err := r.validate(); err != nil {
+		return nil, fmt.Errorf("invalid request: %w", err)
+	}
+
+	reqProto, err := r.cloneWithN(n)
+	if err != nil {
+		return nil, err
+	}
+
+	stream, err := client.GetCompletionChunk(ctx, reqProto)
+	if err != nil {
+		return nil, fmt.Errorf("chat completion batch stream failed: %w", err)
+	}
+
+	responses := make([]*Response, n)
+	for i := int32(0); i < n; i++ {
+		responses[i] = &Response{
+			proto: &xaiv1.GetChatCompletionResponse{
+				Outputs: []*xaiv1.CompletionOutput{{
+					Index:   i,
+					Message: &xaiv1.CompletionMessage{},
+				}},
+			},
+		}
+	}
+
+	return &BatchStream{
+		stream:    stream,
+		responses: responses,
+		count:     n,
+	}, nil
 }
 
 // validate validates the request.
@@ -870,7 +1041,9 @@ func (r *Request) validateMessage(msg *xaiv1.Message, index int) error {
 		xaiv1.MessageRole_ROLE_SYSTEM:    true,
 		xaiv1.MessageRole_ROLE_USER:      true,
 		xaiv1.MessageRole_ROLE_ASSISTANT: true,
+		xaiv1.MessageRole_ROLE_FUNCTION:  true,
 		xaiv1.MessageRole_ROLE_TOOL:      true,
+		xaiv1.MessageRole_ROLE_DEVELOPER: true,
 	}
 	if !validRoles[msg.Role] {
 		return fmt.Errorf("invalid role '%s' in message at index %d", roleFromProto(msg.Role), index)
@@ -1448,5 +1621,116 @@ func (u *TokenUsage) Proto() *xaiv1.SamplingUsage {
 
 // Err returns the error that occurred during streaming.
 func (s *Stream) Err() error {
+	return s.err
+}
+
+func cloneChunkWithOutput(chunk *xaiv1.GetChatCompletionChunk, output *xaiv1.CompletionOutputChunk) *xaiv1.GetChatCompletionChunk {
+	if chunk == nil {
+		return nil
+	}
+	cloned := &xaiv1.GetChatCompletionChunk{
+		Id:                chunk.Id,
+		Model:             chunk.Model,
+		Created:           chunk.Created,
+		SystemFingerprint: chunk.SystemFingerprint,
+		Usage:             chunk.Usage,
+		Citations:         chunk.Citations,
+	}
+	if output != nil {
+		cloned.Outputs = []*xaiv1.CompletionOutputChunk{output}
+	}
+	return cloned
+}
+
+func applyChunkToResponse(resp *Response, chunk *xaiv1.GetChatCompletionChunk, output *xaiv1.CompletionOutputChunk) {
+	if resp == nil || resp.proto == nil || output == nil {
+		return
+	}
+	resp.proto.Id = chunk.Id
+	resp.proto.Model = chunk.Model
+	resp.proto.Created = chunk.Created
+	resp.proto.SystemFingerprint = chunk.SystemFingerprint
+	resp.proto.Usage = chunk.Usage
+	resp.proto.Citations = chunk.Citations
+
+	if len(resp.proto.Outputs) == 0 || resp.proto.Outputs[0] == nil {
+		resp.proto.Outputs = []*xaiv1.CompletionOutput{{Index: output.Index, Message: &xaiv1.CompletionMessage{}}}
+	}
+	current := resp.proto.Outputs[0]
+	current.Index = output.Index
+	if current.Message == nil {
+		current.Message = &xaiv1.CompletionMessage{}
+	}
+	if output.Delta != nil {
+		if output.Delta.Role != xaiv1.MessageRole_INVALID_ROLE {
+			current.Message.Role = output.Delta.Role
+		}
+		if content := output.Delta.GetContent(); content != "" {
+			current.Message.Content += content
+		}
+		if output.Delta.ReasoningContent != "" {
+			current.Message.ReasoningContent += output.Delta.ReasoningContent
+		}
+		if output.Delta.EncryptedContent != "" {
+			current.Message.EncryptedContent += output.Delta.EncryptedContent
+		}
+		if len(output.Delta.ToolCalls) > 0 {
+			current.Message.ToolCalls = append(current.Message.ToolCalls, output.Delta.ToolCalls...)
+		}
+	}
+}
+
+// Next reads the next set of chunks from the batch stream.
+func (s *BatchStream) Next() bool {
+	if s.stream == nil {
+		s.err = fmt.Errorf("stream is nil")
+		return false
+	}
+
+	chunk, err := s.stream.Recv()
+	if err != nil {
+		if err == io.EOF {
+			return false
+		}
+		s.err = err
+		return false
+	}
+	if chunk == nil {
+		s.err = fmt.Errorf("received nil chunk")
+		return false
+	}
+
+	s.currentChunks = make([]*Chunk, s.count)
+	for i := int32(0); i < s.count; i++ {
+		s.currentChunks[i] = &Chunk{proto: cloneChunkWithOutput(chunk, nil)}
+	}
+
+	for _, output := range chunk.Outputs {
+		if output == nil {
+			continue
+		}
+		index := int(output.Index)
+		if index < 0 || index >= len(s.responses) {
+			continue
+		}
+		applyChunkToResponse(s.responses[index], chunk, output)
+		s.currentChunks[index] = &Chunk{proto: cloneChunkWithOutput(chunk, output)}
+	}
+
+	return true
+}
+
+// CurrentResponses returns the accumulated responses for each output in the batch stream.
+func (s *BatchStream) CurrentResponses() []*Response {
+	return s.responses
+}
+
+// CurrentChunks returns the current per-output chunks from the batch stream.
+func (s *BatchStream) CurrentChunks() []*Chunk {
+	return s.currentChunks
+}
+
+// Err returns the error that occurred during batch streaming.
+func (s *BatchStream) Err() error {
 	return s.err
 }

@@ -26,7 +26,17 @@ type SearchRequest struct {
 	Query         string
 	CollectionIDs []string
 	Limit         int32
+	Instructions  string
+	retrievalMode retrievalMode
 }
+
+type retrievalMode string
+
+const (
+	RetrievalModeHybrid   retrievalMode = "hybrid"
+	RetrievalModeSemantic retrievalMode = "semantic"
+	RetrievalModeKeyword  retrievalMode = "keyword"
+)
 
 // SearchMatch represents a single search result.
 type SearchMatch struct {
@@ -57,6 +67,26 @@ func (r *SearchRequest) WithLimit(limit int32) *SearchRequest {
 	return r
 }
 
+func (r *SearchRequest) WithInstructions(instructions string) *SearchRequest {
+	r.Instructions = instructions
+	return r
+}
+
+func (r *SearchRequest) WithHybridRetrieval() *SearchRequest {
+	r.retrievalMode = RetrievalModeHybrid
+	return r
+}
+
+func (r *SearchRequest) WithSemanticRetrieval() *SearchRequest {
+	r.retrievalMode = RetrievalModeSemantic
+	return r
+}
+
+func (r *SearchRequest) WithKeywordRetrieval() *SearchRequest {
+	r.retrievalMode = RetrievalModeKeyword
+	return r
+}
+
 // Search searches across document collections.
 func (c *Client) Search(ctx context.Context, req *SearchRequest) (*SearchResponse, error) {
 	if c.restClient == nil {
@@ -69,6 +99,25 @@ func (c *Client) Search(ctx context.Context, req *SearchRequest) (*SearchRespons
 			CollectionIds: req.CollectionIDs,
 		},
 		Limit: &req.Limit,
+	}
+
+	if req.Instructions != "" {
+		protoReq.Instructions = &req.Instructions
+	}
+
+	switch req.retrievalMode {
+	case RetrievalModeHybrid:
+		protoReq.RetrievalMode = &xaiv1.SearchRequest_HybridRetrieval{
+			HybridRetrieval: &xaiv1.HybridRetrieval{},
+		}
+	case RetrievalModeSemantic:
+		protoReq.RetrievalMode = &xaiv1.SearchRequest_SemanticRetrieval{
+			SemanticRetrieval: &xaiv1.SemanticRetrieval{},
+		}
+	case RetrievalModeKeyword:
+		protoReq.RetrievalMode = &xaiv1.SearchRequest_KeywordRetrieval{
+			KeywordRetrieval: &xaiv1.KeywordRetrieval{},
+		}
 	}
 
 	jsonData, err := protojson.Marshal(protoReq)

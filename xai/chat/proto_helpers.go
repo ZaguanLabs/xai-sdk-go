@@ -20,6 +20,8 @@ func roleToProto(role string) xaiv1.MessageRole {
 		return xaiv1.MessageRole_ROLE_FUNCTION //nolint:staticcheck // Deprecated but kept for backward compatibility
 	case "tool":
 		return xaiv1.MessageRole_ROLE_TOOL
+	case "developer":
+		return xaiv1.MessageRole_ROLE_DEVELOPER
 	default:
 		return xaiv1.MessageRole_INVALID_ROLE
 	}
@@ -38,6 +40,8 @@ func roleFromProto(role xaiv1.MessageRole) string {
 		return "function"
 	case xaiv1.MessageRole_ROLE_TOOL:
 		return "tool"
+	case xaiv1.MessageRole_ROLE_DEVELOPER:
+		return "developer"
 	default:
 		return ""
 	}

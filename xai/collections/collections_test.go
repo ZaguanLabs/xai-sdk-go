@@ -85,12 +85,13 @@ func TestGetCollection(t *testing.T) {
 
 func TestListCollections(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token := "next-page"
 		resp := &xaiv1.ListCollectionsResponse{
 			Collections: []*xaiv1.CollectionMetadata{
 				{CollectionId: "col-1", CollectionName: "Collection 1"},
 				{CollectionId: "col-2", CollectionName: "Collection 2"},
 			},
-			PaginationToken: "next-page",
+			PaginationToken: &token,
 		}
 		json.NewEncoder(w).Encode(resp)
 	}))
@@ -217,12 +218,13 @@ func TestGetDocument(t *testing.T) {
 
 func TestListDocuments(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token := "next"
 		resp := &xaiv1.ListDocumentsResponse{
 			Documents: []*xaiv1.DocumentMetadata{
 				{FileMetadata: &xaiv1.FileMetadata{FileId: "file-1"}},
 				{FileMetadata: &xaiv1.FileMetadata{FileId: "file-2"}},
 			},
-			PaginationToken: "next",
+			PaginationToken: &token,
 		}
 		json.NewEncoder(w).Encode(resp)
 	}))

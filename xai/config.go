@@ -26,6 +26,8 @@ type Config struct {
 	// APIKey is the xAI API key for authentication.
 	APIKey string `json:"api_key"`
 
+	ManagementAPIKey string `json:"management_api_key"`
+
 	// Host is the xAI API host (default: api.x.ai).
 	Host string `json:"host"`
 
@@ -34,6 +36,8 @@ type Config struct {
 
 	// HTTPHost is the HTTP API host (default: api.x.ai).
 	HTTPHost string `json:"http_host"`
+
+	ManagementAPIHost string `json:"management_api_host"`
 
 	// HTTPPort is the HTTP API port (default: 80).
 	HTTPPort string `json:"http_port"`
@@ -137,6 +141,10 @@ func (c *Config) loadHostConfig() {
 		c.APIKey = apiKey
 	}
 
+	if managementAPIKey := os.Getenv("XAI_MANAGEMENT_API_KEY"); managementAPIKey != "" {
+		c.ManagementAPIKey = managementAPIKey
+	}
+
 	// Host configuration
 	if host := os.Getenv("XAI_HOST"); host != "" {
 		c.Host = host
@@ -148,6 +156,10 @@ func (c *Config) loadHostConfig() {
 
 	if httpHost := os.Getenv("XAI_HTTP_HOST"); httpHost != "" {
 		c.HTTPHost = httpHost
+	}
+
+	if managementAPIHost := os.Getenv("XAI_MANAGEMENT_API_HOST"); managementAPIHost != "" {
+		c.ManagementAPIHost = managementAPIHost
 	}
 
 	if httpPort := os.Getenv("XAI_HTTP_PORT"); httpPort != "" {
@@ -280,6 +292,10 @@ func (c *Config) validateHost() error {
 		c.HTTPHost = constants.DefaultHTTPHost
 	}
 
+	if c.ManagementAPIHost == "" {
+		c.ManagementAPIHost = c.HTTPHost
+	}
+
 	if c.HTTPPort == "" {
 		c.HTTPPort = "80"
 	}
@@ -405,10 +421,20 @@ func (c *Config) WithAPIKey(apiKey string) *Config {
 	return c
 }
 
+func (c *Config) WithManagementAPIKey(apiKey string) *Config {
+	c.ManagementAPIKey = apiKey
+	return c
+}
+
 // WithHost sets the API host.
 func (c *Config) WithHost(host string) *Config {
 	c.Host = host
 	c.HTTPHost = host // Keep HTTP host in sync
+	return c
+}
+
+func (c *Config) WithManagementAPIHost(host string) *Config {
+	c.ManagementAPIHost = host
 	return c
 }
 

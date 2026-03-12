@@ -7,6 +7,7 @@ import (
 	"time"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -14,6 +15,11 @@ import (
 // DeferredRequest represents a deferred chat completion request.
 type DeferredRequest struct {
 	proto *xaiv1.GetCompletionsRequest
+}
+
+type storedCompletionClient interface {
+	GetStoredCompletion(ctx context.Context, in *xaiv1.GetStoredCompletionRequest, opts ...grpc.CallOption) (*xaiv1.GetChatCompletionResponse, error)
+	DeleteStoredCompletion(ctx context.Context, in *xaiv1.DeleteStoredCompletionRequest, opts ...grpc.CallOption) (*xaiv1.DeleteStoredCompletionResponse, error)
 }
 
 // DeferredRequestOption represents a functional option for DeferredRequest.
@@ -108,8 +114,8 @@ func (r *DeferredRequest) Submit(ctx context.Context, client ServiceClient) (*De
 		return nil, fmt.Errorf("model is required")
 	}
 
-	// Submit the request
-	resp, err := client.GetCompletion(ctx, r.proto)
+	// Submit the deferred request
+	start, err := client.StartDeferredCompletion(ctx, r.proto)
 	if err != nil {
 		// Handle specific gRPC errors
 		if st, ok := status.FromError(err); ok {
@@ -135,11 +141,19 @@ func (r *DeferredRequest) Submit(ctx context.Context, client ServiceClient) (*De
 		return nil, fmt.Errorf("deferred request failed: %w", err)
 	}
 
-	if resp == nil {
+	if start == nil {
 		return nil, fmt.Errorf("received nil response")
 	}
 
-	return &DeferredResponse{proto: resp}, nil
+	result, err := client.GetDeferredCompletion(ctx, &xaiv1.GetDeferredRequest{RequestId: start.RequestId})
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch deferred response: %w", err)
+	}
+	if result == nil || result.Response == nil {
+		return nil, fmt.Errorf("received nil deferred response")
+	}
+
+	return &DeferredResponse{proto: result.Response}, nil
 }
 
 // DeferredResponse represents a deferred chat completion response.
@@ -199,57 +213,55 @@ func (r *DeferredRequest) Poll(ctx context.Context, client ServiceClient, interv
 	if r.proto == nil {
 		return nil, fmt.Errorf("request proto is nil")
 	}
+	if interval <= 0 {
+		interval = 100 * time.Millisecond
+	}
+	if timeout <= 0 {
+		timeout = 10 * time.Minute
+	}
 
-	// Create a context with timeout
 	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	// Submit the request
-	response, err := r.Submit(timeoutCtx, client)
+	start, err := client.StartDeferredCompletion(timeoutCtx, r.proto)
 	if err != nil {
 		return nil, fmt.Errorf("failed to submit deferred request: %w", err)
 	}
-
-	if response == nil {
-		return nil, fmt.Errorf("received nil response")
+	if start == nil {
+		return nil, fmt.Errorf("received nil deferred start response")
 	}
 
-	// Create a ticker for polling
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
-
-	startTime := time.Now()
 
 	for {
 		select {
 		case <-timeoutCtx.Done():
-			return &PollResult{
-				Response: response,
-				Done:     false,
-			}, timeoutCtx.Err()
-
+			return &PollResult{Done: false}, timeoutCtx.Err()
 		case <-ticker.C:
-			// Check if the request is complete
-			if response.Status() == "completed" {
+			result, err := client.GetDeferredCompletion(timeoutCtx, &xaiv1.GetDeferredRequest{RequestId: start.RequestId})
+			if err != nil {
+				return &PollResult{Done: false}, err
+			}
+			if result == nil {
+				return &PollResult{Done: false}, fmt.Errorf("received nil deferred completion response")
+			}
+
+			switch result.Status {
+			case xaiv1.DeferredStatus_DONE:
+				if result.Response == nil {
+					return &PollResult{Done: false}, fmt.Errorf("deferred request completed without a response")
+				}
 				return &PollResult{
-					Response: response,
+					Response: &DeferredResponse{proto: result.Response},
 					Done:     true,
 				}, nil
+			case xaiv1.DeferredStatus_PENDING:
+			case xaiv1.DeferredStatus_EXPIRED:
+				return &PollResult{Done: false}, fmt.Errorf("deferred request expired")
+			default:
+				return &PollResult{Done: false}, fmt.Errorf("unknown deferred status: %s", result.Status.String())
 			}
-
-			// Check if we've timed out
-			if time.Since(startTime) > timeout {
-				return &PollResult{
-					Response: response,
-					Done:     false,
-				}, fmt.Errorf("polling timeout")
-			}
-
-		case <-ctx.Done():
-			return &PollResult{
-				Response: response,
-				Done:     false,
-			}, ctx.Err()
 		}
 	}
 }
@@ -263,9 +275,27 @@ func GetStoredCompletion(ctx context.Context, client ServiceClient, completionID
 		return nil, fmt.Errorf("completion ID is required")
 	}
 
-	// TODO: Implement actual gRPC call to GetStoredCompletion
-	// This requires implementing the ChatServiceClient.GetStoredCompletion method
-	return nil, fmt.Errorf("GetStoredCompletion not yet implemented")
+	storageClient, ok := client.(storedCompletionClient)
+	if !ok {
+		return nil, fmt.Errorf("chat client does not support stored completions")
+	}
+
+	response, err := storageClient.GetStoredCompletion(ctx, &xaiv1.GetStoredCompletionRequest{ResponseId: completionID})
+	if err != nil {
+		return nil, err
+	}
+
+	stored := &StoredCompletion{id: completionID}
+	if response != nil {
+		if response.Created != nil {
+			stored.createdAt = response.Created.AsTime()
+		}
+		if len(response.Outputs) > 0 && response.Outputs[0] != nil && response.Outputs[0].Message != nil {
+			stored.content = response.Outputs[0].Message.Content
+		}
+	}
+
+	return stored, nil
 }
 
 // DeleteStoredCompletion deletes a stored completion by ID.
@@ -277,9 +307,13 @@ func DeleteStoredCompletion(ctx context.Context, client ServiceClient, completio
 		return fmt.Errorf("completion ID is required")
 	}
 
-	// TODO: Implement actual gRPC call to DeleteStoredCompletion
-	// This requires implementing the ChatServiceClient.DeleteStoredCompletion method
-	return fmt.Errorf("DeleteStoredCompletion not yet implemented")
+	storageClient, ok := client.(storedCompletionClient)
+	if !ok {
+		return fmt.Errorf("chat client does not support stored completions")
+	}
+
+	_, err := storageClient.DeleteStoredCompletion(ctx, &xaiv1.DeleteStoredCompletionRequest{ResponseId: completionID})
+	return err
 }
 
 // StoredCompletion represents a stored chat completion.

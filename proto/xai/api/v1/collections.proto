@@ -1,55 +1,122 @@
 syntax = "proto3";
 
-package xai_api;
+package collections;
 
+import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
+import "xai/api/v1/shared.proto";
+import "xai/api/v1/types.proto";
 
 service Collections {
   rpc CreateCollection(CreateCollectionRequest) returns (CollectionMetadata) {}
-  rpc GetCollection(GetCollectionRequest) returns (CollectionMetadata) {}
   rpc ListCollections(ListCollectionsRequest) returns (ListCollectionsResponse) {}
-  rpc UpdateCollection(UpdateCollectionRequest) returns (CollectionMetadata) {}
-  rpc DeleteCollection(DeleteCollectionRequest) returns (DeleteCollectionResponse) {}
-  
-  rpc AddDocumentToCollection(AddDocumentToCollectionRequest) returns (DocumentMetadata) {}
-  rpc GetDocument(GetDocumentRequest) returns (DocumentMetadata) {}
-  rpc ListDocuments(ListDocumentsRequest) returns (ListDocumentsResponse) {}
+  rpc DeleteCollection(DeleteCollectionRequest) returns (google.protobuf.Empty) {}
+  rpc GetCollectionMetadata(GetCollectionMetadataRequest) returns (CollectionMetadata) {}
+  rpc ListAvailableEmbeddingModels(ListAvailableEmbeddingModelsRequest) returns (ListAvailableEmbeddingModelsResponse) {}
+  rpc ListAvailableTokenEncodings(ListAvailableTokenEncodingsRequest) returns (ListAvailableTokenEncodingsResponse) {}
+  rpc UploadDocument(UploadDocumentRequest) returns (DocumentMetadata) {}
   rpc UpdateDocument(UpdateDocumentRequest) returns (DocumentMetadata) {}
-  rpc DeleteDocument(DeleteDocumentRequest) returns (DeleteDocumentResponse) {}
+  rpc ListDocuments(ListDocumentsRequest) returns (ListDocumentsResponse) {}
+  rpc GetDocumentMetadata(GetDocumentMetadataRequest) returns (DocumentMetadata) {}
+  rpc AddDocumentToCollection(AddDocumentToCollectionRequest) returns (google.protobuf.Empty) {}
+  rpc RemoveDocumentFromCollection(RemoveDocumentFromCollectionRequest) returns (google.protobuf.Empty) {}
+  rpc ReIndexDocument(ReIndexDocumentRequest) returns (google.protobuf.Empty) {}
+  rpc UpdateCollection(UpdateCollectionRequest) returns (CollectionMetadata) {}
   rpc BatchGetDocuments(BatchGetDocumentsRequest) returns (BatchGetDocumentsResponse) {}
 }
 
-enum Ordering {
-  ORDERING_DESC = 0;
-  ORDERING_ASC = 1;
-}
-
 enum CollectionsSortBy {
-  COLLECTIONS_SORT_BY_CREATED_AT = 0;
-  COLLECTIONS_SORT_BY_NAME = 1;
+  COLLECTIONS_SORT_BY_NAME = 0;
+  COLLECTIONS_SORT_BY_AGE = 1;
 }
 
 enum DocumentsSortBy {
-  DOCUMENTS_SORT_BY_CREATED_AT = 0;
-  DOCUMENTS_SORT_BY_NAME = 1;
+  DOCUMENTS_SORT_BY_NAME = 0;
+  DOCUMENTS_SORT_BY_SIZE = 1;
+  DOCUMENTS_SORT_BY_AGE = 2;
 }
 
 enum DocumentStatus {
-  DOCUMENT_STATUS_PENDING = 0;
-  DOCUMENT_STATUS_PROCESSED = 1;
-  DOCUMENT_STATUS_FAILED = 2;
+  DOCUMENT_STATUS_UNKNOWN = 0;
+  DOCUMENT_STATUS_PROCESSING = 1;
+  DOCUMENT_STATUS_PROCESSED = 2;
+  DOCUMENT_STATUS_FAILED = 3;
 }
 
-message FieldsEntry {
+message FieldDefinition {
   string key = 1;
-  string value = 2;
+  bool required = 2;
+  bool inject_into_chunk = 3;
+  bool unique = 4;
+  optional string description = 5;
+}
+
+message CreateCollectionRequest {
+  optional string team_id = 1;
+  string collection_name = 2;
+  optional rag.IndexConfiguration index_configuration = 4;
+  optional rag.ChunkConfiguration chunk_configuration = 5;
+  optional rag.HNSWMetric metric_space = 7;
+  repeated FieldDefinition field_definitions = 9;
 }
 
 message CollectionMetadata {
   string collection_id = 1;
   string collection_name = 2;
   google.protobuf.Timestamp created_at = 3;
-  int32 documents_count = 4;
+  rag.IndexConfiguration index_configuration = 4;
+  rag.ChunkConfiguration chunk_configuration = 5;
+  int32 documents_count = 6;
+  repeated FieldDefinition field_definitions = 8;
+}
+
+message ListCollectionsRequest {
+  optional string team_id = 1;
+  optional int32 limit = 2;
+  optional shared.Ordering order = 3;
+  optional CollectionsSortBy sort_by = 4;
+  optional string pagination_token = 5;
+  optional string filter = 6;
+}
+
+message ListCollectionsResponse {
+  repeated CollectionMetadata collections = 1;
+  optional string pagination_token = 2;
+}
+
+message DeleteCollectionRequest {
+  optional string team_id = 1;
+  string collection_id = 2;
+}
+
+message GetCollectionMetadataRequest {
+  optional string team_id = 1;
+  string collection_id = 2;
+}
+
+message ListAvailableEmbeddingModelsRequest {
+  optional string team_id = 1;
+}
+
+message ListAvailableEmbeddingModelsResponse {
+  repeated string embedding_models = 1;
+}
+
+message ListAvailableTokenEncodingsRequest {
+  optional string team_id = 1;
+}
+
+message ListAvailableTokenEncodingsResponse {
+  repeated string encodings = 1;
+}
+
+message UploadDocumentRequest {
+  optional string team_id = 1;
+  string collection_id = 2;
+  string name = 3;
+  bytes data = 4;
+  string content_type = 5;
+  map<string, string> fields = 7;
 }
 
 message FileMetadata {
@@ -60,95 +127,77 @@ message FileMetadata {
   google.protobuf.Timestamp created_at = 5;
   google.protobuf.Timestamp expires_at = 6;
   string hash = 7;
+  optional string upload_status = 8;
+  optional string upload_error_message = 9;
 }
 
 message DocumentMetadata {
-  DocumentStatus status = 1;
-  string error_message = 2;
-  repeated FieldsEntry fields = 3;
-  FileMetadata file_metadata = 4;
-}
-
-message CreateCollectionRequest {
-  string team_id = 1;
-  string collection_name = 2;
-}
-
-message GetCollectionRequest {
-  string collection_id = 1;
-  string team_id = 2;
-}
-
-message ListCollectionsRequest {
-  string team_id = 1;
-  int32 limit = 2;
-  Ordering order = 3;
-  string pagination_token = 4;
-  CollectionsSortBy sort_by = 5;
-}
-
-message ListCollectionsResponse {
-  repeated CollectionMetadata collections = 1;
-  string pagination_token = 2;
-}
-
-message UpdateCollectionRequest {
-  string collection_id = 1;
-  string team_id = 2;
-  string collection_name = 3;
-}
-
-message DeleteCollectionRequest {
-  string collection_id = 1;
-  string team_id = 2;
-}
-
-message DeleteCollectionResponse {}
-
-message AddDocumentToCollectionRequest {
-  string file_id = 1;
-  string team_id = 2;
-  string collection_id = 3;
-  repeated FieldsEntry fields = 4;
-}
-
-message GetDocumentRequest {
-  string collection_id = 1;
-  string file_id = 2;
-  string team_id = 3;
+  FileMetadata file_metadata = 1;
+  map<string, string> fields = 2;
+  DocumentStatus status = 3;
+  optional string error_message = 4;
 }
 
 message ListDocumentsRequest {
-  string collection_id = 1;
-  string team_id = 2;
-  int32 limit = 3;
-  Ordering order = 4;
-  string pagination_token = 5;
-  DocumentsSortBy sort_by = 6;
+  optional string team_id = 1;
+  string collection_id = 2;
+  optional int32 limit = 3;
+  optional shared.Ordering order = 4;
+  optional DocumentsSortBy sort_by = 5;
+  optional string pagination_token = 6;
+  optional string name = 7;
+  optional string filter = 8;
 }
 
 message ListDocumentsResponse {
   repeated DocumentMetadata documents = 1;
-  string pagination_token = 2;
+  optional string pagination_token = 2;
+}
+
+message GetDocumentMetadataRequest {
+  string file_id = 1;
+  optional string team_id = 2;
+  string collection_id = 3;
+}
+
+message AddDocumentToCollectionRequest {
+  string file_id = 1;
+  optional string team_id = 2;
+  string collection_id = 3;
+  map<string, string> fields = 5;
+}
+
+message RemoveDocumentFromCollectionRequest {
+  string file_id = 1;
+  optional string team_id = 2;
+  string collection_id = 3;
 }
 
 message UpdateDocumentRequest {
-  string collection_id = 1;
-  string file_id = 2;
-  string team_id = 3;
-  repeated FieldsEntry fields = 4;
+  optional string team_id = 1;
+  string collection_id = 2;
+  string file_id = 3;
+  optional string name = 4;
+  optional bytes data = 5;
+  optional string content_type = 6;
+  map<string, string> fields = 7;
 }
 
-message DeleteDocumentRequest {
-  string collection_id = 1;
-  string file_id = 2;
-  string team_id = 3;
+message ReIndexDocumentRequest {
+  optional string team_id = 1;
+  string collection_id = 2;
+  string file_id = 3;
 }
 
-message DeleteDocumentResponse {}
+message UpdateCollectionRequest {
+  optional string team_id = 1;
+  string collection_id = 2;
+  optional string collection_name = 3;
+  optional rag.ChunkConfiguration chunk_configuration = 4;
+}
 
 message BatchGetDocumentsRequest {
-  string team_id = 1;
+  optional string team_id = 1;
   string collection_id = 2;
   repeated string file_ids = 3;
 }

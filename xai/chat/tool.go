@@ -373,6 +373,40 @@ func WebSearchTool(opts ...WebSearchOption) *ServerTool {
 // WebSearchOption configures web search tool.
 type WebSearchOption func(*xaiv1.WebSearch)
 
+type WebSearchUserLocation struct {
+	proto *xaiv1.WebSearchUserLocation
+}
+
+func NewWebSearchUserLocation() *WebSearchUserLocation {
+	return &WebSearchUserLocation{
+		proto: &xaiv1.WebSearchUserLocation{},
+	}
+}
+
+func (l *WebSearchUserLocation) Proto() *xaiv1.WebSearchUserLocation {
+	return l.proto
+}
+
+func (l *WebSearchUserLocation) WithCountry(country string) *WebSearchUserLocation {
+	l.proto.Country = &country
+	return l
+}
+
+func (l *WebSearchUserLocation) WithCity(city string) *WebSearchUserLocation {
+	l.proto.City = &city
+	return l
+}
+
+func (l *WebSearchUserLocation) WithRegion(region string) *WebSearchUserLocation {
+	l.proto.Region = &region
+	return l
+}
+
+func (l *WebSearchUserLocation) WithTimezone(timezone string) *WebSearchUserLocation {
+	l.proto.Timezone = &timezone
+	return l
+}
+
 // WithExcludedDomains excludes specific domains from web search.
 func WithExcludedDomains(domains ...string) WebSearchOption {
 	return func(ws *xaiv1.WebSearch) {
@@ -391,6 +425,14 @@ func WithAllowedDomains(domains ...string) WebSearchOption {
 func WithImageUnderstanding(enable bool) WebSearchOption {
 	return func(ws *xaiv1.WebSearch) {
 		ws.EnableImageUnderstanding = &enable
+	}
+}
+
+func WithWebSearchUserLocation(location *WebSearchUserLocation) WebSearchOption {
+	return func(ws *xaiv1.WebSearch) {
+		if location != nil {
+			ws.UserLocation = location.Proto()
+		}
 	}
 }
 

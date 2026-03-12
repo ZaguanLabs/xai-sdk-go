@@ -39,35 +39,7 @@ func NewResponseFormatJSONSchema(schema map[string]interface{}) *ResponseFormatO
 	}
 }
 
-// Parse performs a chat completion request and parses the response into the provided type.
-func (r *Request) Parse(ctx context.Context, client ServiceClient, v any) error {
-	if client == nil {
-		return fmt.Errorf("chat client is nil")
-	}
-	if r.proto == nil {
-		return fmt.Errorf("request proto is nil")
-	}
-	if r.proto.Model == "" {
-		return fmt.Errorf("model is required")
-	}
-
-	// Perform chat completion
-	resp, err := client.GetCompletion(ctx, r.proto)
-	if err != nil {
-		return fmt.Errorf("chat completion failed: %w", err)
-	}
-
-	if resp == nil || len(resp.Outputs) == 0 {
-		return fmt.Errorf("empty response received")
-	}
-
-	// Get the content from the first output
-	content := resp.Outputs[0].Message.Content
-	if content == "" {
-		return fmt.Errorf("empty content in response")
-	}
-
-	// Parse based on the target type
+func parseContent(content string, v any) error {
 	switch target := v.(type) {
 	case *string:
 		*target = content
@@ -91,6 +63,42 @@ func (r *Request) Parse(ctx context.Context, client ServiceClient, v any) error 
 	default:
 		return fmt.Errorf("unsupported target type: %T", v)
 	}
+}
+
+// ParseWithResponse performs a chat completion request, parses the response into the provided type,
+// and returns the raw response alongside the parsed value.
+func (r *Request) ParseWithResponse(ctx context.Context, client ServiceClient, v any) (*Response, error) {
+	if client == nil {
+		return nil, fmt.Errorf("chat client is nil")
+	}
+	if r.proto == nil {
+		return nil, fmt.Errorf("request proto is nil")
+	}
+	if r.proto.Model == "" {
+		return nil, fmt.Errorf("model is required")
+	}
+
+	resp, err := r.Sample(ctx, client)
+	if err != nil {
+		return nil, err
+	}
+
+	content := resp.Content()
+	if content == "" {
+		return nil, fmt.Errorf("empty content in response")
+	}
+
+	if err := parseContent(content, v); err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+// Parse performs a chat completion request and parses the response into the provided type.
+func (r *Request) Parse(ctx context.Context, client ServiceClient, v any) error {
+	_, err := r.ParseWithResponse(ctx, client, v)
+	return err
 }
 
 // ParseJSON performs a chat completion request and parses the response as JSON.

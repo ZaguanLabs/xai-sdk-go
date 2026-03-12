@@ -77,6 +77,10 @@ func Assistant(parts ...Part) *Message {
 	return NewMessage("assistant", parts...)
 }
 
+func Developer(parts ...Part) *Message {
+	return NewMessage("developer", parts...)
+}
+
 // Proto returns the underlying protobuf message.
 func (m *Message) Proto() *xaiv1.Message {
 	return m.proto
@@ -124,6 +128,20 @@ func (m *Message) Name() string {
 func (m *Message) WithName(name string) *Message {
 	if m.proto != nil {
 		m.proto.Name = name
+	}
+	return m
+}
+
+func (m *Message) ToolCallID() string {
+	if m.proto == nil || m.proto.ToolCallId == nil {
+		return ""
+	}
+	return *m.proto.ToolCallId
+}
+
+func (m *Message) WithToolCallID(toolCallID string) *Message {
+	if m.proto != nil {
+		m.proto.ToolCallId = &toolCallID
 	}
 	return m
 }

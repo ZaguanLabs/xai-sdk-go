@@ -1,0 +1,137 @@
+syntax = "proto3";
+
+package xai_api;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/rpc/status.proto";
+import "xai/api/v1/chat.proto";
+
+message Batch {
+  string batch_id = 1;
+  string name = 2;
+  google.protobuf.Timestamp create_time = 3;
+  google.protobuf.Timestamp expire_time = 4;
+  string create_api_key_id = 5;
+  google.protobuf.Timestamp cancel_time = 6;
+  optional string cancel_by_xai_message = 7;
+  BatchState state = 8;
+  BatchCostBreakdown cost_breakdown = 9;
+}
+
+message BatchState {
+  int64 num_requests = 1;
+  int64 num_pending = 2;
+  int64 num_success = 3;
+  int64 num_error = 4;
+  int64 num_cancelled = 5;
+}
+
+message BatchCostBreakdown {
+  int64 total_cost_usd_ticks = 1;
+  repeated EndpointCost endpoint_costs = 2;
+  google.protobuf.Timestamp calculation_time = 3;
+}
+
+message EndpointCost {
+  string endpoint = 1;
+  int64 cost_usd_ticks = 2;
+  int64 request_count = 3;
+}
+
+message BatchRequest {
+  optional string batch_request_id = 1;
+  oneof request {
+    GetCompletionsRequest completion_request = 2;
+  }
+}
+
+message BatchResultData {
+  oneof response {
+    GetChatCompletionResponse completion_response = 2;
+  }
+}
+
+message BatchResult {
+  string batch_request_id = 1;
+  oneof result {
+    google.rpc.Status error = 3;
+    BatchResultData response = 4;
+  }
+}
+
+message BatchRequestMetadata {
+  enum State {
+    STATE_UNKNOWN = 0;
+    STATE_PENDING = 1;
+    STATE_SUCCEEDED = 2;
+    STATE_CANCELLED = 3;
+    STATE_FAILED = 4;
+  }
+
+  string batch_request_id = 1;
+  string endpoint = 2;
+  string model = 3;
+  State state = 4;
+  google.protobuf.Timestamp create_time = 5;
+  google.protobuf.Timestamp finish_time = 6;
+}
+
+message CreateBatchRequest {
+  string name = 1;
+}
+
+message AddBatchRequestsRequest {
+  string batch_id = 1;
+  repeated BatchRequest batch_requests = 2;
+}
+
+message GetBatchRequest {
+  string batch_id = 1;
+}
+
+message ListBatchesRequest {
+  int32 limit = 1;
+  optional string pagination_token = 2;
+}
+
+message ListBatchesResponse {
+  repeated Batch batches = 1;
+  optional string pagination_token = 2;
+}
+
+message CancelBatchRequest {
+  string batch_id = 1;
+}
+
+message ListBatchRequestMetadataRequest {
+  string batch_id = 1;
+  int32 limit = 2;
+  optional string pagination_token = 3;
+}
+
+message ListBatchRequestMetadataResponse {
+  repeated BatchRequestMetadata batch_request_metadata = 1;
+  optional string pagination_token = 2;
+}
+
+message ListBatchResultsRequest {
+  string batch_id = 1;
+  int32 limit = 2;
+  optional string pagination_token = 3;
+}
+
+message ListBatchResultsResponse {
+  repeated BatchResult results = 1;
+  optional string pagination_token = 2;
+}
+
+service BatchMgmt {
+  rpc CreateBatch(CreateBatchRequest) returns (Batch) {}
+  rpc GetBatch(GetBatchRequest) returns (Batch) {}
+  rpc ListBatches(ListBatchesRequest) returns (ListBatchesResponse) {}
+  rpc CancelBatch(CancelBatchRequest) returns (Batch) {}
+  rpc AddBatchRequests(AddBatchRequestsRequest) returns (google.protobuf.Empty) {}
+  rpc ListBatchRequestMetadata(ListBatchRequestMetadataRequest) returns (ListBatchRequestMetadataResponse) {}
+  rpc ListBatchResults(ListBatchResultsRequest) returns (ListBatchResultsResponse) {}
+}

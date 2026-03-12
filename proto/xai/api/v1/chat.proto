@@ -4,6 +4,7 @@ package xai_api;
 
 import "google/protobuf/timestamp.proto";
 import "xai/api/v1/deferred.proto";
+import "xai/api/v1/documents.proto";
 import "xai/api/v1/image.proto";
 import "xai/api/v1/sample.proto";
 import "xai/api/v1/usage.proto";
@@ -187,6 +188,8 @@ message GetCompletionsRequest {
   // A list of output options to include in the response.
   // Use this to request additional data like tool call outputs or inline citations.
   repeated IncludeOption include = 26;
+
+  optional AgentCount agent_count = 29;
 }
 
 message GetChatCompletionResponse {
@@ -487,6 +490,8 @@ message Message {
 
   // The encrypted content.
   string encrypted_content = 6;
+
+  optional string tool_call_id = 7;
 }
 
 enum MessageRole {
@@ -507,6 +512,14 @@ enum MessageRole {
 
   // Indicates a return from a tool call.
   ROLE_TOOL = 5;
+
+  ROLE_DEVELOPER = 6;
+}
+
+enum AgentCount {
+  AGENT_COUNT_UNSPECIFIED = 0;
+  AGENT_COUNT_4 = 1;
+  AGENT_COUNT_16 = 2;
 }
 
 enum ReasoningEffort {
@@ -602,6 +615,15 @@ message WebSearch {
   // Enable image understanding in downstream tools (e.g. allow fetching and interpreting images).
   // When true, the server may add image viewing tools to the active MCP toolset.
   optional bool enable_image_understanding = 3;
+
+  optional WebSearchUserLocation user_location = 4;
+}
+
+message WebSearchUserLocation {
+  optional string country = 1;
+  optional string city = 2;
+  optional string region = 3;
+  optional string timezone = 4;
 }
 
 message XSearch {
@@ -661,15 +683,6 @@ message CollectionsSearch {
     KeywordRetrieval keyword_retrieval = 6;
   }
 }
-
-// Configuration for hybrid retrieval combining semantic and keyword search.
-message HybridRetrieval {}
-
-// Configuration for semantic retrieval based on embeddings.
-message SemanticRetrieval {}
-
-// Configuration for keyword-based retrieval.
-message KeywordRetrieval {}
 
 // Built-in attachment search tool for searching within uploaded file attachments.
 message AttachmentSearch {

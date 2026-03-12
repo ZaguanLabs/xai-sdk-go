@@ -9,6 +9,7 @@ import (
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/auth"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/batch"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/chat"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/collections"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/deferred"
@@ -22,21 +23,23 @@ import (
 	"github.com/ZaguanLabs/xai-sdk-go/xai/models"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/sample"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/tokenizer"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/video"
 	"google.golang.org/grpc"
 )
 
 // Client represents the main xAI SDK client.
 type Client struct {
-	config       *Config
-	grpcConn     *grpc.ClientConn
-	grpcClient   *grpc.ClientConn // Alias for consistency
-	restClient   *rest.Client
-	chatClient   xaiv1.ChatClient
-	modelsClient xaiv1.ModelsClient
-	mu           sync.RWMutex
-	isClosed     bool
-	createdAt    time.Time
-	metadata     *metadata.SDKMetadata
+	config               *Config
+	grpcConn             *grpc.ClientConn
+	grpcClient           *grpc.ClientConn // Alias for consistency
+	restClient           *rest.Client
+	managementRestClient *rest.Client
+	chatClient           xaiv1.ChatClient
+	modelsClient         xaiv1.ModelsClient
+	mu                   sync.RWMutex
+	isClosed             bool
+	createdAt            time.Time
+	metadata             *metadata.SDKMetadata
 }
 
 // NewClient creates a new xAI client with the given configuration.
@@ -67,6 +70,21 @@ func NewClient(config *Config) (*Client, error) {
 	client.restClient = rest.NewClient(rest.Config{
 		BaseURL:   baseURL,
 		APIKey:    config.APIKey,
+		UserAgent: metadata.UserAgent,
+		Timeout:   config.Timeout,
+	})
+
+	managementBaseURL := fmt.Sprintf("https://%s/v1", config.ManagementAPIHost)
+	if config.Insecure {
+		managementBaseURL = fmt.Sprintf("http://%s/v1", config.ManagementAPIHost)
+	}
+	managementAPIKey := config.ManagementAPIKey
+	if managementAPIKey == "" {
+		managementAPIKey = config.APIKey
+	}
+	client.managementRestClient = rest.NewClient(rest.Config{
+		BaseURL:   managementBaseURL,
+		APIKey:    managementAPIKey,
 		UserAgent: metadata.UserAgent,
 		Timeout:   config.Timeout,
 	})
@@ -165,8 +183,15 @@ func (c *Client) GRPCConnection() *grpc.ClientConn {
 	return c.grpcConn
 }
 
-// Chat returns the chat service client.
-func (c *Client) Chat() xaiv1.ChatClient {
+// Chat returns the chat service client wrapper.
+func (c *Client) Chat() *chat.Client {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return chat.NewClient(c.chatClient)
+}
+
+// RawChat returns the underlying generated gRPC chat client.
+func (c *Client) RawChat() xaiv1.ChatClient {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return c.chatClient
@@ -235,6 +260,9 @@ func (c *Client) Close() error {
 	// Close REST client
 	if c.restClient != nil {
 		c.restClient.Close()
+	}
+	if c.managementRestClient != nil {
+		c.managementRestClient.Close()
 	}
 
 	// Close gRPC connection
@@ -315,15 +343,16 @@ func (c *Client) WithTimeout(timeout time.Duration) *Client {
 	newConfig.Timeout = timeout
 
 	return &Client{
-		config:       &newConfig,
-		metadata:     c.metadata,
-		grpcConn:     c.grpcConn,
-		grpcClient:   c.grpcConn,
-		restClient:   c.restClient,
-		chatClient:   c.chatClient,
-		modelsClient: c.modelsClient,
-		createdAt:    c.createdAt,
-		isClosed:     c.isClosed,
+		config:               &newConfig,
+		metadata:             c.metadata,
+		grpcConn:             c.grpcConn,
+		grpcClient:           c.grpcConn,
+		restClient:           c.restClient,
+		managementRestClient: c.managementRestClient,
+		chatClient:           c.chatClient,
+		modelsClient:         c.modelsClient,
+		createdAt:            c.createdAt,
+		isClosed:             c.isClosed,
 	}
 }
 
@@ -339,15 +368,16 @@ func (c *Client) WithAPIKey(apiKey string) *Client {
 	newMetadata.APIKey = apiKey
 
 	return &Client{
-		config:       &newConfig,
-		metadata:     newMetadata,
-		grpcConn:     c.grpcConn,
-		grpcClient:   c.grpcConn,
-		restClient:   c.restClient,
-		chatClient:   c.chatClient,
-		modelsClient: c.modelsClient,
-		createdAt:    c.createdAt,
-		isClosed:     c.isClosed,
+		config:               &newConfig,
+		metadata:             newMetadata,
+		grpcConn:             c.grpcConn,
+		grpcClient:           c.grpcConn,
+		restClient:           c.restClient,
+		managementRestClient: c.managementRestClient,
+		chatClient:           c.chatClient,
+		modelsClient:         c.modelsClient,
+		createdAt:            c.createdAt,
+		isClosed:             c.isClosed,
 	}
 }
 
@@ -462,14 +492,14 @@ func (c *Client) Files() *files.Client {
 func (c *Client) Collections() *collections.Client {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	return collections.NewClient(c.restClient)
+	return collections.NewClient(c.managementRestClient)
 }
 
 // Auth returns the auth service client.
 func (c *Client) Auth() *auth.Client {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	return auth.NewClient(c.restClient)
+	return auth.NewClient(c.managementRestClient)
 }
 
 // Images returns the image generation service client.
@@ -477,6 +507,11 @@ func (c *Client) Images() *image.Client {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return image.NewClient(c.restClient)
+}
+
+// Image returns the image generation service client.
+func (c *Client) Image() *image.Client {
+	return c.Images()
 }
 
 // Deferred returns the deferred completions service client.
@@ -505,4 +540,21 @@ func (c *Client) Tokenizer() *tokenizer.Client {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return tokenizer.NewClient(c.restClient)
+}
+
+// Tokenize returns the tokenization service client.
+func (c *Client) Tokenize() *tokenizer.Client {
+	return c.Tokenizer()
+}
+
+func (c *Client) Batch() *batch.Client {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return batch.NewClient(xaiv1.NewBatchMgmtClient(c.grpcConn))
+}
+
+func (c *Client) Video() *video.Client {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return video.NewClient(xaiv1.NewVideoClient(c.grpcConn))
 }

@@ -30,8 +30,11 @@ func fromProtoDocument(pd *xaiv1.DocumentMetadata) *Document {
 	}
 
 	d := &Document{
-		Status:   pd.Status,
-		ErrorMsg: pd.ErrorMessage,
+		Status: pd.Status,
+	}
+
+	if pd.ErrorMessage != nil {
+		d.ErrorMsg = *pd.ErrorMessage
 	}
 
 	// Extract file metadata
@@ -55,8 +58,8 @@ func fromProtoDocument(pd *xaiv1.DocumentMetadata) *Document {
 	// Convert fields
 	if len(pd.Fields) > 0 {
 		d.Fields = make(map[string]string, len(pd.Fields))
-		for _, f := range pd.Fields {
-			d.Fields[f.Key] = f.Value
+		for k, v := range pd.Fields {
+			d.Fields[k] = v
 		}
 	}
 

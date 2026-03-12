@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package shared;
+
+enum Ordering {
+  ORDERING_UNKNOWN = 0;
+  ORDERING_ASCENDING = 1;
+  ORDERING_DESCENDING = 2;
+}

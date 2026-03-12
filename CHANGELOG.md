@@ -7,6 +7,87 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-03-12
+
+### 🎯 Focus: Python SDK v1.8.1 Public-Surface Parity
+
+This release brings the Go SDK to public-surface parity with the official Python SDK v1.8.1 sync client surface, with a focus on chat conveniences, collections/document workflows, batch/video ergonomics, and top-level client accessors.
+
+### Added
+
+#### Top-Level Client Ergonomics
+- **`Client.Chat()`**: Returns a high-level `chat.Client` wrapper
+- **`Client.RawChat()`**: Exposes the underlying generated gRPC chat client when needed
+- **`Client.Image()`**: Python-style alias for `Images()`
+- **`Client.Tokenize()`**: Python-style alias for `Tokenizer()`
+
+#### Chat Client Surface
+- **`chat.Client`**: High-level wrapper aligned with Python chat client ergonomics
+- **`chat.Client.Create()`**: Python-style chat request factory
+- **`chat.Client.GetStoredCompletion()`**: Retrieve stored completions by response ID
+- **`chat.Client.DeleteStoredCompletion()`**: Delete stored completions by response ID
+- **`Request.SampleBatch()`**: Request multiple completion outputs in a single call
+- **`Request.StreamBatch()`**: Stream multiple completion outputs with accumulated response state
+- **`Request.Defer()`**: Deferred polling helper for single-output chat completions
+- **`Request.DeferBatch()`**: Deferred polling helper for multi-output chat completions
+- **`Request.ParseWithResponse()`**: Structured parsing while preserving the raw response
+- **`BatchStream`**: Go-style helper for multi-output streaming chat responses
+
+#### Collections & Documents Convenience Layer
+- **`collections.Client.Create()`**, **`Get()`**, **`Update()`**: Python-style collection aliases
+- **`collections.Client.Search()`**: High-level collections search convenience
+- **`collections.Client.UploadDocument()`**: Upload-and-attach helper with optional indexing wait/polling
+
+#### Batch & Video Ergonomics
+- **`batch.Client.Add()`**: Accepts either batch proto requests or `chat.Request` values directly
+- **`batch.Client.ListBatchRequests()`**: Alias for batch request metadata listing
+- **`batch.Client.ListBatchResults()`**: Alias for batch result listing
+- **`video.Client.Start()`**: Python-style deferred video start helper
+- **`video.Client.Get()`**: Python-style deferred video retrieval helper
+- **`video.Client.GenerateAndPoll()`**: Polling convenience for deferred video generation
+
+### Changed
+
+#### Chat API Parity Enhancements
+- Added support for the **`developer`** message role
+- Added support for **`tool_call_id`**
+- Added support for **`max_turns`**
+- Added support for request **`include`** options
+- Added support for **`batch_request_id`**
+- Added support for web search **`user_location`**
+
+#### Collections Search & Document Workflow
+- Extended document search with **instructions**
+- Extended document search with **hybrid**, **semantic**, and **keyword** retrieval modes
+- Added optional wait-for-indexing workflow for uploaded collection documents
+
+#### Client Configuration Behavior
+- Management-aware client accessors now consistently use the management REST client where required
+- Client clones created via `WithTimeout()` and `WithAPIKey()` now preserve management client state
+
+### Fixed
+
+- Implemented stored-completion retrieval/deletion on the chat SDK layer using the generated gRPC surface
+- Corrected deferred chat polling helpers to use actual deferred request status flow
+- Fixed stale deferred polling semantics in the public deferred helper surface
+
+### Python SDK Parity
+
+This release closes the audited public sync-surface gap against Python SDK v1.8.1:
+- ✅ Chat wrapper and stored completion helpers
+- ✅ Chat batch/deferred convenience helpers
+- ✅ Parse helper with raw-response access
+- ✅ Batch add/list convenience methods
+- ✅ Video start/get/polling convenience methods
+- ✅ Collections search/upload-document conveniences
+- ✅ Top-level image/tokenize/chat accessors
+- ✅ Management API-aware client behavior for parity-sensitive surfaces
+
+### Testing
+
+- ✅ `go test ./...`
+- ✅ Final parity re-audit against `docs/xai-sdk-python/xai_sdk-1.8.1/src`
+
 ## [0.10.0] - 2025-12-10
 
 ### 🎯 Focus: Python SDK v1.5.0 Parity
