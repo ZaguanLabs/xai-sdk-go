@@ -969,10 +969,6 @@ func (r *Request) validate() error {
 		return err
 	}
 
-	if err := r.validateParameters(); err != nil {
-		return err
-	}
-
 	if err := r.validateMessages(); err != nil {
 		return err
 	}
@@ -985,27 +981,6 @@ func (r *Request) validateModel() error {
 	if r.proto.Model == "" {
 		return fmt.Errorf("model is required")
 	}
-	return nil
-}
-
-// validateParameters validates temperature and max_tokens.
-func (r *Request) validateParameters() error {
-	// Validate temperature if set
-	if r.proto.Temperature != nil && *r.proto.Temperature != 0 {
-		temp := *r.proto.Temperature
-		if temp < 0.0 || temp > 2.0 {
-			return fmt.Errorf("temperature must be between 0.0 and 2.0, got %f", temp)
-		}
-	}
-
-	// Validate max_tokens if set
-	if r.proto.MaxTokens != nil && *r.proto.MaxTokens != 0 {
-		maxTokens := *r.proto.MaxTokens
-		if maxTokens < 1 || maxTokens > 8192 {
-			return fmt.Errorf("max_tokens must be between 1 and 8192, got %d", maxTokens)
-		}
-	}
-
 	return nil
 }
 
@@ -1031,9 +1006,6 @@ func (r *Request) validateMessage(msg *xaiv1.Message, index int) error {
 	}
 	if msg.Role == xaiv1.MessageRole_INVALID_ROLE {
 		return fmt.Errorf("message at index %d has invalid role", index)
-	}
-	if len(msg.Content) == 0 {
-		return fmt.Errorf("message at index %d has empty content", index)
 	}
 
 	// Validate role
