@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-03-13
+
+### 🎯 Focus: Grok 4.20 and Tool-Calling Reliability
+
+This patch release removes overly strict client-side validation that previously blocked valid requests for newer models like `grok-4.20` and complex tool-calling flows, achieving closer structural parity with the official Python SDK's validation patterns.
+
+### Fixed
+
+#### Relaxed Token Limits
+- **Removed `max_tokens` upper bound limitation:** Previously, the Go SDK enforced a hardcoded client-side limit of `8192` for `max_tokens`. This restriction has been removed, delegating upper-bound token validation entirely to the xAI backend API. This ensures full compatibility with newer models (like `grok-4.20`) that support significantly larger output bounds.
+
+#### Tool-Calling Message Content
+- **Removed empty message content validation:** The SDK previously rejected messages that had an empty `content` field. This broke valid tool-calling flows where an assistant message might contain only `tool_calls` but no raw text content. The `validateMessage` function has been updated to accept such valid payloads.
+
 ## [0.11.0] - 2026-03-12
 
 ### 🎯 Focus: Python SDK v1.8.1 Public-Surface Parity
