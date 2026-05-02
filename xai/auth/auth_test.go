@@ -10,8 +10,18 @@ import (
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
+	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
+
+type fakeAuthClient struct {
+	key *xaiv1.ApiKey
+}
+
+func (f fakeAuthClient) GetApiKeyInfo(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*xaiv1.ApiKey, error) {
+	return f.key, nil
+}
 
 func TestNewClient(t *testing.T) {
 	restClient := &rest.Client{}
@@ -161,6 +171,18 @@ func TestValidateKey(t *testing.T) {
 				t.Error("ValidateKey() returned nil key")
 			}
 		})
+	}
+}
+
+func TestGetAPIKeyInfo(t *testing.T) {
+	client := NewClientWithGRPC(nil, fakeAuthClient{key: &xaiv1.ApiKey{ApiKeyId: "key-123"}})
+
+	key, err := client.GetAPIKeyInfo(context.Background())
+	if err != nil {
+		t.Fatalf("GetAPIKeyInfo() error = %v", err)
+	}
+	if key.ApiKeyID != "key-123" {
+		t.Errorf("ApiKeyID = %v, want key-123", key.ApiKeyID)
 	}
 }
 

@@ -499,7 +499,7 @@ func (c *Client) Collections() *collections.Client {
 func (c *Client) Auth() *auth.Client {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	return auth.NewClient(c.managementRestClient)
+	return auth.NewClientWithGRPC(c.managementRestClient, xaiv1.NewAuthClient(c.grpcConn))
 }
 
 // Images returns the image generation service client.

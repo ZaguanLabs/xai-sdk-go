@@ -7,7 +7,7 @@
 package v1
 
 import (
-	rpc "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/google/rpc"
+	status "google.golang.org/genproto/googleapis/rpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -90,6 +90,7 @@ type Batch struct {
 	CancelByXaiMessage *string                `protobuf:"bytes,7,opt,name=cancel_by_xai_message,json=cancelByXaiMessage,proto3,oneof" json:"cancel_by_xai_message,omitempty"`
 	State              *BatchState            `protobuf:"bytes,8,opt,name=state,proto3" json:"state,omitempty"`
 	CostBreakdown      *BatchCostBreakdown    `protobuf:"bytes,9,opt,name=cost_breakdown,json=costBreakdown,proto3" json:"cost_breakdown,omitempty"`
+	InputFileId        string                 `protobuf:"bytes,10,opt,name=input_file_id,json=inputFileId,proto3" json:"input_file_id,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -185,6 +186,13 @@ func (x *Batch) GetCostBreakdown() *BatchCostBreakdown {
 		return x.CostBreakdown
 	}
 	return nil
+}
+
+func (x *Batch) GetInputFileId() string {
+	if x != nil {
+		return x.InputFileId
+	}
+	return ""
 }
 
 type BatchState struct {
@@ -389,6 +397,8 @@ type BatchRequest struct {
 	// Types that are valid to be assigned to Request:
 	//
 	//	*BatchRequest_CompletionRequest
+	//	*BatchRequest_ImageRequest
+	//	*BatchRequest_VideoRequest
 	Request       isBatchRequest_Request `protobuf_oneof:"request"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -447,6 +457,24 @@ func (x *BatchRequest) GetCompletionRequest() *GetCompletionsRequest {
 	return nil
 }
 
+func (x *BatchRequest) GetImageRequest() *GenerateImageRequest {
+	if x != nil {
+		if x, ok := x.Request.(*BatchRequest_ImageRequest); ok {
+			return x.ImageRequest
+		}
+	}
+	return nil
+}
+
+func (x *BatchRequest) GetVideoRequest() *GenerateVideoRequest {
+	if x != nil {
+		if x, ok := x.Request.(*BatchRequest_VideoRequest); ok {
+			return x.VideoRequest
+		}
+	}
+	return nil
+}
+
 type isBatchRequest_Request interface {
 	isBatchRequest_Request()
 }
@@ -455,13 +483,27 @@ type BatchRequest_CompletionRequest struct {
 	CompletionRequest *GetCompletionsRequest `protobuf:"bytes,2,opt,name=completion_request,json=completionRequest,proto3,oneof"`
 }
 
+type BatchRequest_ImageRequest struct {
+	ImageRequest *GenerateImageRequest `protobuf:"bytes,3,opt,name=image_request,json=imageRequest,proto3,oneof"`
+}
+
+type BatchRequest_VideoRequest struct {
+	VideoRequest *GenerateVideoRequest `protobuf:"bytes,4,opt,name=video_request,json=videoRequest,proto3,oneof"`
+}
+
 func (*BatchRequest_CompletionRequest) isBatchRequest_Request() {}
+
+func (*BatchRequest_ImageRequest) isBatchRequest_Request() {}
+
+func (*BatchRequest_VideoRequest) isBatchRequest_Request() {}
 
 type BatchResultData struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Response:
 	//
 	//	*BatchResultData_CompletionResponse
+	//	*BatchResultData_ImageResponse
+	//	*BatchResultData_VideoResponse
 	Response      isBatchResultData_Response `protobuf_oneof:"response"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -513,6 +555,24 @@ func (x *BatchResultData) GetCompletionResponse() *GetChatCompletionResponse {
 	return nil
 }
 
+func (x *BatchResultData) GetImageResponse() *ImageResponse {
+	if x != nil {
+		if x, ok := x.Response.(*BatchResultData_ImageResponse); ok {
+			return x.ImageResponse
+		}
+	}
+	return nil
+}
+
+func (x *BatchResultData) GetVideoResponse() *VideoResponse {
+	if x != nil {
+		if x, ok := x.Response.(*BatchResultData_VideoResponse); ok {
+			return x.VideoResponse
+		}
+	}
+	return nil
+}
+
 type isBatchResultData_Response interface {
 	isBatchResultData_Response()
 }
@@ -521,7 +581,19 @@ type BatchResultData_CompletionResponse struct {
 	CompletionResponse *GetChatCompletionResponse `protobuf:"bytes,2,opt,name=completion_response,json=completionResponse,proto3,oneof"`
 }
 
+type BatchResultData_ImageResponse struct {
+	ImageResponse *ImageResponse `protobuf:"bytes,3,opt,name=image_response,json=imageResponse,proto3,oneof"`
+}
+
+type BatchResultData_VideoResponse struct {
+	VideoResponse *VideoResponse `protobuf:"bytes,4,opt,name=video_response,json=videoResponse,proto3,oneof"`
+}
+
 func (*BatchResultData_CompletionResponse) isBatchResultData_Response() {}
+
+func (*BatchResultData_ImageResponse) isBatchResultData_Response() {}
+
+func (*BatchResultData_VideoResponse) isBatchResultData_Response() {}
 
 type BatchResult struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
@@ -579,7 +651,7 @@ func (x *BatchResult) GetResult() isBatchResult_Result {
 	return nil
 }
 
-func (x *BatchResult) GetError() *rpc.Status {
+func (x *BatchResult) GetError() *status.Status {
 	if x != nil {
 		if x, ok := x.Result.(*BatchResult_Error); ok {
 			return x.Error
@@ -602,7 +674,7 @@ type isBatchResult_Result interface {
 }
 
 type BatchResult_Error struct {
-	Error *rpc.Status `protobuf:"bytes,3,opt,name=error,proto3,oneof"`
+	Error *status.Status `protobuf:"bytes,3,opt,name=error,proto3,oneof"`
 }
 
 type BatchResult_Response struct {
@@ -700,6 +772,7 @@ func (x *BatchRequestMetadata) GetFinishTime() *timestamppb.Timestamp {
 type CreateBatchRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	InputFileId   string                 `protobuf:"bytes,2,opt,name=input_file_id,json=inputFileId,proto3" json:"input_file_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -737,6 +810,13 @@ func (*CreateBatchRequest) Descriptor() ([]byte, []int) {
 func (x *CreateBatchRequest) GetName() string {
 	if x != nil {
 		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateBatchRequest) GetInputFileId() string {
+	if x != nil {
+		return x.InputFileId
 	}
 	return ""
 }
@@ -1209,11 +1289,115 @@ func (x *ListBatchResultsResponse) GetPaginationToken() string {
 	return ""
 }
 
+type GetBatchRequestResultRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	BatchId        string                 `protobuf:"bytes,1,opt,name=batch_id,json=batchId,proto3" json:"batch_id,omitempty"`
+	BatchRequestId string                 `protobuf:"bytes,2,opt,name=batch_request_id,json=batchRequestId,proto3" json:"batch_request_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *GetBatchRequestResultRequest) Reset() {
+	*x = GetBatchRequestResultRequest{}
+	mi := &file_xai_api_v1_batch_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBatchRequestResultRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBatchRequestResultRequest) ProtoMessage() {}
+
+func (x *GetBatchRequestResultRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_api_v1_batch_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBatchRequestResultRequest.ProtoReflect.Descriptor instead.
+func (*GetBatchRequestResultRequest) Descriptor() ([]byte, []int) {
+	return file_xai_api_v1_batch_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GetBatchRequestResultRequest) GetBatchId() string {
+	if x != nil {
+		return x.BatchId
+	}
+	return ""
+}
+
+func (x *GetBatchRequestResultRequest) GetBatchRequestId() string {
+	if x != nil {
+		return x.BatchRequestId
+	}
+	return ""
+}
+
+type GetBatchRequestResultResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Request       *BatchRequest          `protobuf:"bytes,1,opt,name=request,proto3" json:"request,omitempty"`
+	Result        *BatchResult           `protobuf:"bytes,2,opt,name=result,proto3" json:"result,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBatchRequestResultResponse) Reset() {
+	*x = GetBatchRequestResultResponse{}
+	mi := &file_xai_api_v1_batch_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBatchRequestResultResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBatchRequestResultResponse) ProtoMessage() {}
+
+func (x *GetBatchRequestResultResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_api_v1_batch_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBatchRequestResultResponse.ProtoReflect.Descriptor instead.
+func (*GetBatchRequestResultResponse) Descriptor() ([]byte, []int) {
+	return file_xai_api_v1_batch_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *GetBatchRequestResultResponse) GetRequest() *BatchRequest {
+	if x != nil {
+		return x.Request
+	}
+	return nil
+}
+
+func (x *GetBatchRequestResultResponse) GetResult() *BatchResult {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
 var File_xai_api_v1_batch_proto protoreflect.FileDescriptor
 
 const file_xai_api_v1_batch_proto_rawDesc = "" +
 	"\n" +
-	"\x16xai/api/v1/batch.proto\x12\axai_api\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\x1a\x15xai/api/v1/chat.proto\"\xd9\x03\n" +
+	"\x16xai/api/v1/batch.proto\x12\axai_api\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\x1a\x15xai/api/v1/chat.proto\x1a\x16xai/api/v1/image.proto\x1a\x16xai/api/v1/video.proto\"\xfd\x03\n" +
 	"\x05Batch\x12\x19\n" +
 	"\bbatch_id\x18\x01 \x01(\tR\abatchId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12;\n" +
@@ -1226,7 +1410,9 @@ const file_xai_api_v1_batch_proto_rawDesc = "" +
 	"cancelTime\x126\n" +
 	"\x15cancel_by_xai_message\x18\a \x01(\tH\x00R\x12cancelByXaiMessage\x88\x01\x01\x12)\n" +
 	"\x05state\x18\b \x01(\v2\x13.xai_api.BatchStateR\x05state\x12B\n" +
-	"\x0ecost_breakdown\x18\t \x01(\v2\x1b.xai_api.BatchCostBreakdownR\rcostBreakdownB\x18\n" +
+	"\x0ecost_breakdown\x18\t \x01(\v2\x1b.xai_api.BatchCostBreakdownR\rcostBreakdown\x12\"\n" +
+	"\rinput_file_id\x18\n" +
+	" \x01(\tR\vinputFileIdB\x18\n" +
 	"\x16_cancel_by_xai_message\"\xb3\x01\n" +
 	"\n" +
 	"BatchState\x12!\n" +
@@ -1244,14 +1430,18 @@ const file_xai_api_v1_batch_proto_rawDesc = "" +
 	"\fEndpointCost\x12\x1a\n" +
 	"\bendpoint\x18\x01 \x01(\tR\bendpoint\x12$\n" +
 	"\x0ecost_usd_ticks\x18\x02 \x01(\x03R\fcostUsdTicks\x12#\n" +
-	"\rrequest_count\x18\x03 \x01(\x03R\frequestCount\"\xae\x01\n" +
+	"\rrequest_count\x18\x03 \x01(\x03R\frequestCount\"\xba\x02\n" +
 	"\fBatchRequest\x12-\n" +
 	"\x10batch_request_id\x18\x01 \x01(\tH\x01R\x0ebatchRequestId\x88\x01\x01\x12O\n" +
-	"\x12completion_request\x18\x02 \x01(\v2\x1e.xai_api.GetCompletionsRequestH\x00R\x11completionRequestB\t\n" +
+	"\x12completion_request\x18\x02 \x01(\v2\x1e.xai_api.GetCompletionsRequestH\x00R\x11completionRequest\x12D\n" +
+	"\rimage_request\x18\x03 \x01(\v2\x1d.xai_api.GenerateImageRequestH\x00R\fimageRequest\x12D\n" +
+	"\rvideo_request\x18\x04 \x01(\v2\x1d.xai_api.GenerateVideoRequestH\x00R\fvideoRequestB\t\n" +
 	"\arequestB\x13\n" +
-	"\x11_batch_request_id\"t\n" +
+	"\x11_batch_request_id\"\xf6\x01\n" +
 	"\x0fBatchResultData\x12U\n" +
-	"\x13completion_response\x18\x02 \x01(\v2\".xai_api.GetChatCompletionResponseH\x00R\x12completionResponseB\n" +
+	"\x13completion_response\x18\x02 \x01(\v2\".xai_api.GetChatCompletionResponseH\x00R\x12completionResponse\x12?\n" +
+	"\x0eimage_response\x18\x03 \x01(\v2\x16.xai_api.ImageResponseH\x00R\rimageResponse\x12?\n" +
+	"\x0evideo_response\x18\x04 \x01(\v2\x16.xai_api.VideoResponseH\x00R\rvideoResponseB\n" +
 	"\n" +
 	"\bresponse\"\xa5\x01\n" +
 	"\vBatchResult\x12(\n" +
@@ -1273,9 +1463,10 @@ const file_xai_api_v1_batch_proto_rawDesc = "" +
 	"\rSTATE_PENDING\x10\x01\x12\x13\n" +
 	"\x0fSTATE_SUCCEEDED\x10\x02\x12\x13\n" +
 	"\x0fSTATE_CANCELLED\x10\x03\x12\x10\n" +
-	"\fSTATE_FAILED\x10\x04\"(\n" +
+	"\fSTATE_FAILED\x10\x04\"L\n" +
 	"\x12CreateBatchRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\"r\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\"\n" +
+	"\rinput_file_id\x18\x02 \x01(\tR\vinputFileId\"r\n" +
 	"\x17AddBatchRequestsRequest\x12\x19\n" +
 	"\bbatch_id\x18\x01 \x01(\tR\abatchId\x12<\n" +
 	"\x0ebatch_requests\x18\x02 \x03(\v2\x15.xai_api.BatchRequestR\rbatchRequests\",\n" +
@@ -1308,7 +1499,13 @@ const file_xai_api_v1_batch_proto_rawDesc = "" +
 	"\x18ListBatchResultsResponse\x12.\n" +
 	"\aresults\x18\x01 \x03(\v2\x14.xai_api.BatchResultR\aresults\x12.\n" +
 	"\x10pagination_token\x18\x02 \x01(\tH\x00R\x0fpaginationToken\x88\x01\x01B\x13\n" +
-	"\x11_pagination_token2\xa9\x04\n" +
+	"\x11_pagination_token\"c\n" +
+	"\x1cGetBatchRequestResultRequest\x12\x19\n" +
+	"\bbatch_id\x18\x01 \x01(\tR\abatchId\x12(\n" +
+	"\x10batch_request_id\x18\x02 \x01(\tR\x0ebatchRequestId\"~\n" +
+	"\x1dGetBatchRequestResultResponse\x12/\n" +
+	"\arequest\x18\x01 \x01(\v2\x15.xai_api.BatchRequestR\arequest\x12,\n" +
+	"\x06result\x18\x02 \x01(\v2\x14.xai_api.BatchResultR\x06result2\x93\x05\n" +
 	"\tBatchMgmt\x12<\n" +
 	"\vCreateBatch\x12\x1b.xai_api.CreateBatchRequest\x1a\x0e.xai_api.Batch\"\x00\x126\n" +
 	"\bGetBatch\x12\x18.xai_api.GetBatchRequest\x1a\x0e.xai_api.Batch\"\x00\x12J\n" +
@@ -1316,7 +1513,8 @@ const file_xai_api_v1_batch_proto_rawDesc = "" +
 	"\vCancelBatch\x12\x1b.xai_api.CancelBatchRequest\x1a\x0e.xai_api.Batch\"\x00\x12N\n" +
 	"\x10AddBatchRequests\x12 .xai_api.AddBatchRequestsRequest\x1a\x16.google.protobuf.Empty\"\x00\x12q\n" +
 	"\x18ListBatchRequestMetadata\x12(.xai_api.ListBatchRequestMetadataRequest\x1a).xai_api.ListBatchRequestMetadataResponse\"\x00\x12Y\n" +
-	"\x10ListBatchResults\x12 .xai_api.ListBatchResultsRequest\x1a!.xai_api.ListBatchResultsResponse\"\x00B\x8b\x01\n" +
+	"\x10ListBatchResults\x12 .xai_api.ListBatchResultsRequest\x1a!.xai_api.ListBatchResultsResponse\"\x00\x12h\n" +
+	"\x15GetBatchRequestResult\x12%.xai_api.GetBatchRequestResultRequest\x1a&.xai_api.GetBatchRequestResultResponse\"\x00B\x8b\x01\n" +
 	"\vcom.xai_apiB\n" +
 	"BatchProtoP\x01Z8github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1\xa2\x02\x03XXX\xaa\x02\x06XaiApi\xca\x02\x06XaiApi\xe2\x02\x12XaiApi\\GPBMetadata\xea\x02\x06XaiApib\x06proto3"
 
@@ -1333,7 +1531,7 @@ func file_xai_api_v1_batch_proto_rawDescGZIP() []byte {
 }
 
 var file_xai_api_v1_batch_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_xai_api_v1_batch_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_xai_api_v1_batch_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_xai_api_v1_batch_proto_goTypes = []any{
 	(BatchRequestMetadata_State)(0),          // 0: xai_api.BatchRequestMetadata.State
 	(*Batch)(nil),                            // 1: xai_api.Batch
@@ -1354,50 +1552,64 @@ var file_xai_api_v1_batch_proto_goTypes = []any{
 	(*ListBatchRequestMetadataResponse)(nil), // 16: xai_api.ListBatchRequestMetadataResponse
 	(*ListBatchResultsRequest)(nil),          // 17: xai_api.ListBatchResultsRequest
 	(*ListBatchResultsResponse)(nil),         // 18: xai_api.ListBatchResultsResponse
-	(*timestamppb.Timestamp)(nil),            // 19: google.protobuf.Timestamp
-	(*GetCompletionsRequest)(nil),            // 20: xai_api.GetCompletionsRequest
-	(*GetChatCompletionResponse)(nil),        // 21: xai_api.GetChatCompletionResponse
-	(*rpc.Status)(nil),                       // 22: google.rpc.Status
-	(*emptypb.Empty)(nil),                    // 23: google.protobuf.Empty
+	(*GetBatchRequestResultRequest)(nil),     // 19: xai_api.GetBatchRequestResultRequest
+	(*GetBatchRequestResultResponse)(nil),    // 20: xai_api.GetBatchRequestResultResponse
+	(*timestamppb.Timestamp)(nil),            // 21: google.protobuf.Timestamp
+	(*GetCompletionsRequest)(nil),            // 22: xai_api.GetCompletionsRequest
+	(*GenerateImageRequest)(nil),             // 23: xai_api.GenerateImageRequest
+	(*GenerateVideoRequest)(nil),             // 24: xai_api.GenerateVideoRequest
+	(*GetChatCompletionResponse)(nil),        // 25: xai_api.GetChatCompletionResponse
+	(*ImageResponse)(nil),                    // 26: xai_api.ImageResponse
+	(*VideoResponse)(nil),                    // 27: xai_api.VideoResponse
+	(*status.Status)(nil),                       // 28: google.rpc.Status
+	(*emptypb.Empty)(nil),                    // 29: google.protobuf.Empty
 }
 var file_xai_api_v1_batch_proto_depIdxs = []int32{
-	19, // 0: xai_api.Batch.create_time:type_name -> google.protobuf.Timestamp
-	19, // 1: xai_api.Batch.expire_time:type_name -> google.protobuf.Timestamp
-	19, // 2: xai_api.Batch.cancel_time:type_name -> google.protobuf.Timestamp
+	21, // 0: xai_api.Batch.create_time:type_name -> google.protobuf.Timestamp
+	21, // 1: xai_api.Batch.expire_time:type_name -> google.protobuf.Timestamp
+	21, // 2: xai_api.Batch.cancel_time:type_name -> google.protobuf.Timestamp
 	2,  // 3: xai_api.Batch.state:type_name -> xai_api.BatchState
 	3,  // 4: xai_api.Batch.cost_breakdown:type_name -> xai_api.BatchCostBreakdown
 	4,  // 5: xai_api.BatchCostBreakdown.endpoint_costs:type_name -> xai_api.EndpointCost
-	19, // 6: xai_api.BatchCostBreakdown.calculation_time:type_name -> google.protobuf.Timestamp
-	20, // 7: xai_api.BatchRequest.completion_request:type_name -> xai_api.GetCompletionsRequest
-	21, // 8: xai_api.BatchResultData.completion_response:type_name -> xai_api.GetChatCompletionResponse
-	22, // 9: xai_api.BatchResult.error:type_name -> google.rpc.Status
-	6,  // 10: xai_api.BatchResult.response:type_name -> xai_api.BatchResultData
-	0,  // 11: xai_api.BatchRequestMetadata.state:type_name -> xai_api.BatchRequestMetadata.State
-	19, // 12: xai_api.BatchRequestMetadata.create_time:type_name -> google.protobuf.Timestamp
-	19, // 13: xai_api.BatchRequestMetadata.finish_time:type_name -> google.protobuf.Timestamp
-	5,  // 14: xai_api.AddBatchRequestsRequest.batch_requests:type_name -> xai_api.BatchRequest
-	1,  // 15: xai_api.ListBatchesResponse.batches:type_name -> xai_api.Batch
-	8,  // 16: xai_api.ListBatchRequestMetadataResponse.batch_request_metadata:type_name -> xai_api.BatchRequestMetadata
-	7,  // 17: xai_api.ListBatchResultsResponse.results:type_name -> xai_api.BatchResult
-	9,  // 18: xai_api.BatchMgmt.CreateBatch:input_type -> xai_api.CreateBatchRequest
-	11, // 19: xai_api.BatchMgmt.GetBatch:input_type -> xai_api.GetBatchRequest
-	12, // 20: xai_api.BatchMgmt.ListBatches:input_type -> xai_api.ListBatchesRequest
-	14, // 21: xai_api.BatchMgmt.CancelBatch:input_type -> xai_api.CancelBatchRequest
-	10, // 22: xai_api.BatchMgmt.AddBatchRequests:input_type -> xai_api.AddBatchRequestsRequest
-	15, // 23: xai_api.BatchMgmt.ListBatchRequestMetadata:input_type -> xai_api.ListBatchRequestMetadataRequest
-	17, // 24: xai_api.BatchMgmt.ListBatchResults:input_type -> xai_api.ListBatchResultsRequest
-	1,  // 25: xai_api.BatchMgmt.CreateBatch:output_type -> xai_api.Batch
-	1,  // 26: xai_api.BatchMgmt.GetBatch:output_type -> xai_api.Batch
-	13, // 27: xai_api.BatchMgmt.ListBatches:output_type -> xai_api.ListBatchesResponse
-	1,  // 28: xai_api.BatchMgmt.CancelBatch:output_type -> xai_api.Batch
-	23, // 29: xai_api.BatchMgmt.AddBatchRequests:output_type -> google.protobuf.Empty
-	16, // 30: xai_api.BatchMgmt.ListBatchRequestMetadata:output_type -> xai_api.ListBatchRequestMetadataResponse
-	18, // 31: xai_api.BatchMgmt.ListBatchResults:output_type -> xai_api.ListBatchResultsResponse
-	25, // [25:32] is the sub-list for method output_type
-	18, // [18:25] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	21, // 6: xai_api.BatchCostBreakdown.calculation_time:type_name -> google.protobuf.Timestamp
+	22, // 7: xai_api.BatchRequest.completion_request:type_name -> xai_api.GetCompletionsRequest
+	23, // 8: xai_api.BatchRequest.image_request:type_name -> xai_api.GenerateImageRequest
+	24, // 9: xai_api.BatchRequest.video_request:type_name -> xai_api.GenerateVideoRequest
+	25, // 10: xai_api.BatchResultData.completion_response:type_name -> xai_api.GetChatCompletionResponse
+	26, // 11: xai_api.BatchResultData.image_response:type_name -> xai_api.ImageResponse
+	27, // 12: xai_api.BatchResultData.video_response:type_name -> xai_api.VideoResponse
+	28, // 13: xai_api.BatchResult.error:type_name -> google.rpc.Status
+	6,  // 14: xai_api.BatchResult.response:type_name -> xai_api.BatchResultData
+	0,  // 15: xai_api.BatchRequestMetadata.state:type_name -> xai_api.BatchRequestMetadata.State
+	21, // 16: xai_api.BatchRequestMetadata.create_time:type_name -> google.protobuf.Timestamp
+	21, // 17: xai_api.BatchRequestMetadata.finish_time:type_name -> google.protobuf.Timestamp
+	5,  // 18: xai_api.AddBatchRequestsRequest.batch_requests:type_name -> xai_api.BatchRequest
+	1,  // 19: xai_api.ListBatchesResponse.batches:type_name -> xai_api.Batch
+	8,  // 20: xai_api.ListBatchRequestMetadataResponse.batch_request_metadata:type_name -> xai_api.BatchRequestMetadata
+	7,  // 21: xai_api.ListBatchResultsResponse.results:type_name -> xai_api.BatchResult
+	5,  // 22: xai_api.GetBatchRequestResultResponse.request:type_name -> xai_api.BatchRequest
+	7,  // 23: xai_api.GetBatchRequestResultResponse.result:type_name -> xai_api.BatchResult
+	9,  // 24: xai_api.BatchMgmt.CreateBatch:input_type -> xai_api.CreateBatchRequest
+	11, // 25: xai_api.BatchMgmt.GetBatch:input_type -> xai_api.GetBatchRequest
+	12, // 26: xai_api.BatchMgmt.ListBatches:input_type -> xai_api.ListBatchesRequest
+	14, // 27: xai_api.BatchMgmt.CancelBatch:input_type -> xai_api.CancelBatchRequest
+	10, // 28: xai_api.BatchMgmt.AddBatchRequests:input_type -> xai_api.AddBatchRequestsRequest
+	15, // 29: xai_api.BatchMgmt.ListBatchRequestMetadata:input_type -> xai_api.ListBatchRequestMetadataRequest
+	17, // 30: xai_api.BatchMgmt.ListBatchResults:input_type -> xai_api.ListBatchResultsRequest
+	19, // 31: xai_api.BatchMgmt.GetBatchRequestResult:input_type -> xai_api.GetBatchRequestResultRequest
+	1,  // 32: xai_api.BatchMgmt.CreateBatch:output_type -> xai_api.Batch
+	1,  // 33: xai_api.BatchMgmt.GetBatch:output_type -> xai_api.Batch
+	13, // 34: xai_api.BatchMgmt.ListBatches:output_type -> xai_api.ListBatchesResponse
+	1,  // 35: xai_api.BatchMgmt.CancelBatch:output_type -> xai_api.Batch
+	29, // 36: xai_api.BatchMgmt.AddBatchRequests:output_type -> google.protobuf.Empty
+	16, // 37: xai_api.BatchMgmt.ListBatchRequestMetadata:output_type -> xai_api.ListBatchRequestMetadataResponse
+	18, // 38: xai_api.BatchMgmt.ListBatchResults:output_type -> xai_api.ListBatchResultsResponse
+	20, // 39: xai_api.BatchMgmt.GetBatchRequestResult:output_type -> xai_api.GetBatchRequestResultResponse
+	32, // [32:40] is the sub-list for method output_type
+	24, // [24:32] is the sub-list for method input_type
+	24, // [24:24] is the sub-list for extension type_name
+	24, // [24:24] is the sub-list for extension extendee
+	0,  // [0:24] is the sub-list for field type_name
 }
 
 func init() { file_xai_api_v1_batch_proto_init() }
@@ -1406,12 +1618,18 @@ func file_xai_api_v1_batch_proto_init() {
 		return
 	}
 	file_xai_api_v1_chat_proto_init()
+	file_xai_api_v1_image_proto_init()
+	file_xai_api_v1_video_proto_init()
 	file_xai_api_v1_batch_proto_msgTypes[0].OneofWrappers = []any{}
 	file_xai_api_v1_batch_proto_msgTypes[4].OneofWrappers = []any{
 		(*BatchRequest_CompletionRequest)(nil),
+		(*BatchRequest_ImageRequest)(nil),
+		(*BatchRequest_VideoRequest)(nil),
 	}
 	file_xai_api_v1_batch_proto_msgTypes[5].OneofWrappers = []any{
 		(*BatchResultData_CompletionResponse)(nil),
+		(*BatchResultData_ImageResponse)(nil),
+		(*BatchResultData_VideoResponse)(nil),
 	}
 	file_xai_api_v1_batch_proto_msgTypes[6].OneofWrappers = []any{
 		(*BatchResult_Error)(nil),
@@ -1429,7 +1647,7 @@ func file_xai_api_v1_batch_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_xai_api_v1_batch_proto_rawDesc), len(file_xai_api_v1_batch_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   18,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

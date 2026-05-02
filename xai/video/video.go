@@ -6,6 +6,7 @@ import (
 	"time"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/cost"
 )
 
 const (
@@ -18,13 +19,74 @@ type Client struct {
 }
 
 type GenerateOptions struct {
-	ImageURL    string
-	VideoURL    string
-	Duration    *int32
-	AspectRatio *xaiv1.VideoAspectRatio
-	Resolution  *xaiv1.VideoResolution
-	Timeout     time.Duration
-	Interval    time.Duration
+	ImageURL           string
+	VideoURL           string
+	ReferenceImageURLs []string
+	Duration           *int32
+	AspectRatio        *xaiv1.VideoAspectRatio
+	Resolution         *xaiv1.VideoResolution
+	Timeout            time.Duration
+	Interval           time.Duration
+}
+
+type Response struct {
+	proto *xaiv1.VideoResponse
+}
+
+func NewResponse(proto *xaiv1.VideoResponse) *Response {
+	return &Response{proto: proto}
+}
+
+func (r *Response) Proto() *xaiv1.VideoResponse {
+	if r == nil {
+		return nil
+	}
+	return r.proto
+}
+
+func (r *Response) Model() string {
+	if r == nil || r.proto == nil {
+		return ""
+	}
+	return r.proto.Model
+}
+
+func (r *Response) Usage() *xaiv1.SamplingUsage {
+	if r == nil || r.proto == nil {
+		return nil
+	}
+	return r.proto.Usage
+}
+
+func (r *Response) CostUSD() (float64, bool) {
+	return cost.USDFromUsage(r.Usage())
+}
+
+func (r *Response) URL() (string, error) {
+	if r == nil || r.proto == nil || r.proto.Video == nil {
+		return "", fmt.Errorf("video URL missing from response")
+	}
+	if r.proto.Video.Url == "" {
+		if !r.RespectModeration() {
+			return "", fmt.Errorf("video did not respect moderation rules; URL is not available")
+		}
+		return "", fmt.Errorf("video URL missing from response")
+	}
+	return r.proto.Video.Url, nil
+}
+
+func (r *Response) Duration() int32 {
+	if r == nil || r.proto == nil || r.proto.Video == nil {
+		return 0
+	}
+	return r.proto.Video.Duration
+}
+
+func (r *Response) RespectModeration() bool {
+	if r == nil || r.proto == nil || r.proto.Video == nil {
+		return true
+	}
+	return r.proto.Video.RespectModeration
 }
 
 func NewClient(grpcClient xaiv1.VideoClient) *Client {
@@ -49,6 +111,9 @@ func NewGenerateRequestWithOptions(prompt, model string, opts *GenerateOptions) 
 	if opts.VideoURL != "" {
 		req.Video = &xaiv1.VideoUrlContent{Url: opts.VideoURL}
 	}
+	for _, imageURL := range opts.ReferenceImageURLs {
+		req.ReferenceImages = append(req.ReferenceImages, &xaiv1.ImageUrlContent{ImageUrl: imageURL})
+	}
 	if opts.Duration != nil {
 		req.Duration = opts.Duration
 	}
@@ -61,7 +126,33 @@ func NewGenerateRequestWithOptions(prompt, model string, opts *GenerateOptions) 
 	return req
 }
 
-func (c *Client) Generate(ctx context.Context, req *xaiv1.GenerateVideoRequest) (*xaiv1.StartDeferredResponse, error) {
+func NewExtendRequest(prompt, model, videoURL string, duration *int32) *xaiv1.ExtendVideoRequest {
+	return &xaiv1.ExtendVideoRequest{
+		Prompt:   prompt,
+		Model:    model,
+		Video:    &xaiv1.VideoUrlContent{Url: videoURL},
+		Duration: duration,
+	}
+}
+
+func Prepare(prompt, model, batchRequestID string, opts *GenerateOptions) *xaiv1.BatchRequest {
+	req := NewGenerateRequestWithOptions(prompt, model, opts)
+	batchReq := &xaiv1.BatchRequest{
+		Request: &xaiv1.BatchRequest_VideoRequest{
+			VideoRequest: req,
+		},
+	}
+	if batchRequestID != "" {
+		batchReq.BatchRequestId = &batchRequestID
+	}
+	return batchReq
+}
+
+func (c *Client) Prepare(prompt, model, batchRequestID string, opts *GenerateOptions) *xaiv1.BatchRequest {
+	return Prepare(prompt, model, batchRequestID, opts)
+}
+
+func (c *Client) GenerateDeferred(ctx context.Context, req *xaiv1.GenerateVideoRequest) (*xaiv1.StartDeferredResponse, error) {
 	if c.grpcClient == nil {
 		return nil, fmt.Errorf("video client not initialized")
 	}
@@ -69,7 +160,14 @@ func (c *Client) Generate(ctx context.Context, req *xaiv1.GenerateVideoRequest) 
 }
 
 func (c *Client) Start(ctx context.Context, prompt, model string, opts *GenerateOptions) (*xaiv1.StartDeferredResponse, error) {
-	return c.Generate(ctx, NewGenerateRequestWithOptions(prompt, model, opts))
+	return c.GenerateDeferred(ctx, NewGenerateRequestWithOptions(prompt, model, opts))
+}
+
+func (c *Client) ExtendStart(ctx context.Context, prompt, model, videoURL string, duration *int32) (*xaiv1.StartDeferredResponse, error) {
+	if c.grpcClient == nil {
+		return nil, fmt.Errorf("video client not initialized")
+	}
+	return c.grpcClient.ExtendVideo(ctx, NewExtendRequest(prompt, model, videoURL, duration))
 }
 
 func (c *Client) GetDeferred(ctx context.Context, requestID string) (*xaiv1.GetDeferredVideoResponse, error) {
@@ -85,12 +183,31 @@ func (c *Client) Get(ctx context.Context, requestID string) (*xaiv1.GetDeferredV
 	return c.GetDeferred(ctx, requestID)
 }
 
-func (c *Client) GenerateAndPoll(ctx context.Context, prompt, model string, opts *GenerateOptions) (*xaiv1.VideoResponse, error) {
+func (c *Client) Generate(ctx context.Context, prompt, model string, opts *GenerateOptions) (*xaiv1.VideoResponse, error) {
 	start, err := c.Start(ctx, prompt, model, opts)
 	if err != nil {
 		return nil, err
 	}
+	return c.poll(ctx, start.RequestId, opts)
+}
 
+func (c *Client) GenerateAndPoll(ctx context.Context, prompt, model string, opts *GenerateOptions) (*xaiv1.VideoResponse, error) {
+	return c.Generate(ctx, prompt, model, opts)
+}
+
+func (c *Client) GenerateSync(ctx context.Context, prompt, model string, opts *GenerateOptions) (*xaiv1.VideoResponse, error) {
+	return c.Generate(ctx, prompt, model, opts)
+}
+
+func (c *Client) Extend(ctx context.Context, prompt, model, videoURL string, duration *int32, opts *GenerateOptions) (*xaiv1.VideoResponse, error) {
+	start, err := c.ExtendStart(ctx, prompt, model, videoURL, duration)
+	if err != nil {
+		return nil, err
+	}
+	return c.poll(ctx, start.RequestId, opts)
+}
+
+func (c *Client) poll(ctx context.Context, requestID string, opts *GenerateOptions) (*xaiv1.VideoResponse, error) {
 	timeout := DefaultPollTimeout
 	interval := DefaultPollInterval
 	if opts != nil {
@@ -109,7 +226,7 @@ func (c *Client) GenerateAndPoll(ctx context.Context, prompt, model string, opts
 	defer ticker.Stop()
 
 	for {
-		resp, err := c.Get(pollCtx, start.RequestId)
+		resp, err := c.Get(pollCtx, requestID)
 		if err != nil {
 			return nil, err
 		}
@@ -122,6 +239,11 @@ func (c *Client) GenerateAndPoll(ctx context.Context, prompt, model string, opts
 			return resp.Response, nil
 		case xaiv1.DeferredStatus_EXPIRED:
 			return nil, fmt.Errorf("deferred video request expired")
+		case xaiv1.DeferredStatus_FAILED:
+			if resp.Response != nil && resp.Response.Error != nil {
+				return nil, fmt.Errorf("video generation failed (%s): %s", resp.Response.Error.Code, resp.Response.Error.Message)
+			}
+			return nil, fmt.Errorf("video generation failed")
 		case xaiv1.DeferredStatus_PENDING:
 		default:
 			return nil, fmt.Errorf("unknown deferred video status: %s", resp.Status.String())

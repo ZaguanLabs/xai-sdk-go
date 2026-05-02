@@ -20,21 +20,22 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Collections_CreateCollection_FullMethodName             = "/collections.Collections/CreateCollection"
-	Collections_ListCollections_FullMethodName              = "/collections.Collections/ListCollections"
-	Collections_DeleteCollection_FullMethodName             = "/collections.Collections/DeleteCollection"
-	Collections_GetCollectionMetadata_FullMethodName        = "/collections.Collections/GetCollectionMetadata"
-	Collections_ListAvailableEmbeddingModels_FullMethodName = "/collections.Collections/ListAvailableEmbeddingModels"
-	Collections_ListAvailableTokenEncodings_FullMethodName  = "/collections.Collections/ListAvailableTokenEncodings"
-	Collections_UploadDocument_FullMethodName               = "/collections.Collections/UploadDocument"
-	Collections_UpdateDocument_FullMethodName               = "/collections.Collections/UpdateDocument"
-	Collections_ListDocuments_FullMethodName                = "/collections.Collections/ListDocuments"
-	Collections_GetDocumentMetadata_FullMethodName          = "/collections.Collections/GetDocumentMetadata"
-	Collections_AddDocumentToCollection_FullMethodName      = "/collections.Collections/AddDocumentToCollection"
-	Collections_RemoveDocumentFromCollection_FullMethodName = "/collections.Collections/RemoveDocumentFromCollection"
-	Collections_ReIndexDocument_FullMethodName              = "/collections.Collections/ReIndexDocument"
-	Collections_UpdateCollection_FullMethodName             = "/collections.Collections/UpdateCollection"
-	Collections_BatchGetDocuments_FullMethodName            = "/collections.Collections/BatchGetDocuments"
+	Collections_CreateCollection_FullMethodName              = "/collections.Collections/CreateCollection"
+	Collections_ListCollections_FullMethodName               = "/collections.Collections/ListCollections"
+	Collections_DeleteCollection_FullMethodName              = "/collections.Collections/DeleteCollection"
+	Collections_GetCollectionMetadata_FullMethodName         = "/collections.Collections/GetCollectionMetadata"
+	Collections_ListAvailableEmbeddingModels_FullMethodName  = "/collections.Collections/ListAvailableEmbeddingModels"
+	Collections_ListAvailableTokenEncodings_FullMethodName   = "/collections.Collections/ListAvailableTokenEncodings"
+	Collections_UploadDocument_FullMethodName                = "/collections.Collections/UploadDocument"
+	Collections_UpdateDocument_FullMethodName                = "/collections.Collections/UpdateDocument"
+	Collections_ListDocuments_FullMethodName                 = "/collections.Collections/ListDocuments"
+	Collections_GetDocumentMetadata_FullMethodName           = "/collections.Collections/GetDocumentMetadata"
+	Collections_AddDocumentToCollection_FullMethodName       = "/collections.Collections/AddDocumentToCollection"
+	Collections_RemoveDocumentFromCollection_FullMethodName  = "/collections.Collections/RemoveDocumentFromCollection"
+	Collections_ReIndexDocument_FullMethodName               = "/collections.Collections/ReIndexDocument"
+	Collections_UpdateCollection_FullMethodName              = "/collections.Collections/UpdateCollection"
+	Collections_BatchGetDocuments_FullMethodName             = "/collections.Collections/BatchGetDocuments"
+	Collections_GenerateCollectionDescription_FullMethodName = "/collections.Collections/GenerateCollectionDescription"
 )
 
 // CollectionsClient is the client API for Collections service.
@@ -56,6 +57,7 @@ type CollectionsClient interface {
 	ReIndexDocument(ctx context.Context, in *ReIndexDocumentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateCollection(ctx context.Context, in *UpdateCollectionRequest, opts ...grpc.CallOption) (*CollectionMetadata, error)
 	BatchGetDocuments(ctx context.Context, in *BatchGetDocumentsRequest, opts ...grpc.CallOption) (*BatchGetDocumentsResponse, error)
+	GenerateCollectionDescription(ctx context.Context, in *GenerateCollectionDescriptionRequest, opts ...grpc.CallOption) (*GenerateCollectionDescriptionResponse, error)
 }
 
 type collectionsClient struct {
@@ -216,6 +218,16 @@ func (c *collectionsClient) BatchGetDocuments(ctx context.Context, in *BatchGetD
 	return out, nil
 }
 
+func (c *collectionsClient) GenerateCollectionDescription(ctx context.Context, in *GenerateCollectionDescriptionRequest, opts ...grpc.CallOption) (*GenerateCollectionDescriptionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GenerateCollectionDescriptionResponse)
+	err := c.cc.Invoke(ctx, Collections_GenerateCollectionDescription_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CollectionsServer is the server API for Collections service.
 // All implementations must embed UnimplementedCollectionsServer
 // for forward compatibility.
@@ -235,6 +247,7 @@ type CollectionsServer interface {
 	ReIndexDocument(context.Context, *ReIndexDocumentRequest) (*emptypb.Empty, error)
 	UpdateCollection(context.Context, *UpdateCollectionRequest) (*CollectionMetadata, error)
 	BatchGetDocuments(context.Context, *BatchGetDocumentsRequest) (*BatchGetDocumentsResponse, error)
+	GenerateCollectionDescription(context.Context, *GenerateCollectionDescriptionRequest) (*GenerateCollectionDescriptionResponse, error)
 	mustEmbedUnimplementedCollectionsServer()
 }
 
@@ -289,6 +302,9 @@ func (UnimplementedCollectionsServer) UpdateCollection(context.Context, *UpdateC
 }
 func (UnimplementedCollectionsServer) BatchGetDocuments(context.Context, *BatchGetDocumentsRequest) (*BatchGetDocumentsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method BatchGetDocuments not implemented")
+}
+func (UnimplementedCollectionsServer) GenerateCollectionDescription(context.Context, *GenerateCollectionDescriptionRequest) (*GenerateCollectionDescriptionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GenerateCollectionDescription not implemented")
 }
 func (UnimplementedCollectionsServer) mustEmbedUnimplementedCollectionsServer() {}
 func (UnimplementedCollectionsServer) testEmbeddedByValue()                     {}
@@ -581,6 +597,24 @@ func _Collections_BatchGetDocuments_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Collections_GenerateCollectionDescription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateCollectionDescriptionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CollectionsServer).GenerateCollectionDescription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Collections_GenerateCollectionDescription_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CollectionsServer).GenerateCollectionDescription(ctx, req.(*GenerateCollectionDescriptionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Collections_ServiceDesc is the grpc.ServiceDesc for Collections service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -647,6 +681,10 @@ var Collections_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "BatchGetDocuments",
 			Handler:    _Collections_BatchGetDocuments_Handler,
+		},
+		{
+			MethodName: "GenerateCollectionDescription",
+			Handler:    _Collections_GenerateCollectionDescription_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

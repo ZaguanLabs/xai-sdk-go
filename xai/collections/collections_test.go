@@ -337,13 +337,15 @@ func TestFromProtoHelpers(t *testing.T) {
 
 	// Test fromProtoCollection
 	protoCol := &xaiv1.CollectionMetadata{
-		CollectionId:   "col-123",
-		CollectionName: "Test",
-		CreatedAt:      now,
-		DocumentsCount: 5,
+		CollectionId:          "col-123",
+		CollectionName:        "Test",
+		CreatedAt:             now,
+		DocumentsCount:        5,
+		CollectionDescription: stringPtr("description"),
+		TotalFileSize:         42,
 	}
 	col := fromProtoCollection(protoCol)
-	if col.ID != "col-123" || col.Name != "Test" || col.DocumentsCount != 5 {
+	if col.ID != "col-123" || col.Name != "Test" || col.DocumentsCount != 5 || col.Description != "description" || col.TotalFileSize != 42 {
 		t.Error("fromProtoCollection conversion failed")
 	}
 

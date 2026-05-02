@@ -136,6 +136,192 @@ func (ImageFormat) EnumDescriptor() ([]byte, []int) {
 	return file_xai_api_v1_image_proto_rawDescGZIP(), []int{1}
 }
 
+type ImageQuality int32
+
+const (
+	ImageQuality_IMG_QUALITY_INVALID ImageQuality = 0
+	ImageQuality_IMG_QUALITY_LOW     ImageQuality = 1
+	ImageQuality_IMG_QUALITY_MEDIUM  ImageQuality = 2
+	ImageQuality_IMG_QUALITY_HIGH    ImageQuality = 3
+)
+
+// Enum value maps for ImageQuality.
+var (
+	ImageQuality_name = map[int32]string{
+		0: "IMG_QUALITY_INVALID",
+		1: "IMG_QUALITY_LOW",
+		2: "IMG_QUALITY_MEDIUM",
+		3: "IMG_QUALITY_HIGH",
+	}
+	ImageQuality_value = map[string]int32{
+		"IMG_QUALITY_INVALID": 0,
+		"IMG_QUALITY_LOW":     1,
+		"IMG_QUALITY_MEDIUM":  2,
+		"IMG_QUALITY_HIGH":    3,
+	}
+)
+
+func (x ImageQuality) Enum() *ImageQuality {
+	p := new(ImageQuality)
+	*p = x
+	return p
+}
+
+func (x ImageQuality) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ImageQuality) Descriptor() protoreflect.EnumDescriptor {
+	return file_xai_api_v1_image_proto_enumTypes[2].Descriptor()
+}
+
+func (ImageQuality) Type() protoreflect.EnumType {
+	return &file_xai_api_v1_image_proto_enumTypes[2]
+}
+
+func (x ImageQuality) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ImageQuality.Descriptor instead.
+func (ImageQuality) EnumDescriptor() ([]byte, []int) {
+	return file_xai_api_v1_image_proto_rawDescGZIP(), []int{2}
+}
+
+type ImageAspectRatio int32
+
+const (
+	ImageAspectRatio_IMG_ASPECT_RATIO_INVALID ImageAspectRatio = 0
+	ImageAspectRatio_IMG_ASPECT_RATIO_1_1     ImageAspectRatio = 1
+	ImageAspectRatio_IMG_ASPECT_RATIO_3_4     ImageAspectRatio = 2
+	ImageAspectRatio_IMG_ASPECT_RATIO_4_3     ImageAspectRatio = 3
+	ImageAspectRatio_IMG_ASPECT_RATIO_9_16    ImageAspectRatio = 4
+	ImageAspectRatio_IMG_ASPECT_RATIO_16_9    ImageAspectRatio = 5
+	ImageAspectRatio_IMG_ASPECT_RATIO_2_3     ImageAspectRatio = 6
+	ImageAspectRatio_IMG_ASPECT_RATIO_3_2     ImageAspectRatio = 7
+	ImageAspectRatio_IMG_ASPECT_RATIO_AUTO    ImageAspectRatio = 8
+	ImageAspectRatio_IMG_ASPECT_RATIO_9_19_5  ImageAspectRatio = 9
+	ImageAspectRatio_IMG_ASPECT_RATIO_19_5_9  ImageAspectRatio = 10
+	ImageAspectRatio_IMG_ASPECT_RATIO_9_20    ImageAspectRatio = 11
+	ImageAspectRatio_IMG_ASPECT_RATIO_20_9    ImageAspectRatio = 12
+	ImageAspectRatio_IMG_ASPECT_RATIO_1_2     ImageAspectRatio = 13
+	ImageAspectRatio_IMG_ASPECT_RATIO_2_1     ImageAspectRatio = 14
+)
+
+// Enum value maps for ImageAspectRatio.
+var (
+	ImageAspectRatio_name = map[int32]string{
+		0:  "IMG_ASPECT_RATIO_INVALID",
+		1:  "IMG_ASPECT_RATIO_1_1",
+		2:  "IMG_ASPECT_RATIO_3_4",
+		3:  "IMG_ASPECT_RATIO_4_3",
+		4:  "IMG_ASPECT_RATIO_9_16",
+		5:  "IMG_ASPECT_RATIO_16_9",
+		6:  "IMG_ASPECT_RATIO_2_3",
+		7:  "IMG_ASPECT_RATIO_3_2",
+		8:  "IMG_ASPECT_RATIO_AUTO",
+		9:  "IMG_ASPECT_RATIO_9_19_5",
+		10: "IMG_ASPECT_RATIO_19_5_9",
+		11: "IMG_ASPECT_RATIO_9_20",
+		12: "IMG_ASPECT_RATIO_20_9",
+		13: "IMG_ASPECT_RATIO_1_2",
+		14: "IMG_ASPECT_RATIO_2_1",
+	}
+	ImageAspectRatio_value = map[string]int32{
+		"IMG_ASPECT_RATIO_INVALID": 0,
+		"IMG_ASPECT_RATIO_1_1":     1,
+		"IMG_ASPECT_RATIO_3_4":     2,
+		"IMG_ASPECT_RATIO_4_3":     3,
+		"IMG_ASPECT_RATIO_9_16":    4,
+		"IMG_ASPECT_RATIO_16_9":    5,
+		"IMG_ASPECT_RATIO_2_3":     6,
+		"IMG_ASPECT_RATIO_3_2":     7,
+		"IMG_ASPECT_RATIO_AUTO":    8,
+		"IMG_ASPECT_RATIO_9_19_5":  9,
+		"IMG_ASPECT_RATIO_19_5_9":  10,
+		"IMG_ASPECT_RATIO_9_20":    11,
+		"IMG_ASPECT_RATIO_20_9":    12,
+		"IMG_ASPECT_RATIO_1_2":     13,
+		"IMG_ASPECT_RATIO_2_1":     14,
+	}
+)
+
+func (x ImageAspectRatio) Enum() *ImageAspectRatio {
+	p := new(ImageAspectRatio)
+	*p = x
+	return p
+}
+
+func (x ImageAspectRatio) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ImageAspectRatio) Descriptor() protoreflect.EnumDescriptor {
+	return file_xai_api_v1_image_proto_enumTypes[3].Descriptor()
+}
+
+func (ImageAspectRatio) Type() protoreflect.EnumType {
+	return &file_xai_api_v1_image_proto_enumTypes[3]
+}
+
+func (x ImageAspectRatio) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ImageAspectRatio.Descriptor instead.
+func (ImageAspectRatio) EnumDescriptor() ([]byte, []int) {
+	return file_xai_api_v1_image_proto_rawDescGZIP(), []int{3}
+}
+
+type ImageResolution int32
+
+const (
+	ImageResolution_IMG_RESOLUTION_INVALID ImageResolution = 0
+	ImageResolution_IMG_RESOLUTION_1K      ImageResolution = 1
+	ImageResolution_IMG_RESOLUTION_2K      ImageResolution = 2
+)
+
+// Enum value maps for ImageResolution.
+var (
+	ImageResolution_name = map[int32]string{
+		0: "IMG_RESOLUTION_INVALID",
+		1: "IMG_RESOLUTION_1K",
+		2: "IMG_RESOLUTION_2K",
+	}
+	ImageResolution_value = map[string]int32{
+		"IMG_RESOLUTION_INVALID": 0,
+		"IMG_RESOLUTION_1K":      1,
+		"IMG_RESOLUTION_2K":      2,
+	}
+)
+
+func (x ImageResolution) Enum() *ImageResolution {
+	p := new(ImageResolution)
+	*p = x
+	return p
+}
+
+func (x ImageResolution) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ImageResolution) Descriptor() protoreflect.EnumDescriptor {
+	return file_xai_api_v1_image_proto_enumTypes[4].Descriptor()
+}
+
+func (ImageResolution) Type() protoreflect.EnumType {
+	return &file_xai_api_v1_image_proto_enumTypes[4]
+}
+
+func (x ImageResolution) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ImageResolution.Descriptor instead.
+func (ImageResolution) EnumDescriptor() ([]byte, []int) {
+	return file_xai_api_v1_image_proto_rawDescGZIP(), []int{4}
+}
+
 // Request message for generating an image.
 type GenerateImageRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -153,7 +339,10 @@ type GenerateImageRequest struct {
 	User string `protobuf:"bytes,4,opt,name=user,proto3" json:"user,omitempty"`
 	// Optional field to specify the image format to return the generated image(s)
 	// in. See ImageFormat enum for options.
-	Format        ImageFormat `protobuf:"varint,11,opt,name=format,proto3,enum=xai_api.ImageFormat" json:"format,omitempty"`
+	Format        ImageFormat        `protobuf:"varint,11,opt,name=format,proto3,enum=xai_api.ImageFormat" json:"format,omitempty"`
+	AspectRatio   *ImageAspectRatio  `protobuf:"varint,14,opt,name=aspect_ratio,json=aspectRatio,proto3,enum=xai_api.ImageAspectRatio,oneof" json:"aspect_ratio,omitempty"`
+	Resolution    *ImageResolution   `protobuf:"varint,15,opt,name=resolution,proto3,enum=xai_api.ImageResolution,oneof" json:"resolution,omitempty"`
+	Images        []*ImageUrlContent `protobuf:"bytes,17,rep,name=images,proto3" json:"images,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -230,13 +419,35 @@ func (x *GenerateImageRequest) GetFormat() ImageFormat {
 	return ImageFormat_IMG_FORMAT_INVALID
 }
 
+func (x *GenerateImageRequest) GetAspectRatio() ImageAspectRatio {
+	if x != nil && x.AspectRatio != nil {
+		return *x.AspectRatio
+	}
+	return ImageAspectRatio_IMG_ASPECT_RATIO_INVALID
+}
+
+func (x *GenerateImageRequest) GetResolution() ImageResolution {
+	if x != nil && x.Resolution != nil {
+		return *x.Resolution
+	}
+	return ImageResolution_IMG_RESOLUTION_INVALID
+}
+
+func (x *GenerateImageRequest) GetImages() []*ImageUrlContent {
+	if x != nil {
+		return x.Images
+	}
+	return nil
+}
+
 // The response from the image generation models containing the generated image(s).
 type ImageResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// A list of generated images (including relevant metadata).
 	Images []*GeneratedImage `protobuf:"bytes,1,rep,name=images,proto3" json:"images,omitempty"`
 	// The model used to generate the image (ignoring aliases).
-	Model         string `protobuf:"bytes,2,opt,name=model,proto3" json:"model,omitempty"`
+	Model         string         `protobuf:"bytes,2,opt,name=model,proto3" json:"model,omitempty"`
+	Usage         *SamplingUsage `protobuf:"bytes,3,opt,name=usage,proto3" json:"usage,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -285,6 +496,13 @@ func (x *ImageResponse) GetModel() string {
 	return ""
 }
 
+func (x *ImageResponse) GetUsage() *SamplingUsage {
+	if x != nil {
+		return x.Usage
+	}
+	return nil
+}
+
 // Contains all data related to a generated image.
 type GeneratedImage struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -295,8 +513,6 @@ type GeneratedImage struct {
 	//	*GeneratedImage_Base64
 	//	*GeneratedImage_Url
 	Image isGeneratedImage_Image `protobuf_oneof:"image"`
-	// The up sampled prompt that was used to generate the image.
-	UpSampledPrompt string `protobuf:"bytes,2,opt,name=up_sampled_prompt,json=upSampledPrompt,proto3" json:"up_sampled_prompt,omitempty"`
 	// Whether the image generated by the model respects moderation rules.
 	// The field will be true if the image respect moderation rules. Otherwise
 	// the field will be false and the image field is replaced by a placeholder.
@@ -356,13 +572,6 @@ func (x *GeneratedImage) GetUrl() string {
 		if x, ok := x.Image.(*GeneratedImage_Url); ok {
 			return x.Url
 		}
-	}
-	return ""
-}
-
-func (x *GeneratedImage) GetUpSampledPrompt() string {
-	if x != nil {
-		return x.UpSampledPrompt
 	}
 	return ""
 }
@@ -457,24 +666,31 @@ var File_xai_api_v1_image_proto protoreflect.FileDescriptor
 
 const file_xai_api_v1_image_proto_rawDesc = "" +
 	"\n" +
-	"\x16xai/api/v1/image.proto\x12\axai_api\"\xd5\x01\n" +
+	"\x16xai/api/v1/image.proto\x12\axai_api\x1a\x16xai/api/v1/usage.proto\"\xa9\x03\n" +
 	"\x14GenerateImageRequest\x12\x16\n" +
 	"\x06prompt\x18\x01 \x01(\tR\x06prompt\x12.\n" +
 	"\x05image\x18\x05 \x01(\v2\x18.xai_api.ImageUrlContentR\x05image\x12\x14\n" +
 	"\x05model\x18\x02 \x01(\tR\x05model\x12\x11\n" +
 	"\x01n\x18\x03 \x01(\x05H\x00R\x01n\x88\x01\x01\x12\x12\n" +
 	"\x04user\x18\x04 \x01(\tR\x04user\x12,\n" +
-	"\x06format\x18\v \x01(\x0e2\x14.xai_api.ImageFormatR\x06formatB\x04\n" +
-	"\x02_nJ\x04\b\r\x10\x0e\"V\n" +
+	"\x06format\x18\v \x01(\x0e2\x14.xai_api.ImageFormatR\x06format\x12A\n" +
+	"\faspect_ratio\x18\x0e \x01(\x0e2\x19.xai_api.ImageAspectRatioH\x01R\vaspectRatio\x88\x01\x01\x12=\n" +
+	"\n" +
+	"resolution\x18\x0f \x01(\x0e2\x18.xai_api.ImageResolutionH\x02R\n" +
+	"resolution\x88\x01\x01\x120\n" +
+	"\x06images\x18\x11 \x03(\v2\x18.xai_api.ImageUrlContentR\x06imagesB\x04\n" +
+	"\x02_nB\x0f\n" +
+	"\r_aspect_ratioB\r\n" +
+	"\v_resolutionJ\x04\b\r\x10\x0e\"\x84\x01\n" +
 	"\rImageResponse\x12/\n" +
 	"\x06images\x18\x01 \x03(\v2\x17.xai_api.GeneratedImageR\x06images\x12\x14\n" +
-	"\x05model\x18\x02 \x01(\tR\x05model\"\xa2\x01\n" +
+	"\x05model\x18\x02 \x01(\tR\x05model\x12,\n" +
+	"\x05usage\x18\x03 \x01(\v2\x16.xai_api.SamplingUsageR\x05usage\"|\n" +
 	"\x0eGeneratedImage\x12\x18\n" +
 	"\x06base64\x18\x01 \x01(\tH\x00R\x06base64\x12\x12\n" +
-	"\x03url\x18\x03 \x01(\tH\x00R\x03url\x12*\n" +
-	"\x11up_sampled_prompt\x18\x02 \x01(\tR\x0fupSampledPrompt\x12-\n" +
+	"\x03url\x18\x03 \x01(\tH\x00R\x03url\x12-\n" +
 	"\x12respect_moderation\x18\x04 \x01(\bR\x11respectModerationB\a\n" +
-	"\x05image\"\\\n" +
+	"\x05imageJ\x04\b\x02\x10\x03\"\\\n" +
 	"\x0fImageUrlContent\x12\x1b\n" +
 	"\timage_url\x18\x01 \x01(\tR\bimageUrl\x12,\n" +
 	"\x06detail\x18\x02 \x01(\x0e2\x14.xai_api.ImageDetailR\x06detail*S\n" +
@@ -487,7 +703,33 @@ const file_xai_api_v1_image_proto_rawDesc = "" +
 	"\vImageFormat\x12\x16\n" +
 	"\x12IMG_FORMAT_INVALID\x10\x00\x12\x15\n" +
 	"\x11IMG_FORMAT_BASE64\x10\x01\x12\x12\n" +
-	"\x0eIMG_FORMAT_URL\x10\x022Q\n" +
+	"\x0eIMG_FORMAT_URL\x10\x02*j\n" +
+	"\fImageQuality\x12\x17\n" +
+	"\x13IMG_QUALITY_INVALID\x10\x00\x12\x13\n" +
+	"\x0fIMG_QUALITY_LOW\x10\x01\x12\x16\n" +
+	"\x12IMG_QUALITY_MEDIUM\x10\x02\x12\x14\n" +
+	"\x10IMG_QUALITY_HIGH\x10\x03*\xa7\x03\n" +
+	"\x10ImageAspectRatio\x12\x1c\n" +
+	"\x18IMG_ASPECT_RATIO_INVALID\x10\x00\x12\x18\n" +
+	"\x14IMG_ASPECT_RATIO_1_1\x10\x01\x12\x18\n" +
+	"\x14IMG_ASPECT_RATIO_3_4\x10\x02\x12\x18\n" +
+	"\x14IMG_ASPECT_RATIO_4_3\x10\x03\x12\x19\n" +
+	"\x15IMG_ASPECT_RATIO_9_16\x10\x04\x12\x19\n" +
+	"\x15IMG_ASPECT_RATIO_16_9\x10\x05\x12\x18\n" +
+	"\x14IMG_ASPECT_RATIO_2_3\x10\x06\x12\x18\n" +
+	"\x14IMG_ASPECT_RATIO_3_2\x10\a\x12\x19\n" +
+	"\x15IMG_ASPECT_RATIO_AUTO\x10\b\x12\x1b\n" +
+	"\x17IMG_ASPECT_RATIO_9_19_5\x10\t\x12\x1b\n" +
+	"\x17IMG_ASPECT_RATIO_19_5_9\x10\n" +
+	"\x12\x19\n" +
+	"\x15IMG_ASPECT_RATIO_9_20\x10\v\x12\x19\n" +
+	"\x15IMG_ASPECT_RATIO_20_9\x10\f\x12\x18\n" +
+	"\x14IMG_ASPECT_RATIO_1_2\x10\r\x12\x18\n" +
+	"\x14IMG_ASPECT_RATIO_2_1\x10\x0e*[\n" +
+	"\x0fImageResolution\x12\x1a\n" +
+	"\x16IMG_RESOLUTION_INVALID\x10\x00\x12\x15\n" +
+	"\x11IMG_RESOLUTION_1K\x10\x01\x12\x15\n" +
+	"\x11IMG_RESOLUTION_2K\x10\x022Q\n" +
 	"\x05Image\x12H\n" +
 	"\rGenerateImage\x12\x1d.xai_api.GenerateImageRequest\x1a\x16.xai_api.ImageResponse\"\x00B\x8b\x01\n" +
 	"\vcom.xai_apiB\n" +
@@ -505,28 +747,36 @@ func file_xai_api_v1_image_proto_rawDescGZIP() []byte {
 	return file_xai_api_v1_image_proto_rawDescData
 }
 
-var file_xai_api_v1_image_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_xai_api_v1_image_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
 var file_xai_api_v1_image_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_xai_api_v1_image_proto_goTypes = []any{
 	(ImageDetail)(0),             // 0: xai_api.ImageDetail
 	(ImageFormat)(0),             // 1: xai_api.ImageFormat
-	(*GenerateImageRequest)(nil), // 2: xai_api.GenerateImageRequest
-	(*ImageResponse)(nil),        // 3: xai_api.ImageResponse
-	(*GeneratedImage)(nil),       // 4: xai_api.GeneratedImage
-	(*ImageUrlContent)(nil),      // 5: xai_api.ImageUrlContent
+	(ImageQuality)(0),            // 2: xai_api.ImageQuality
+	(ImageAspectRatio)(0),        // 3: xai_api.ImageAspectRatio
+	(ImageResolution)(0),         // 4: xai_api.ImageResolution
+	(*GenerateImageRequest)(nil), // 5: xai_api.GenerateImageRequest
+	(*ImageResponse)(nil),        // 6: xai_api.ImageResponse
+	(*GeneratedImage)(nil),       // 7: xai_api.GeneratedImage
+	(*ImageUrlContent)(nil),      // 8: xai_api.ImageUrlContent
+	(*SamplingUsage)(nil),        // 9: xai_api.SamplingUsage
 }
 var file_xai_api_v1_image_proto_depIdxs = []int32{
-	5, // 0: xai_api.GenerateImageRequest.image:type_name -> xai_api.ImageUrlContent
+	8, // 0: xai_api.GenerateImageRequest.image:type_name -> xai_api.ImageUrlContent
 	1, // 1: xai_api.GenerateImageRequest.format:type_name -> xai_api.ImageFormat
-	4, // 2: xai_api.ImageResponse.images:type_name -> xai_api.GeneratedImage
-	0, // 3: xai_api.ImageUrlContent.detail:type_name -> xai_api.ImageDetail
-	2, // 4: xai_api.Image.GenerateImage:input_type -> xai_api.GenerateImageRequest
-	3, // 5: xai_api.Image.GenerateImage:output_type -> xai_api.ImageResponse
-	5, // [5:6] is the sub-list for method output_type
-	4, // [4:5] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	3, // 2: xai_api.GenerateImageRequest.aspect_ratio:type_name -> xai_api.ImageAspectRatio
+	4, // 3: xai_api.GenerateImageRequest.resolution:type_name -> xai_api.ImageResolution
+	8, // 4: xai_api.GenerateImageRequest.images:type_name -> xai_api.ImageUrlContent
+	7, // 5: xai_api.ImageResponse.images:type_name -> xai_api.GeneratedImage
+	9, // 6: xai_api.ImageResponse.usage:type_name -> xai_api.SamplingUsage
+	0, // 7: xai_api.ImageUrlContent.detail:type_name -> xai_api.ImageDetail
+	5, // 8: xai_api.Image.GenerateImage:input_type -> xai_api.GenerateImageRequest
+	6, // 9: xai_api.Image.GenerateImage:output_type -> xai_api.ImageResponse
+	9, // [9:10] is the sub-list for method output_type
+	8, // [8:9] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_xai_api_v1_image_proto_init() }
@@ -534,6 +784,7 @@ func file_xai_api_v1_image_proto_init() {
 	if File_xai_api_v1_image_proto != nil {
 		return
 	}
+	file_xai_api_v1_usage_proto_init()
 	file_xai_api_v1_image_proto_msgTypes[0].OneofWrappers = []any{}
 	file_xai_api_v1_image_proto_msgTypes[2].OneofWrappers = []any{
 		(*GeneratedImage_Base64)(nil),
@@ -544,7 +795,7 @@ func file_xai_api_v1_image_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_xai_api_v1_image_proto_rawDesc), len(file_xai_api_v1_image_proto_rawDesc)),
-			NumEnums:      2,
+			NumEnums:      5,
 			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,

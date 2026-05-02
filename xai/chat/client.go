@@ -2,6 +2,8 @@ package chat
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"google.golang.org/grpc"
@@ -20,6 +22,54 @@ func NewClient(grpcClient xaiv1.ChatClient) *Client {
 // Create creates a new chat request with the provided model and options.
 func (c *Client) Create(model string, opts ...RequestOption) *Request {
 	return NewRequest(model, opts...)
+}
+
+func (c *Client) Sample(ctx context.Context, req *Request) (*Response, error) {
+	return req.Sample(ctx, c.grpcClient)
+}
+
+func (c *Client) SampleBatch(ctx context.Context, req *Request, n int32) ([]*Response, error) {
+	return req.SampleBatch(ctx, c.grpcClient, n)
+}
+
+func (c *Client) Stream(ctx context.Context, req *Request) (*Stream, error) {
+	return req.Stream(ctx, c.grpcClient)
+}
+
+func (c *Client) StreamBatch(ctx context.Context, req *Request, n int32) (*BatchStream, error) {
+	return req.StreamBatch(ctx, c.grpcClient, n)
+}
+
+func (c *Client) Parse(ctx context.Context, req *Request, v any) error {
+	return req.Parse(ctx, c.grpcClient, v)
+}
+
+func (c *Client) Defer(ctx context.Context, req *Request, timeout, interval time.Duration) (*DeferredResponse, error) {
+	deferred := &DeferredRequest{proto: req.Proto()}
+	result, err := deferred.Poll(ctx, c.grpcClient, interval, timeout)
+	if err != nil {
+		return nil, err
+	}
+	return result.Response, nil
+}
+
+func (c *Client) DeferBatch(ctx context.Context, req *Request, n int32, timeout, interval time.Duration) ([]*Response, error) {
+	if n <= 0 {
+		return nil, fmt.Errorf("n must be greater than 0")
+	}
+	batchReq, err := req.cloneWithN(n)
+	if err != nil {
+		return nil, err
+	}
+	deferred := &DeferredRequest{proto: batchReq}
+	result, err := deferred.Poll(ctx, c.grpcClient, interval, timeout)
+	if err != nil {
+		return nil, err
+	}
+	if result == nil || result.Response == nil {
+		return nil, nil
+	}
+	return splitResponses(result.Response.Proto()), nil
 }
 
 // GetCompletion forwards to the underlying gRPC chat client.

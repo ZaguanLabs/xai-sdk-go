@@ -75,3 +75,11 @@ func (c *Client) Tokenize(ctx context.Context, text, model, user string) (*Respo
 		Model:  tokenResp.Model,
 	}, nil
 }
+
+func (c *Client) TokenizeText(ctx context.Context, text, model string) ([]*Token, error) {
+	resp, err := c.Tokenize(ctx, text, model, "")
+	if err != nil {
+		return nil, err
+	}
+	return resp.Tokens, nil
+}

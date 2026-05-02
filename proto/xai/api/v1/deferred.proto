@@ -30,4 +30,5 @@ enum DeferredStatus {
 
   // The request is still being processed.
   PENDING = 3;
+  FAILED = 4;
 }

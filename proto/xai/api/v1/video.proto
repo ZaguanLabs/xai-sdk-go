@@ -28,6 +28,7 @@ message GenerateVideoRequest {
   VideoUrlContent video = 6;
   optional VideoAspectRatio aspect_ratio = 7;
   optional VideoResolution resolution = 8;
+  repeated ImageUrlContent reference_images = 13;
 }
 
 message GetDeferredVideoRequest {
@@ -38,11 +39,25 @@ message VideoResponse {
   GeneratedVideo video = 1;
   string model = 2;
   SamplingUsage usage = 3;
+  optional VideoError error = 6;
+  int32 progress = 7;
 }
 
 message GetDeferredVideoResponse {
   DeferredStatus status = 1;
   optional VideoResponse response = 2;
+}
+
+message VideoError {
+  string code = 1;
+  string message = 2;
+}
+
+message ExtendVideoRequest {
+  string prompt = 1;
+  VideoUrlContent video = 2;
+  string model = 3;
+  optional int32 duration = 4;
 }
 
 enum VideoAspectRatio {
@@ -64,5 +79,6 @@ enum VideoResolution {
 
 service Video {
   rpc GenerateVideo(GenerateVideoRequest) returns (StartDeferredResponse) {}
+  rpc ExtendVideo(ExtendVideoRequest) returns (StartDeferredResponse) {}
   rpc GetDeferredVideo(GetDeferredVideoRequest) returns (GetDeferredVideoResponse) {}
 }

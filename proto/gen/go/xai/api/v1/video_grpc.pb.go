@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	Video_GenerateVideo_FullMethodName    = "/xai_api.Video/GenerateVideo"
+	Video_ExtendVideo_FullMethodName      = "/xai_api.Video/ExtendVideo"
 	Video_GetDeferredVideo_FullMethodName = "/xai_api.Video/GetDeferredVideo"
 )
 
@@ -28,6 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type VideoClient interface {
 	GenerateVideo(ctx context.Context, in *GenerateVideoRequest, opts ...grpc.CallOption) (*StartDeferredResponse, error)
+	ExtendVideo(ctx context.Context, in *ExtendVideoRequest, opts ...grpc.CallOption) (*StartDeferredResponse, error)
 	GetDeferredVideo(ctx context.Context, in *GetDeferredVideoRequest, opts ...grpc.CallOption) (*GetDeferredVideoResponse, error)
 }
 
@@ -49,6 +51,16 @@ func (c *videoClient) GenerateVideo(ctx context.Context, in *GenerateVideoReques
 	return out, nil
 }
 
+func (c *videoClient) ExtendVideo(ctx context.Context, in *ExtendVideoRequest, opts ...grpc.CallOption) (*StartDeferredResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StartDeferredResponse)
+	err := c.cc.Invoke(ctx, Video_ExtendVideo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *videoClient) GetDeferredVideo(ctx context.Context, in *GetDeferredVideoRequest, opts ...grpc.CallOption) (*GetDeferredVideoResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetDeferredVideoResponse)
@@ -64,6 +76,7 @@ func (c *videoClient) GetDeferredVideo(ctx context.Context, in *GetDeferredVideo
 // for forward compatibility.
 type VideoServer interface {
 	GenerateVideo(context.Context, *GenerateVideoRequest) (*StartDeferredResponse, error)
+	ExtendVideo(context.Context, *ExtendVideoRequest) (*StartDeferredResponse, error)
 	GetDeferredVideo(context.Context, *GetDeferredVideoRequest) (*GetDeferredVideoResponse, error)
 	mustEmbedUnimplementedVideoServer()
 }
@@ -77,6 +90,9 @@ type UnimplementedVideoServer struct{}
 
 func (UnimplementedVideoServer) GenerateVideo(context.Context, *GenerateVideoRequest) (*StartDeferredResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GenerateVideo not implemented")
+}
+func (UnimplementedVideoServer) ExtendVideo(context.Context, *ExtendVideoRequest) (*StartDeferredResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ExtendVideo not implemented")
 }
 func (UnimplementedVideoServer) GetDeferredVideo(context.Context, *GetDeferredVideoRequest) (*GetDeferredVideoResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetDeferredVideo not implemented")
@@ -120,6 +136,24 @@ func _Video_GenerateVideo_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Video_ExtendVideo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExtendVideoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServer).ExtendVideo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Video_ExtendVideo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServer).ExtendVideo(ctx, req.(*ExtendVideoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Video_GetDeferredVideo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetDeferredVideoRequest)
 	if err := dec(in); err != nil {
@@ -148,6 +182,10 @@ var Video_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GenerateVideo",
 			Handler:    _Video_GenerateVideo_Handler,
+		},
+		{
+			MethodName: "ExtendVideo",
+			Handler:    _Video_ExtendVideo_Handler,
 		},
 		{
 			MethodName: "GetDeferredVideo",

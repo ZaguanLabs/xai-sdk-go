@@ -114,6 +114,7 @@ type SamplingUsage struct {
 	NumSourcesUsed int32 `protobuf:"varint,8,opt,name=num_sources_used,json=numSourcesUsed,proto3" json:"num_sources_used,omitempty"`
 	// List of server side tools called.
 	ServerSideToolsUsed []ServerSideTool `protobuf:"varint,9,rep,packed,name=server_side_tools_used,json=serverSideToolsUsed,proto3,enum=xai_api.ServerSideTool" json:"server_side_tools_used,omitempty"`
+	CostInUsdTicks      *int64           `protobuf:"varint,11,opt,name=cost_in_usd_ticks,json=costInUsdTicks,proto3,oneof" json:"cost_in_usd_ticks,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -211,6 +212,13 @@ func (x *SamplingUsage) GetServerSideToolsUsed() []ServerSideTool {
 	return nil
 }
 
+func (x *SamplingUsage) GetCostInUsdTicks() int64 {
+	if x != nil && x.CostInUsdTicks != nil {
+		return *x.CostInUsdTicks
+	}
+	return 0
+}
+
 // Usage of embedding models.
 type EmbeddingUsage struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -270,7 +278,7 @@ var File_xai_api_v1_usage_proto protoreflect.FileDescriptor
 
 const file_xai_api_v1_usage_proto_rawDesc = "" +
 	"\n" +
-	"\x16xai/api/v1/usage.proto\x12\axai_api\"\xc0\x03\n" +
+	"\x16xai/api/v1/usage.proto\x12\axai_api\"\x86\x04\n" +
 	"\rSamplingUsage\x12+\n" +
 	"\x11completion_tokens\x18\x01 \x01(\x05R\x10completionTokens\x12)\n" +
 	"\x10reasoning_tokens\x18\x06 \x01(\x05R\x0freasoningTokens\x12#\n" +
@@ -280,7 +288,9 @@ const file_xai_api_v1_usage_proto_rawDesc = "" +
 	"\x19cached_prompt_text_tokens\x18\a \x01(\x05R\x16cachedPromptTextTokens\x12.\n" +
 	"\x13prompt_image_tokens\x18\x05 \x01(\x05R\x11promptImageTokens\x12(\n" +
 	"\x10num_sources_used\x18\b \x01(\x05R\x0enumSourcesUsed\x12L\n" +
-	"\x16server_side_tools_used\x18\t \x03(\x0e2\x17.xai_api.ServerSideToolR\x13serverSideToolsUsed\"r\n" +
+	"\x16server_side_tools_used\x18\t \x03(\x0e2\x17.xai_api.ServerSideToolR\x13serverSideToolsUsed\x12.\n" +
+	"\x11cost_in_usd_ticks\x18\v \x01(\x03H\x00R\x0ecostInUsdTicks\x88\x01\x01B\x14\n" +
+	"\x12_cost_in_usd_ticks\"r\n" +
 	"\x0eEmbeddingUsage\x12.\n" +
 	"\x13num_text_embeddings\x18\x01 \x01(\x05R\x11numTextEmbeddings\x120\n" +
 	"\x14num_image_embeddings\x18\x02 \x01(\x05R\x12numImageEmbeddings*\xc0\x02\n" +
@@ -330,6 +340,7 @@ func file_xai_api_v1_usage_proto_init() {
 	if File_xai_api_v1_usage_proto != nil {
 		return
 	}
+	file_xai_api_v1_usage_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

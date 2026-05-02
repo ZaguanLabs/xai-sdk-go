@@ -14,6 +14,8 @@ func fromProtoCollection(pc *xaiv1.CollectionMetadata) *Collection {
 		ID:             pc.CollectionId,
 		Name:           pc.CollectionName,
 		DocumentsCount: pc.DocumentsCount,
+		Description:    pc.GetCollectionDescription(),
+		TotalFileSize:  pc.TotalFileSize,
 	}
 
 	if pc.CreatedAt != nil {

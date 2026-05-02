@@ -44,11 +44,16 @@ func TestNewRequest(t *testing.T) {
 }
 
 func TestRequestBuilders(t *testing.T) {
+	aspectRatio := xaiv1.ImageAspectRatio_IMG_ASPECT_RATIO_16_9
+	resolution := xaiv1.ImageResolution_IMG_RESOLUTION_2K
 	req := NewRequest("test", "model").
 		WithCount(3).
 		WithUser("test-user").
 		WithFormat(xaiv1.ImageFormat_IMG_FORMAT_BASE64).
-		WithImage("http://example.com/img.jpg", xaiv1.ImageDetail_DETAIL_HIGH)
+		WithImage("http://example.com/img.jpg", xaiv1.ImageDetail_DETAIL_HIGH).
+		WithImages(&Input{ImageURL: "http://example.com/ref.jpg", Detail: xaiv1.ImageDetail_DETAIL_AUTO}).
+		WithAspectRatio(aspectRatio).
+		WithResolution(resolution)
 
 	if req.N != 3 {
 		t.Errorf("N = %v, want 3", req.N)
@@ -64,6 +69,16 @@ func TestRequestBuilders(t *testing.T) {
 	}
 	if req.Image.ImageURL != "http://example.com/img.jpg" {
 		t.Errorf("ImageURL = %v, want http://example.com/img.jpg", req.Image.ImageURL)
+	}
+	protoReq := req.Proto()
+	if len(protoReq.Images) != 1 || protoReq.Images[0].ImageUrl != "http://example.com/ref.jpg" {
+		t.Errorf("Images = %v, want one reference image", protoReq.Images)
+	}
+	if protoReq.GetAspectRatio() != aspectRatio {
+		t.Errorf("AspectRatio = %v, want %v", protoReq.GetAspectRatio(), aspectRatio)
+	}
+	if protoReq.GetResolution() != resolution {
+		t.Errorf("Resolution = %v, want %v", protoReq.GetResolution(), resolution)
 	}
 }
 
@@ -85,7 +100,6 @@ func TestGenerate(t *testing.T) {
 						Image: &xaiv1.GeneratedImage_Url{
 							Url: "http://example.com/cat.jpg",
 						},
-						UpSampledPrompt:   "A detailed cat",
 						RespectModeration: true,
 					},
 				},
@@ -183,15 +197,21 @@ func TestGeneratedImage(t *testing.T) {
 	img := &GeneratedImage{
 		proto: &xaiv1.GeneratedImage{
 			Image: &xaiv1.GeneratedImage_Base64{
-				Base64: "base64data",
+				Base64: "data:image/png;base64,aGVsbG8=",
 			},
-			UpSampledPrompt:   "detailed prompt",
 			RespectModeration: true,
 		},
 	}
 
-	if img.Base64() != "base64data" {
-		t.Errorf("Base64 = %v, want base64data", img.Base64())
+	if img.Base64() != "data:image/png;base64,aGVsbG8=" {
+		t.Errorf("Base64 = %v, want data:image/png;base64,aGVsbG8=", img.Base64())
+	}
+	decoded, err := img.DecodeBase64()
+	if err != nil {
+		t.Fatalf("DecodeBase64() error = %v", err)
+	}
+	if string(decoded) != "hello" {
+		t.Errorf("DecodeBase64() = %q, want hello", string(decoded))
 	}
 	// URL should be empty when Base64 is set
 	if img.URL() != "" {
@@ -204,16 +224,12 @@ func TestGeneratedImage(t *testing.T) {
 			Image: &xaiv1.GeneratedImage_Url{
 				Url: "http://example.com/img.jpg",
 			},
-			UpSampledPrompt:   "detailed prompt",
 			RespectModeration: true,
 		},
 	}
 
 	if imgUrl.URL() != "http://example.com/img.jpg" {
 		t.Errorf("URL = %v, want http://example.com/img.jpg", imgUrl.URL())
-	}
-	if img.UpsampledPrompt() != "detailed prompt" {
-		t.Errorf("UpsampledPrompt = %v, want detailed prompt", img.UpsampledPrompt())
 	}
 	if !img.RespectModeration() {
 		t.Error("RespectModeration should be true")
@@ -246,5 +262,8 @@ func TestResponse(t *testing.T) {
 	}
 	if resp.Model != "image-model" {
 		t.Errorf("Model = %v, want image-model", resp.Model)
+	}
+	if resp.Image().URL() != "http://example.com/1.jpg" {
+		t.Errorf("Image().URL() = %v, want http://example.com/1.jpg", resp.Image().URL())
 	}
 }

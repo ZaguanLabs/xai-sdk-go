@@ -125,6 +125,25 @@ func TestTokenizeClientNotInitialized(t *testing.T) {
 	}
 }
 
+func TestTokenizeText(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(&xaiv1.TokenizeTextResponse{
+			Tokens: []*xaiv1.Token{{TokenId: 1, StringToken: "Hello"}},
+			Model:  "grok-1",
+		})
+	}))
+	defer server.Close()
+
+	client := NewClient(rest.NewClient(rest.Config{BaseURL: server.URL, APIKey: "test"}))
+	tokens, err := client.TokenizeText(context.Background(), "Hello", "grok-1")
+	if err != nil {
+		t.Fatalf("TokenizeText() error = %v", err)
+	}
+	if len(tokens) != 1 || tokens[0].StringToken != "Hello" {
+		t.Errorf("TokenizeText() tokens = %v, want one Hello token", tokens)
+	}
+}
+
 func TestToken(t *testing.T) {
 	token := &Token{
 		TokenID:     123,

@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.12.1] - 2026-05-02
+
+### 🎯 Focus: Python SDK v1.12.1 Parity
+
+This release brings the Go SDK significantly closer to public API and behavior parity with the official Python SDK v1.12.1, including updated protobuf surfaces, image/video/batch/collections features, response convenience wrappers, cost helpers, and module-level helper packages.
+
+### Added
+
+#### Protobuf and Service Surface Parity
+- Added image generation fields and enums for quality, aspect ratio, resolution, and multi-image support.
+- Added video reference images, errors, progress fields, extension requests, and deferred failure status support.
+- Added batch support for input files plus image and video request/result payloads.
+- Added collection description generation and expanded collection/document metadata fields.
+- Added usage cost ticks to sampling usage.
+
+#### Python-Style Client Conveniences
+- Added `auth.Client.GetAPIKeyInfo()` and `GetApiKeyInfo()`.
+- Added `files.Client.Content()` for complete file content retrieval.
+- Added `tokenizer.Client.TokenizeText()`.
+- Added chat client convenience methods for sample, batch sample, streaming, parsing, and deferred flows.
+- Added blocking video `Generate()` semantics plus deferred aliases.
+- Added batch helpers for file-backed batches, image/video batch requests, and single request results.
+- Added collection helpers for existing documents and richer document updates.
+
+#### Response and Helper Parity
+- Added `xai/cost` with USD cost conversion helpers.
+- Added image and video response convenience wrappers including cost helpers.
+- Added chat response cost convenience.
+- Added batch result wrapper helpers for success/error/result inspection.
+- Added `xai/search`, `xai/tools`, and `xai/types` packages to mirror Python helper modules and literal/type alias surfaces using Go constants and helpers.
+
+### Fixed
+
+- Resolved duplicate `google/rpc/status.proto` registration by relying on the canonical generated status package.
+
+### Testing
+
+- ✅ `go test ./...`
+- ✅ `go build ./...`
+- ✅ `go vet ./...`
+
 ## [0.11.1] - 2026-03-13
 
 ### 🎯 Focus: Grok 4.20 and Tool-Calling Reliability

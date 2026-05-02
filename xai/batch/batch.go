@@ -6,6 +6,8 @@ import (
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/chat"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/image"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/video"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -18,12 +20,24 @@ type ListOptions struct {
 	PaginationToken string
 }
 
+type ListBatchResultsResponse struct {
+	proto *xaiv1.ListBatchResultsResponse
+}
+
+type BatchResult struct {
+	proto *xaiv1.BatchResult
+}
+
 func NewClient(grpcClient xaiv1.BatchMgmtClient) *Client {
 	return &Client{grpcClient: grpcClient}
 }
 
 func (c *Client) Create(ctx context.Context, name string) (*xaiv1.Batch, error) {
 	return c.CreateWithRequest(ctx, &xaiv1.CreateBatchRequest{Name: name})
+}
+
+func (c *Client) CreateFromFile(ctx context.Context, name, inputFileID string) (*xaiv1.Batch, error) {
+	return c.CreateWithRequest(ctx, &xaiv1.CreateBatchRequest{Name: name, InputFileId: inputFileID})
 }
 
 func (c *Client) CreateWithRequest(ctx context.Context, req *xaiv1.CreateBatchRequest) (*xaiv1.Batch, error) {
@@ -105,6 +119,13 @@ func (c *Client) Add(ctx context.Context, batchID string, requests ...interface{
 			if batchReq != nil {
 				batchRequests = append(batchRequests, batchReq)
 			}
+		case *image.GenerateRequest:
+			batchReq := BatchRequestFromImageRequest(value, "")
+			if batchReq != nil {
+				batchRequests = append(batchRequests, batchReq)
+			}
+		case *xaiv1.GenerateVideoRequest:
+			batchRequests = append(batchRequests, BatchRequestFromVideoRequest(value, ""))
 		default:
 			return fmt.Errorf("unsupported batch request type: %T", request)
 		}
@@ -162,6 +183,16 @@ func (c *Client) ListBatchResults(ctx context.Context, batchID string, opts *Lis
 	return c.ListResults(ctx, batchID, opts)
 }
 
+func (c *Client) GetRequestResult(ctx context.Context, batchID, batchRequestID string) (*xaiv1.GetBatchRequestResultResponse, error) {
+	if c.grpcClient == nil {
+		return nil, fmt.Errorf("batch client not initialized")
+	}
+	return c.grpcClient.GetBatchRequestResult(ctx, &xaiv1.GetBatchRequestResultRequest{
+		BatchId:        batchID,
+		BatchRequestId: batchRequestID,
+	})
+}
+
 func BatchRequestFromChatRequest(req *chat.Request) *xaiv1.BatchRequest {
 	if req == nil || req.Proto() == nil {
 		return nil
@@ -183,4 +214,143 @@ func BatchRequestFromChatRequest(req *chat.Request) *xaiv1.BatchRequest {
 	}
 
 	return batchReq
+}
+
+func BatchRequestFromImageRequest(req *image.GenerateRequest, batchRequestID string) *xaiv1.BatchRequest {
+	if req == nil {
+		return nil
+	}
+	batchReq := &xaiv1.BatchRequest{
+		Request: &xaiv1.BatchRequest_ImageRequest{
+			ImageRequest: req.Proto(),
+		},
+	}
+	if batchRequestID != "" {
+		batchReq.BatchRequestId = &batchRequestID
+	}
+	return batchReq
+}
+
+func BatchRequestFromVideoRequest(req *xaiv1.GenerateVideoRequest, batchRequestID string) *xaiv1.BatchRequest {
+	if req == nil {
+		return nil
+	}
+	batchReq := &xaiv1.BatchRequest{
+		Request: &xaiv1.BatchRequest_VideoRequest{
+			VideoRequest: req,
+		},
+	}
+	if batchRequestID != "" {
+		batchReq.BatchRequestId = &batchRequestID
+	}
+	return batchReq
+}
+
+func PrepareVideoRequest(prompt, model, batchRequestID string, opts *video.GenerateOptions) *xaiv1.BatchRequest {
+	return video.Prepare(prompt, model, batchRequestID, opts)
+}
+
+func NewListBatchResultsResponse(proto *xaiv1.ListBatchResultsResponse) *ListBatchResultsResponse {
+	return &ListBatchResultsResponse{proto: proto}
+}
+
+func (r *ListBatchResultsResponse) Results() []*BatchResult {
+	if r == nil || r.proto == nil {
+		return nil
+	}
+	results := make([]*BatchResult, len(r.proto.Results))
+	for i, result := range r.proto.Results {
+		results[i] = &BatchResult{proto: result}
+	}
+	return results
+}
+
+func (r *ListBatchResultsResponse) Succeeded() []*BatchResult {
+	results := r.Results()
+	succeeded := make([]*BatchResult, 0, len(results))
+	for _, result := range results {
+		if result.IsSuccess() {
+			succeeded = append(succeeded, result)
+		}
+	}
+	return succeeded
+}
+
+func (r *ListBatchResultsResponse) Failed() []*BatchResult {
+	results := r.Results()
+	failed := make([]*BatchResult, 0, len(results))
+	for _, result := range results {
+		if result.HasError() {
+			failed = append(failed, result)
+		}
+	}
+	return failed
+}
+
+func (r *ListBatchResultsResponse) PaginationToken() string {
+	if r == nil || r.proto == nil {
+		return ""
+	}
+	return r.proto.GetPaginationToken()
+}
+
+func (r *ListBatchResultsResponse) Proto() *xaiv1.ListBatchResultsResponse {
+	if r == nil {
+		return nil
+	}
+	return r.proto
+}
+
+func NewBatchResult(proto *xaiv1.BatchResult) *BatchResult {
+	return &BatchResult{proto: proto}
+}
+
+func (r *BatchResult) BatchRequestID() string {
+	if r == nil || r.proto == nil {
+		return ""
+	}
+	return r.proto.GetBatchRequestId()
+}
+
+func (r *BatchResult) Response() *xaiv1.BatchResultData {
+	if r == nil || r.proto == nil {
+		return nil
+	}
+	return r.proto.GetResponse()
+}
+
+func (r *BatchResult) ImageResponse() *xaiv1.ImageResponse {
+	if response := r.Response(); response != nil {
+		return response.GetImageResponse()
+	}
+	return nil
+}
+
+func (r *BatchResult) VideoResponse() *xaiv1.VideoResponse {
+	if response := r.Response(); response != nil {
+		return response.GetVideoResponse()
+	}
+	return nil
+}
+
+func (r *BatchResult) HasError() bool {
+	return r != nil && r.proto != nil && r.proto.GetError() != nil
+}
+
+func (r *BatchResult) IsSuccess() bool {
+	return r != nil && r.proto != nil && r.proto.GetResponse() != nil
+}
+
+func (r *BatchResult) ErrorMessage() string {
+	if r == nil || r.proto == nil || r.proto.GetError() == nil {
+		return ""
+	}
+	return r.proto.GetError().Message
+}
+
+func (r *BatchResult) Proto() *xaiv1.BatchResult {
+	if r == nil {
+		return nil
+	}
+	return r.proto
 }

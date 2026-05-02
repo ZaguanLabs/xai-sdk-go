@@ -6,6 +6,8 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "google/rpc/status.proto";
 import "xai/api/v1/chat.proto";
+import "xai/api/v1/image.proto";
+import "xai/api/v1/video.proto";
 
 message Batch {
   string batch_id = 1;
@@ -17,6 +19,7 @@ message Batch {
   optional string cancel_by_xai_message = 7;
   BatchState state = 8;
   BatchCostBreakdown cost_breakdown = 9;
+  string input_file_id = 10;
 }
 
 message BatchState {
@@ -43,12 +46,16 @@ message BatchRequest {
   optional string batch_request_id = 1;
   oneof request {
     GetCompletionsRequest completion_request = 2;
+    GenerateImageRequest image_request = 3;
+    GenerateVideoRequest video_request = 4;
   }
 }
 
 message BatchResultData {
   oneof response {
     GetChatCompletionResponse completion_response = 2;
+    ImageResponse image_response = 3;
+    VideoResponse video_response = 4;
   }
 }
 
@@ -79,6 +86,7 @@ message BatchRequestMetadata {
 
 message CreateBatchRequest {
   string name = 1;
+  string input_file_id = 2;
 }
 
 message AddBatchRequestsRequest {
@@ -126,6 +134,16 @@ message ListBatchResultsResponse {
   optional string pagination_token = 2;
 }
 
+message GetBatchRequestResultRequest {
+  string batch_id = 1;
+  string batch_request_id = 2;
+}
+
+message GetBatchRequestResultResponse {
+  BatchRequest request = 1;
+  BatchResult result = 2;
+}
+
 service BatchMgmt {
   rpc CreateBatch(CreateBatchRequest) returns (Batch) {}
   rpc GetBatch(GetBatchRequest) returns (Batch) {}
@@ -134,4 +152,5 @@ service BatchMgmt {
   rpc AddBatchRequests(AddBatchRequestsRequest) returns (google.protobuf.Empty) {}
   rpc ListBatchRequestMetadata(ListBatchRequestMetadataRequest) returns (ListBatchRequestMetadataResponse) {}
   rpc ListBatchResults(ListBatchResultsRequest) returns (ListBatchResultsResponse) {}
+  rpc GetBatchRequestResult(GetBatchRequestResultRequest) returns (GetBatchRequestResultResponse) {}
 }

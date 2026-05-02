@@ -55,6 +55,8 @@ type Collection struct {
 	Name           string
 	CreatedAt      time.Time
 	DocumentsCount int32
+	Description    string
+	TotalFileSize  int64
 }
 
 // Document represents a document in a collection.
@@ -87,6 +89,7 @@ type CreateCollectionOptions struct {
 	TeamID             string
 	IndexConfiguration *IndexConfiguration
 	ChunkConfiguration *ChunkConfiguration
+	Description        string
 }
 
 // ListCollectionsOptions contains options for listing collections.
@@ -96,6 +99,7 @@ type ListCollectionsOptions struct {
 	Order           xaiv1.Ordering
 	PaginationToken string
 	SortBy          xaiv1.CollectionsSortBy
+	Filter          string
 }
 
 // ListDocumentsOptions contains options for listing documents.
@@ -106,6 +110,7 @@ type ListDocumentsOptions struct {
 	Order           xaiv1.Ordering
 	PaginationToken string
 	SortBy          xaiv1.DocumentsSortBy
+	Filter          string
 }
 
 // AddDocumentOptions contains options for adding a document.
@@ -113,6 +118,16 @@ type AddDocumentOptions struct {
 	FileID       string
 	TeamID       string
 	CollectionID string
+	Fields       map[string]string
+}
+
+type UpdateDocumentOptions struct {
+	CollectionID string
+	FileID       string
+	TeamID       string
+	Name         string
+	Data         []byte
+	ContentType  string
 	Fields       map[string]string
 }
 
@@ -139,8 +154,9 @@ func (c *Client) CreateCollection(ctx context.Context, opts CreateCollectionOpti
 	}
 
 	req := &xaiv1.CreateCollectionRequest{
-		TeamId:         stringPtr(opts.TeamID),
-		CollectionName: opts.Name,
+		TeamId:                stringPtr(opts.TeamID),
+		CollectionName:        opts.Name,
+		CollectionDescription: stringPtr(opts.Description),
 	}
 
 	jsonData, err := protojson.Marshal(req)
@@ -201,6 +217,7 @@ func (c *Client) ListCollections(ctx context.Context, opts *ListCollectionsOptio
 		req.Order = orderingPtr(opts.Order)
 		req.PaginationToken = stringPtr(opts.PaginationToken)
 		req.SortBy = collectionsSortByPtr(opts.SortBy)
+		req.Filter = stringPtr(opts.Filter)
 	}
 
 	jsonData, err := protojson.Marshal(req)
@@ -241,9 +258,10 @@ func (c *Client) UpdateCollection(ctx context.Context, collectionID, teamID stri
 	}
 
 	req := &xaiv1.UpdateCollectionRequest{
-		CollectionId:   collectionID,
-		TeamId:         stringPtr(teamID),
-		CollectionName: stringPtr(opts.Name),
+		CollectionId:          collectionID,
+		TeamId:                stringPtr(teamID),
+		CollectionName:        stringPtr(opts.Name),
+		CollectionDescription: stringPtr(opts.Description),
 	}
 
 	jsonData, err := protojson.Marshal(req)
@@ -369,7 +387,10 @@ func (c *Client) waitForIndexing(ctx context.Context, collectionID, fileID, team
 		switch document.Status {
 		case xaiv1.DocumentStatus_DOCUMENT_STATUS_PROCESSED:
 			return document, nil
-		case xaiv1.DocumentStatus_DOCUMENT_STATUS_PROCESSING:
+		case xaiv1.DocumentStatus_DOCUMENT_STATUS_PROCESSING,
+			xaiv1.DocumentStatus_DOCUMENT_STATUS_CHUNKED,
+			xaiv1.DocumentStatus_DOCUMENT_STATUS_EMBEDDING,
+			xaiv1.DocumentStatus_DOCUMENT_STATUS_WRITING:
 		case xaiv1.DocumentStatus_DOCUMENT_STATUS_FAILED:
 			return nil, fmt.Errorf("document indexing failed: %s", document.ErrorMsg)
 		default:
@@ -415,6 +436,14 @@ func (c *Client) AddDocument(ctx context.Context, opts AddDocumentOptions) (*Doc
 	return fromProtoDocument(&doc), nil
 }
 
+func (c *Client) AddExistingDocument(ctx context.Context, collectionID, fileID string, fields map[string]string) (*Document, error) {
+	return c.AddDocument(ctx, AddDocumentOptions{
+		CollectionID: collectionID,
+		FileID:       fileID,
+		Fields:       fields,
+	})
+}
+
 // GetDocument retrieves a document by ID.
 func (c *Client) GetDocument(ctx context.Context, collectionID, fileID, teamID string) (*Document, error) {
 	if c.restClient == nil {
@@ -449,6 +478,7 @@ func (c *Client) ListDocuments(ctx context.Context, opts *ListDocumentsOptions) 
 		req.Order = orderingPtr(opts.Order)
 		req.PaginationToken = stringPtr(opts.PaginationToken)
 		req.SortBy = documentsSortByPtr(opts.SortBy)
+		req.Filter = stringPtr(opts.Filter)
 		collectionID = opts.CollectionID
 	}
 
@@ -481,15 +511,27 @@ func (c *Client) ListDocuments(ctx context.Context, opts *ListDocumentsOptions) 
 
 // UpdateDocument updates a document's fields.
 func (c *Client) UpdateDocument(ctx context.Context, collectionID, fileID, teamID string, fields map[string]string) (*Document, error) {
+	return c.UpdateDocumentWithOptions(ctx, UpdateDocumentOptions{
+		CollectionID: collectionID,
+		FileID:       fileID,
+		TeamID:       teamID,
+		Fields:       fields,
+	})
+}
+
+func (c *Client) UpdateDocumentWithOptions(ctx context.Context, opts UpdateDocumentOptions) (*Document, error) {
 	if c.restClient == nil {
 		return nil, ErrClientNotInitialized
 	}
 
 	req := &xaiv1.UpdateDocumentRequest{
-		CollectionId: collectionID,
-		FileId:       fileID,
-		TeamId:       stringPtr(teamID),
-		Fields:       fields,
+		CollectionId: opts.CollectionID,
+		FileId:       opts.FileID,
+		TeamId:       stringPtr(opts.TeamID),
+		Name:         stringPtr(opts.Name),
+		Data:         opts.Data,
+		ContentType:  stringPtr(opts.ContentType),
+		Fields:       opts.Fields,
 	}
 
 	jsonData, err := protojson.Marshal(req)
@@ -497,7 +539,7 @@ func (c *Client) UpdateDocument(ctx context.Context, collectionID, fileID, teamI
 		return nil, err
 	}
 
-	resp, err := c.restClient.Put(ctx, fmt.Sprintf("/collections/%s/documents/%s", collectionID, fileID), jsonData)
+	resp, err := c.restClient.Put(ctx, fmt.Sprintf("/collections/%s/documents/%s", opts.CollectionID, opts.FileID), jsonData)
 	if err != nil {
 		return nil, err
 	}
@@ -518,6 +560,54 @@ func (c *Client) DeleteDocument(ctx context.Context, collectionID, fileID, teamI
 
 	_, err := c.restClient.Delete(ctx, fmt.Sprintf("/collections/%s/documents/%s?team_id=%s", collectionID, fileID, teamID))
 	return err
+}
+
+func (c *Client) RemoveDocument(ctx context.Context, collectionID, fileID, teamID string) error {
+	return c.DeleteDocument(ctx, collectionID, fileID, teamID)
+}
+
+func (c *Client) ReindexDocument(ctx context.Context, collectionID, fileID, teamID string) error {
+	if c.restClient == nil {
+		return ErrClientNotInitialized
+	}
+
+	req := &xaiv1.ReIndexDocumentRequest{
+		TeamId:       stringPtr(teamID),
+		CollectionId: collectionID,
+		FileId:       fileID,
+	}
+
+	jsonData, err := protojson.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.restClient.Post(ctx, fmt.Sprintf("/collections/%s/documents/%s/reindex", collectionID, fileID), jsonData)
+	return err
+}
+
+func (c *Client) GenerateDescription(ctx context.Context, collectionID string) (string, error) {
+	if c.restClient == nil {
+		return "", ErrClientNotInitialized
+	}
+
+	req := &xaiv1.GenerateCollectionDescriptionRequest{CollectionId: collectionID}
+	jsonData, err := protojson.Marshal(req)
+	if err != nil {
+		return "", err
+	}
+
+	resp, err := c.restClient.Post(ctx, fmt.Sprintf("/collections/%s/description", collectionID), jsonData)
+	if err != nil {
+		return "", err
+	}
+
+	var descriptionResp xaiv1.GenerateCollectionDescriptionResponse
+	if err := protojson.Unmarshal(resp.Body, &descriptionResp); err != nil {
+		return "", err
+	}
+
+	return descriptionResp.CollectionDescription, nil
 }
 
 // BatchGetDocuments retrieves multiple documents at once.

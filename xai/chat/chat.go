@@ -8,6 +8,7 @@ import (
 	"io"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/cost"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -1275,6 +1276,13 @@ func (r *Response) Usage() *TokenUsage {
 	return &TokenUsage{proto: r.proto.Usage}
 }
 
+func (r *Response) CostUSD() (float64, bool) {
+	if r == nil || r.proto == nil {
+		return 0, false
+	}
+	return cost.USDFromUsage(r.proto.Usage)
+}
+
 // Citations returns the citations from the response.
 // Citations are returned when search is enabled and return_citations is true.
 func (r *Response) Citations() []string {
@@ -1494,6 +1502,13 @@ func (u *TokenUsage) TotalTokens() int32 {
 		return 0
 	}
 	return u.proto.GetTotalTokens()
+}
+
+func (u *TokenUsage) CostUSD() (float64, bool) {
+	if u == nil {
+		return 0, false
+	}
+	return cost.USDFromUsage(u.proto)
 }
 
 // validateStream validates the stream state.

@@ -34,6 +34,7 @@ const (
 	DeferredStatus_EXPIRED DeferredStatus = 2
 	// The request is still being processed.
 	DeferredStatus_PENDING DeferredStatus = 3
+	DeferredStatus_FAILED  DeferredStatus = 4
 )
 
 // Enum value maps for DeferredStatus.
@@ -43,12 +44,14 @@ var (
 		1: "DONE",
 		2: "EXPIRED",
 		3: "PENDING",
+		4: "FAILED",
 	}
 	DeferredStatus_value = map[string]int32{
 		"INVALID_DEFERRED_STATUS": 0,
 		"DONE":                    1,
 		"EXPIRED":                 2,
 		"PENDING":                 3,
+		"FAILED":                  4,
 	}
 )
 
@@ -183,12 +186,14 @@ const file_xai_api_v1_deferred_proto_rawDesc = "" +
 	"request_id\x18\x01 \x01(\tR\trequestId\"3\n" +
 	"\x12GetDeferredRequest\x12\x1d\n" +
 	"\n" +
-	"request_id\x18\x01 \x01(\tR\trequestId*Q\n" +
+	"request_id\x18\x01 \x01(\tR\trequestId*]\n" +
 	"\x0eDeferredStatus\x12\x1b\n" +
 	"\x17INVALID_DEFERRED_STATUS\x10\x00\x12\b\n" +
 	"\x04DONE\x10\x01\x12\v\n" +
 	"\aEXPIRED\x10\x02\x12\v\n" +
-	"\aPENDING\x10\x03B\x8e\x01\n" +
+	"\aPENDING\x10\x03\x12\n" +
+	"\n" +
+	"\x06FAILED\x10\x04B\x8e\x01\n" +
 	"\vcom.xai_apiB\rDeferredProtoP\x01Z8github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1\xa2\x02\x03XXX\xaa\x02\x06XaiApi\xca\x02\x06XaiApi\xe2\x02\x12XaiApi\\GPBMetadata\xea\x02\x06XaiApib\x06proto3"
 
 var (

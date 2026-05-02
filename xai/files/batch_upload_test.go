@@ -5,8 +5,14 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
+
+	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 func TestBatchUpload_Success(t *testing.T) {
@@ -44,6 +50,26 @@ func TestBatchUpload_Success(t *testing.T) {
 		if result.Error == nil {
 			t.Errorf("Expected error for result %d", i)
 		}
+	}
+}
+
+func TestContent(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		data, err := protojson.Marshal(&xaiv1.FileContentChunk{Data: []byte("file content")})
+		if err != nil {
+			t.Fatalf("protojson.Marshal() error = %v", err)
+		}
+		w.Write(data)
+	}))
+	defer server.Close()
+
+	client := NewClient(rest.NewClient(rest.Config{BaseURL: server.URL, APIKey: "test"}))
+	content, err := client.Content(context.Background(), "file-1")
+	if err != nil {
+		t.Fatalf("Content() error = %v", err)
+	}
+	if string(content) != "file content" {
+		t.Errorf("Content() = %q, want file content", string(content))
 	}
 }
 

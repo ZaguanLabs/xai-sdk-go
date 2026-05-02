@@ -9,17 +9,26 @@ import (
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // Client provides access to the xAI Auth API.
 type Client struct {
 	restClient *rest.Client
+	grpcClient xaiv1.AuthClient
 }
 
 // NewClient creates a new Auth API client.
 func NewClient(restClient *rest.Client) *Client {
 	return &Client{
 		restClient: restClient,
+	}
+}
+
+func NewClientWithGRPC(restClient *rest.Client, grpcClient xaiv1.AuthClient) *Client {
+	return &Client{
+		restClient: restClient,
+		grpcClient: grpcClient,
 	}
 }
 
@@ -89,6 +98,23 @@ func (c *Client) ValidateKey(ctx context.Context, apiKey string) (*ApiKey, error
 	}
 
 	return fromProto(&key), nil
+}
+
+func (c *Client) GetAPIKeyInfo(ctx context.Context) (*ApiKey, error) {
+	if c.grpcClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+
+	key, err := c.grpcClient.GetApiKeyInfo(ctx, &emptypb.Empty{})
+	if err != nil {
+		return nil, err
+	}
+
+	return fromProto(key), nil
+}
+
+func (c *Client) GetApiKeyInfo(ctx context.Context) (*ApiKey, error) {
+	return c.GetAPIKeyInfo(ctx)
 }
 
 // GetKey retrieves API key metadata by ID.

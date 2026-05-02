@@ -23,11 +23,17 @@ service Collections {
   rpc ReIndexDocument(ReIndexDocumentRequest) returns (google.protobuf.Empty) {}
   rpc UpdateCollection(UpdateCollectionRequest) returns (CollectionMetadata) {}
   rpc BatchGetDocuments(BatchGetDocumentsRequest) returns (BatchGetDocumentsResponse) {}
+  rpc GenerateCollectionDescription(GenerateCollectionDescriptionRequest) returns (GenerateCollectionDescriptionResponse) {}
 }
 
 enum CollectionsSortBy {
   COLLECTIONS_SORT_BY_NAME = 0;
   COLLECTIONS_SORT_BY_AGE = 1;
+}
+
+enum FieldDefinitionOperation {
+  FIELD_DEFINITION_ADD = 0;
+  FIELD_DEFINITION_DELETE = 1;
 }
 
 enum DocumentsSortBy {
@@ -41,6 +47,9 @@ enum DocumentStatus {
   DOCUMENT_STATUS_PROCESSING = 1;
   DOCUMENT_STATUS_PROCESSED = 2;
   DOCUMENT_STATUS_FAILED = 3;
+  DOCUMENT_STATUS_CHUNKED = 4;
+  DOCUMENT_STATUS_EMBEDDING = 5;
+  DOCUMENT_STATUS_WRITING = 6;
 }
 
 message FieldDefinition {
@@ -51,6 +60,11 @@ message FieldDefinition {
   optional string description = 5;
 }
 
+message FieldDefinitionUpdate {
+  FieldDefinition field_definition = 1;
+  FieldDefinitionOperation operation = 2;
+}
+
 message CreateCollectionRequest {
   optional string team_id = 1;
   string collection_name = 2;
@@ -58,6 +72,7 @@ message CreateCollectionRequest {
   optional rag.ChunkConfiguration chunk_configuration = 5;
   optional rag.HNSWMetric metric_space = 7;
   repeated FieldDefinition field_definitions = 9;
+  optional string collection_description = 10;
 }
 
 message CollectionMetadata {
@@ -68,6 +83,8 @@ message CollectionMetadata {
   rag.ChunkConfiguration chunk_configuration = 5;
   int32 documents_count = 6;
   repeated FieldDefinition field_definitions = 8;
+  optional string collection_description = 9;
+  int64 total_file_size = 10;
 }
 
 message ListCollectionsRequest {
@@ -129,6 +146,8 @@ message FileMetadata {
   string hash = 7;
   optional string upload_status = 8;
   optional string upload_error_message = 9;
+  optional string processing_status = 10;
+  optional string file_path = 11;
 }
 
 message DocumentMetadata {
@@ -136,6 +155,9 @@ message DocumentMetadata {
   map<string, string> fields = 2;
   DocumentStatus status = 3;
   optional string error_message = 4;
+  google.protobuf.Timestamp last_indexed_at = 5;
+  optional int32 chunk_count = 6;
+  optional int64 chunks_processed_count = 7;
 }
 
 message ListDocumentsRequest {
@@ -194,6 +216,8 @@ message UpdateCollectionRequest {
   string collection_id = 2;
   optional string collection_name = 3;
   optional rag.ChunkConfiguration chunk_configuration = 4;
+  repeated FieldDefinitionUpdate field_definition_updates = 5;
+  optional string collection_description = 6;
 }
 
 message BatchGetDocumentsRequest {
@@ -204,4 +228,12 @@ message BatchGetDocumentsRequest {
 
 message BatchGetDocumentsResponse {
   repeated DocumentMetadata documents = 1;
+}
+
+message GenerateCollectionDescriptionRequest {
+  string collection_id = 1;
+}
+
+message GenerateCollectionDescriptionResponse {
+  string collection_description = 1;
 }

@@ -35,6 +35,8 @@ message SamplingUsage {
 
   // List of server side tools called.
   repeated ServerSideTool server_side_tools_used = 9;
+
+  optional int64 cost_in_usd_ticks = 11;
 }
 
 // Usage of embedding models.

@@ -157,6 +157,15 @@ func (c *Client) Download(ctx context.Context, fileID string) (io.ReadCloser, er
 	return io.NopCloser(bytes.NewReader(chunks.Data)), nil
 }
 
+func (c *Client) Content(ctx context.Context, fileID string) ([]byte, error) {
+	reader, err := c.Download(ctx, fileID)
+	if err != nil {
+		return nil, err
+	}
+	defer reader.Close()
+	return io.ReadAll(reader)
+}
+
 // List lists files with optional filtering and pagination.
 func (c *Client) List(ctx context.Context, opts *ListOptions) (*ListResult, error) {
 	if c.restClient == nil {

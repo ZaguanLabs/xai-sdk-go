@@ -3,8 +3,12 @@ package image
 
 import (
 	"context"
+	"encoding/base64"
+	"fmt"
+	"strings"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/cost"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
 	"google.golang.org/protobuf/encoding/protojson"
 )
@@ -23,12 +27,15 @@ func NewClient(restClient *rest.Client) *Client {
 
 // GenerateRequest represents an image generation request.
 type GenerateRequest struct {
-	Prompt string
-	Model  string
-	N      int32
-	User   string
-	Image  *Input
-	Format xaiv1.ImageFormat
+	Prompt      string
+	Model       string
+	N           int32
+	User        string
+	Image       *Input
+	Images      []*Input
+	Format      xaiv1.ImageFormat
+	AspectRatio *xaiv1.ImageAspectRatio
+	Resolution  *xaiv1.ImageResolution
 }
 
 // Input represents an input image for image-to-image generation.
@@ -50,6 +57,20 @@ func (i *GeneratedImage) Base64() string {
 	return i.proto.GetBase64()
 }
 
+func (i *GeneratedImage) DecodeBase64() ([]byte, error) {
+	value := i.Base64()
+	if value == "" {
+		if !i.RespectModeration() {
+			return nil, fmt.Errorf("image did not respect moderation rules; base64 is not available")
+		}
+		return nil, fmt.Errorf("image was not returned via base64")
+	}
+	if comma := strings.Index(value, "base64,"); comma >= 0 {
+		value = value[comma+len("base64,"):]
+	}
+	return base64.StdEncoding.DecodeString(value)
+}
+
 // URL returns the URL of the generated image.
 func (i *GeneratedImage) URL() string {
 	if i.proto == nil {
@@ -60,10 +81,7 @@ func (i *GeneratedImage) URL() string {
 
 // UpsampledPrompt returns the upsampled prompt.
 func (i *GeneratedImage) UpsampledPrompt() string {
-	if i.proto == nil {
-		return ""
-	}
-	return i.proto.UpSampledPrompt
+	return ""
 }
 
 // RespectModeration returns whether the image respects moderation.
@@ -78,6 +96,21 @@ func (i *GeneratedImage) RespectModeration() bool {
 type Response struct {
 	Images []*GeneratedImage
 	Model  string
+	Usage  *xaiv1.SamplingUsage
+}
+
+func (r *Response) Image() *GeneratedImage {
+	if r == nil || len(r.Images) == 0 {
+		return nil
+	}
+	return r.Images[0]
+}
+
+func (r *Response) CostUSD() (float64, bool) {
+	if r == nil {
+		return 0, false
+	}
+	return cost.USDFromUsage(r.Usage)
 }
 
 // NewRequest creates a new image generation request.
@@ -117,28 +150,104 @@ func (r *GenerateRequest) WithImage(imageURL string, detail xaiv1.ImageDetail) *
 	return r
 }
 
+func (r *GenerateRequest) WithImages(images ...*Input) *GenerateRequest {
+	r.Images = append(r.Images, images...)
+	return r
+}
+
+func (r *GenerateRequest) WithImageURL(imageURL string, detail xaiv1.ImageDetail) *GenerateRequest {
+	return r.WithImage(imageURL, detail)
+}
+
+func (r *GenerateRequest) WithAspectRatio(aspectRatio xaiv1.ImageAspectRatio) *GenerateRequest {
+	r.AspectRatio = &aspectRatio
+	return r
+}
+
+func (r *GenerateRequest) WithResolution(resolution xaiv1.ImageResolution) *GenerateRequest {
+	r.Resolution = &resolution
+	return r
+}
+
+func (r *GenerateRequest) Proto() *xaiv1.GenerateImageRequest {
+	protoReq := &xaiv1.GenerateImageRequest{
+		Prompt: r.Prompt,
+		Model:  r.Model,
+		N:      &r.N,
+		User:   r.User,
+		Format: r.Format,
+	}
+
+	if r.Image != nil {
+		protoReq.Image = &xaiv1.ImageUrlContent{
+			ImageUrl: r.Image.ImageURL,
+			Detail:   r.Image.Detail,
+		}
+	}
+	if len(r.Images) > 0 {
+		protoReq.Images = make([]*xaiv1.ImageUrlContent, 0, len(r.Images))
+		for _, img := range r.Images {
+			if img == nil {
+				continue
+			}
+			protoReq.Images = append(protoReq.Images, &xaiv1.ImageUrlContent{
+				ImageUrl: img.ImageURL,
+				Detail:   img.Detail,
+			})
+		}
+	}
+	if r.AspectRatio != nil {
+		protoReq.AspectRatio = r.AspectRatio
+	}
+	if r.Resolution != nil {
+		protoReq.Resolution = r.Resolution
+	}
+
+	return protoReq
+}
+
+func (c *Client) Prepare(req *GenerateRequest, batchRequestID string) *xaiv1.BatchRequest {
+	if req == nil {
+		return nil
+	}
+	batchReq := &xaiv1.BatchRequest{
+		Request: &xaiv1.BatchRequest_ImageRequest{
+			ImageRequest: req.Proto(),
+		},
+	}
+	if batchRequestID != "" {
+		batchReq.BatchRequestId = &batchRequestID
+	}
+	return batchReq
+}
+
+func (c *Client) Sample(ctx context.Context, req *GenerateRequest) (*GeneratedImage, error) {
+	resp, err := c.Generate(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	if len(resp.Images) == 0 {
+		return nil, nil
+	}
+	return resp.Images[0], nil
+}
+
+func (c *Client) SampleBatch(ctx context.Context, req *GenerateRequest, n int32) ([]*GeneratedImage, error) {
+	req.WithCount(n)
+	resp, err := c.Generate(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return resp.Images, nil
+}
+
 // Generate generates images based on the request.
 func (c *Client) Generate(ctx context.Context, req *GenerateRequest) (*Response, error) {
 	if c.restClient == nil {
 		return nil, ErrClientNotInitialized
 	}
 
-	protoReq := &xaiv1.GenerateImageRequest{
-		Prompt: req.Prompt,
-		Model:  req.Model,
-		N:      &req.N,
-		User:   req.User,
-		Format: req.Format,
-	}
-
-	if req.Image != nil {
-		protoReq.Image = &xaiv1.ImageUrlContent{
-			ImageUrl: req.Image.ImageURL,
-			Detail:   req.Image.Detail,
-		}
-	}
-
-	jsonData, err := protojson.Marshal(protoReq)
+	jsonData, err := protojson.Marshal(req.Proto())
 	if err != nil {
 		return nil, err
 	}
@@ -163,5 +272,6 @@ func (c *Client) Generate(ctx context.Context, req *GenerateRequest) (*Response,
 	return &Response{
 		Images: images,
 		Model:  imageResp.Model,
+		Usage:  imageResp.Usage,
 	}, nil
 }

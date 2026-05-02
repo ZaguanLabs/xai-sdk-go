@@ -27,6 +27,7 @@ const (
 	BatchMgmt_AddBatchRequests_FullMethodName         = "/xai_api.BatchMgmt/AddBatchRequests"
 	BatchMgmt_ListBatchRequestMetadata_FullMethodName = "/xai_api.BatchMgmt/ListBatchRequestMetadata"
 	BatchMgmt_ListBatchResults_FullMethodName         = "/xai_api.BatchMgmt/ListBatchResults"
+	BatchMgmt_GetBatchRequestResult_FullMethodName    = "/xai_api.BatchMgmt/GetBatchRequestResult"
 )
 
 // BatchMgmtClient is the client API for BatchMgmt service.
@@ -40,6 +41,7 @@ type BatchMgmtClient interface {
 	AddBatchRequests(ctx context.Context, in *AddBatchRequestsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListBatchRequestMetadata(ctx context.Context, in *ListBatchRequestMetadataRequest, opts ...grpc.CallOption) (*ListBatchRequestMetadataResponse, error)
 	ListBatchResults(ctx context.Context, in *ListBatchResultsRequest, opts ...grpc.CallOption) (*ListBatchResultsResponse, error)
+	GetBatchRequestResult(ctx context.Context, in *GetBatchRequestResultRequest, opts ...grpc.CallOption) (*GetBatchRequestResultResponse, error)
 }
 
 type batchMgmtClient struct {
@@ -120,6 +122,16 @@ func (c *batchMgmtClient) ListBatchResults(ctx context.Context, in *ListBatchRes
 	return out, nil
 }
 
+func (c *batchMgmtClient) GetBatchRequestResult(ctx context.Context, in *GetBatchRequestResultRequest, opts ...grpc.CallOption) (*GetBatchRequestResultResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBatchRequestResultResponse)
+	err := c.cc.Invoke(ctx, BatchMgmt_GetBatchRequestResult_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BatchMgmtServer is the server API for BatchMgmt service.
 // All implementations must embed UnimplementedBatchMgmtServer
 // for forward compatibility.
@@ -131,6 +143,7 @@ type BatchMgmtServer interface {
 	AddBatchRequests(context.Context, *AddBatchRequestsRequest) (*emptypb.Empty, error)
 	ListBatchRequestMetadata(context.Context, *ListBatchRequestMetadataRequest) (*ListBatchRequestMetadataResponse, error)
 	ListBatchResults(context.Context, *ListBatchResultsRequest) (*ListBatchResultsResponse, error)
+	GetBatchRequestResult(context.Context, *GetBatchRequestResultRequest) (*GetBatchRequestResultResponse, error)
 	mustEmbedUnimplementedBatchMgmtServer()
 }
 
@@ -161,6 +174,9 @@ func (UnimplementedBatchMgmtServer) ListBatchRequestMetadata(context.Context, *L
 }
 func (UnimplementedBatchMgmtServer) ListBatchResults(context.Context, *ListBatchResultsRequest) (*ListBatchResultsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListBatchResults not implemented")
+}
+func (UnimplementedBatchMgmtServer) GetBatchRequestResult(context.Context, *GetBatchRequestResultRequest) (*GetBatchRequestResultResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBatchRequestResult not implemented")
 }
 func (UnimplementedBatchMgmtServer) mustEmbedUnimplementedBatchMgmtServer() {}
 func (UnimplementedBatchMgmtServer) testEmbeddedByValue()                   {}
@@ -309,6 +325,24 @@ func _BatchMgmt_ListBatchResults_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BatchMgmt_GetBatchRequestResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBatchRequestResultRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BatchMgmtServer).GetBatchRequestResult(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BatchMgmt_GetBatchRequestResult_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BatchMgmtServer).GetBatchRequestResult(ctx, req.(*GetBatchRequestResultRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BatchMgmt_ServiceDesc is the grpc.ServiceDesc for BatchMgmt service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -343,6 +377,10 @@ var BatchMgmt_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListBatchResults",
 			Handler:    _BatchMgmt_ListBatchResults_Handler,
+		},
+		{
+			MethodName: "GetBatchRequestResult",
+			Handler:    _BatchMgmt_GetBatchRequestResult_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

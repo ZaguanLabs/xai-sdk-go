@@ -69,6 +69,52 @@ func (CollectionsSortBy) EnumDescriptor() ([]byte, []int) {
 	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{0}
 }
 
+type FieldDefinitionOperation int32
+
+const (
+	FieldDefinitionOperation_FIELD_DEFINITION_ADD    FieldDefinitionOperation = 0
+	FieldDefinitionOperation_FIELD_DEFINITION_DELETE FieldDefinitionOperation = 1
+)
+
+// Enum value maps for FieldDefinitionOperation.
+var (
+	FieldDefinitionOperation_name = map[int32]string{
+		0: "FIELD_DEFINITION_ADD",
+		1: "FIELD_DEFINITION_DELETE",
+	}
+	FieldDefinitionOperation_value = map[string]int32{
+		"FIELD_DEFINITION_ADD":    0,
+		"FIELD_DEFINITION_DELETE": 1,
+	}
+)
+
+func (x FieldDefinitionOperation) Enum() *FieldDefinitionOperation {
+	p := new(FieldDefinitionOperation)
+	*p = x
+	return p
+}
+
+func (x FieldDefinitionOperation) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (FieldDefinitionOperation) Descriptor() protoreflect.EnumDescriptor {
+	return file_xai_api_v1_collections_proto_enumTypes[1].Descriptor()
+}
+
+func (FieldDefinitionOperation) Type() protoreflect.EnumType {
+	return &file_xai_api_v1_collections_proto_enumTypes[1]
+}
+
+func (x FieldDefinitionOperation) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use FieldDefinitionOperation.Descriptor instead.
+func (FieldDefinitionOperation) EnumDescriptor() ([]byte, []int) {
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{1}
+}
+
 type DocumentsSortBy int32
 
 const (
@@ -102,11 +148,11 @@ func (x DocumentsSortBy) String() string {
 }
 
 func (DocumentsSortBy) Descriptor() protoreflect.EnumDescriptor {
-	return file_xai_api_v1_collections_proto_enumTypes[1].Descriptor()
+	return file_xai_api_v1_collections_proto_enumTypes[2].Descriptor()
 }
 
 func (DocumentsSortBy) Type() protoreflect.EnumType {
-	return &file_xai_api_v1_collections_proto_enumTypes[1]
+	return &file_xai_api_v1_collections_proto_enumTypes[2]
 }
 
 func (x DocumentsSortBy) Number() protoreflect.EnumNumber {
@@ -115,7 +161,7 @@ func (x DocumentsSortBy) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use DocumentsSortBy.Descriptor instead.
 func (DocumentsSortBy) EnumDescriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{1}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{2}
 }
 
 type DocumentStatus int32
@@ -125,6 +171,9 @@ const (
 	DocumentStatus_DOCUMENT_STATUS_PROCESSING DocumentStatus = 1
 	DocumentStatus_DOCUMENT_STATUS_PROCESSED  DocumentStatus = 2
 	DocumentStatus_DOCUMENT_STATUS_FAILED     DocumentStatus = 3
+	DocumentStatus_DOCUMENT_STATUS_CHUNKED    DocumentStatus = 4
+	DocumentStatus_DOCUMENT_STATUS_EMBEDDING  DocumentStatus = 5
+	DocumentStatus_DOCUMENT_STATUS_WRITING    DocumentStatus = 6
 )
 
 // Enum value maps for DocumentStatus.
@@ -134,12 +183,18 @@ var (
 		1: "DOCUMENT_STATUS_PROCESSING",
 		2: "DOCUMENT_STATUS_PROCESSED",
 		3: "DOCUMENT_STATUS_FAILED",
+		4: "DOCUMENT_STATUS_CHUNKED",
+		5: "DOCUMENT_STATUS_EMBEDDING",
+		6: "DOCUMENT_STATUS_WRITING",
 	}
 	DocumentStatus_value = map[string]int32{
 		"DOCUMENT_STATUS_UNKNOWN":    0,
 		"DOCUMENT_STATUS_PROCESSING": 1,
 		"DOCUMENT_STATUS_PROCESSED":  2,
 		"DOCUMENT_STATUS_FAILED":     3,
+		"DOCUMENT_STATUS_CHUNKED":    4,
+		"DOCUMENT_STATUS_EMBEDDING":  5,
+		"DOCUMENT_STATUS_WRITING":    6,
 	}
 )
 
@@ -154,11 +209,11 @@ func (x DocumentStatus) String() string {
 }
 
 func (DocumentStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_xai_api_v1_collections_proto_enumTypes[2].Descriptor()
+	return file_xai_api_v1_collections_proto_enumTypes[3].Descriptor()
 }
 
 func (DocumentStatus) Type() protoreflect.EnumType {
-	return &file_xai_api_v1_collections_proto_enumTypes[2]
+	return &file_xai_api_v1_collections_proto_enumTypes[3]
 }
 
 func (x DocumentStatus) Number() protoreflect.EnumNumber {
@@ -167,7 +222,7 @@ func (x DocumentStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use DocumentStatus.Descriptor instead.
 func (DocumentStatus) EnumDescriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{2}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{3}
 }
 
 type FieldDefinition struct {
@@ -246,21 +301,74 @@ func (x *FieldDefinition) GetDescription() string {
 	return ""
 }
 
+type FieldDefinitionUpdate struct {
+	state           protoimpl.MessageState   `protogen:"open.v1"`
+	FieldDefinition *FieldDefinition         `protobuf:"bytes,1,opt,name=field_definition,json=fieldDefinition,proto3" json:"field_definition,omitempty"`
+	Operation       FieldDefinitionOperation `protobuf:"varint,2,opt,name=operation,proto3,enum=collections.FieldDefinitionOperation" json:"operation,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *FieldDefinitionUpdate) Reset() {
+	*x = FieldDefinitionUpdate{}
+	mi := &file_xai_api_v1_collections_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FieldDefinitionUpdate) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FieldDefinitionUpdate) ProtoMessage() {}
+
+func (x *FieldDefinitionUpdate) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_api_v1_collections_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FieldDefinitionUpdate.ProtoReflect.Descriptor instead.
+func (*FieldDefinitionUpdate) Descriptor() ([]byte, []int) {
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *FieldDefinitionUpdate) GetFieldDefinition() *FieldDefinition {
+	if x != nil {
+		return x.FieldDefinition
+	}
+	return nil
+}
+
+func (x *FieldDefinitionUpdate) GetOperation() FieldDefinitionOperation {
+	if x != nil {
+		return x.Operation
+	}
+	return FieldDefinitionOperation_FIELD_DEFINITION_ADD
+}
+
 type CreateCollectionRequest struct {
-	state              protoimpl.MessageState `protogen:"open.v1"`
-	TeamId             *string                `protobuf:"bytes,1,opt,name=team_id,json=teamId,proto3,oneof" json:"team_id,omitempty"`
-	CollectionName     string                 `protobuf:"bytes,2,opt,name=collection_name,json=collectionName,proto3" json:"collection_name,omitempty"`
-	IndexConfiguration *IndexConfiguration    `protobuf:"bytes,4,opt,name=index_configuration,json=indexConfiguration,proto3,oneof" json:"index_configuration,omitempty"`
-	ChunkConfiguration *ChunkConfiguration    `protobuf:"bytes,5,opt,name=chunk_configuration,json=chunkConfiguration,proto3,oneof" json:"chunk_configuration,omitempty"`
-	MetricSpace        *HNSWMetric            `protobuf:"varint,7,opt,name=metric_space,json=metricSpace,proto3,enum=rag.HNSWMetric,oneof" json:"metric_space,omitempty"`
-	FieldDefinitions   []*FieldDefinition     `protobuf:"bytes,9,rep,name=field_definitions,json=fieldDefinitions,proto3" json:"field_definitions,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	TeamId                *string                `protobuf:"bytes,1,opt,name=team_id,json=teamId,proto3,oneof" json:"team_id,omitempty"`
+	CollectionName        string                 `protobuf:"bytes,2,opt,name=collection_name,json=collectionName,proto3" json:"collection_name,omitempty"`
+	IndexConfiguration    *IndexConfiguration    `protobuf:"bytes,4,opt,name=index_configuration,json=indexConfiguration,proto3,oneof" json:"index_configuration,omitempty"`
+	ChunkConfiguration    *ChunkConfiguration    `protobuf:"bytes,5,opt,name=chunk_configuration,json=chunkConfiguration,proto3,oneof" json:"chunk_configuration,omitempty"`
+	MetricSpace           *HNSWMetric            `protobuf:"varint,7,opt,name=metric_space,json=metricSpace,proto3,enum=rag.HNSWMetric,oneof" json:"metric_space,omitempty"`
+	FieldDefinitions      []*FieldDefinition     `protobuf:"bytes,9,rep,name=field_definitions,json=fieldDefinitions,proto3" json:"field_definitions,omitempty"`
+	CollectionDescription *string                `protobuf:"bytes,10,opt,name=collection_description,json=collectionDescription,proto3,oneof" json:"collection_description,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *CreateCollectionRequest) Reset() {
 	*x = CreateCollectionRequest{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[1]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -272,7 +380,7 @@ func (x *CreateCollectionRequest) String() string {
 func (*CreateCollectionRequest) ProtoMessage() {}
 
 func (x *CreateCollectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[1]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -285,7 +393,7 @@ func (x *CreateCollectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateCollectionRequest.ProtoReflect.Descriptor instead.
 func (*CreateCollectionRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{1}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CreateCollectionRequest) GetTeamId() string {
@@ -330,22 +438,31 @@ func (x *CreateCollectionRequest) GetFieldDefinitions() []*FieldDefinition {
 	return nil
 }
 
+func (x *CreateCollectionRequest) GetCollectionDescription() string {
+	if x != nil && x.CollectionDescription != nil {
+		return *x.CollectionDescription
+	}
+	return ""
+}
+
 type CollectionMetadata struct {
-	state              protoimpl.MessageState `protogen:"open.v1"`
-	CollectionId       string                 `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
-	CollectionName     string                 `protobuf:"bytes,2,opt,name=collection_name,json=collectionName,proto3" json:"collection_name,omitempty"`
-	CreatedAt          *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	IndexConfiguration *IndexConfiguration    `protobuf:"bytes,4,opt,name=index_configuration,json=indexConfiguration,proto3" json:"index_configuration,omitempty"`
-	ChunkConfiguration *ChunkConfiguration    `protobuf:"bytes,5,opt,name=chunk_configuration,json=chunkConfiguration,proto3" json:"chunk_configuration,omitempty"`
-	DocumentsCount     int32                  `protobuf:"varint,6,opt,name=documents_count,json=documentsCount,proto3" json:"documents_count,omitempty"`
-	FieldDefinitions   []*FieldDefinition     `protobuf:"bytes,8,rep,name=field_definitions,json=fieldDefinitions,proto3" json:"field_definitions,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	CollectionId          string                 `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
+	CollectionName        string                 `protobuf:"bytes,2,opt,name=collection_name,json=collectionName,proto3" json:"collection_name,omitempty"`
+	CreatedAt             *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	IndexConfiguration    *IndexConfiguration    `protobuf:"bytes,4,opt,name=index_configuration,json=indexConfiguration,proto3" json:"index_configuration,omitempty"`
+	ChunkConfiguration    *ChunkConfiguration    `protobuf:"bytes,5,opt,name=chunk_configuration,json=chunkConfiguration,proto3" json:"chunk_configuration,omitempty"`
+	DocumentsCount        int32                  `protobuf:"varint,6,opt,name=documents_count,json=documentsCount,proto3" json:"documents_count,omitempty"`
+	FieldDefinitions      []*FieldDefinition     `protobuf:"bytes,8,rep,name=field_definitions,json=fieldDefinitions,proto3" json:"field_definitions,omitempty"`
+	CollectionDescription *string                `protobuf:"bytes,9,opt,name=collection_description,json=collectionDescription,proto3,oneof" json:"collection_description,omitempty"`
+	TotalFileSize         int64                  `protobuf:"varint,10,opt,name=total_file_size,json=totalFileSize,proto3" json:"total_file_size,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *CollectionMetadata) Reset() {
 	*x = CollectionMetadata{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[2]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -357,7 +474,7 @@ func (x *CollectionMetadata) String() string {
 func (*CollectionMetadata) ProtoMessage() {}
 
 func (x *CollectionMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[2]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -370,7 +487,7 @@ func (x *CollectionMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CollectionMetadata.ProtoReflect.Descriptor instead.
 func (*CollectionMetadata) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{2}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *CollectionMetadata) GetCollectionId() string {
@@ -422,6 +539,20 @@ func (x *CollectionMetadata) GetFieldDefinitions() []*FieldDefinition {
 	return nil
 }
 
+func (x *CollectionMetadata) GetCollectionDescription() string {
+	if x != nil && x.CollectionDescription != nil {
+		return *x.CollectionDescription
+	}
+	return ""
+}
+
+func (x *CollectionMetadata) GetTotalFileSize() int64 {
+	if x != nil {
+		return x.TotalFileSize
+	}
+	return 0
+}
+
 type ListCollectionsRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	TeamId          *string                `protobuf:"bytes,1,opt,name=team_id,json=teamId,proto3,oneof" json:"team_id,omitempty"`
@@ -436,7 +567,7 @@ type ListCollectionsRequest struct {
 
 func (x *ListCollectionsRequest) Reset() {
 	*x = ListCollectionsRequest{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[3]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -448,7 +579,7 @@ func (x *ListCollectionsRequest) String() string {
 func (*ListCollectionsRequest) ProtoMessage() {}
 
 func (x *ListCollectionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[3]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -461,7 +592,7 @@ func (x *ListCollectionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCollectionsRequest.ProtoReflect.Descriptor instead.
 func (*ListCollectionsRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{3}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ListCollectionsRequest) GetTeamId() string {
@@ -516,7 +647,7 @@ type ListCollectionsResponse struct {
 
 func (x *ListCollectionsResponse) Reset() {
 	*x = ListCollectionsResponse{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[4]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -528,7 +659,7 @@ func (x *ListCollectionsResponse) String() string {
 func (*ListCollectionsResponse) ProtoMessage() {}
 
 func (x *ListCollectionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[4]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -541,7 +672,7 @@ func (x *ListCollectionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCollectionsResponse.ProtoReflect.Descriptor instead.
 func (*ListCollectionsResponse) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{4}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ListCollectionsResponse) GetCollections() []*CollectionMetadata {
@@ -568,7 +699,7 @@ type DeleteCollectionRequest struct {
 
 func (x *DeleteCollectionRequest) Reset() {
 	*x = DeleteCollectionRequest{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[5]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -580,7 +711,7 @@ func (x *DeleteCollectionRequest) String() string {
 func (*DeleteCollectionRequest) ProtoMessage() {}
 
 func (x *DeleteCollectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[5]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -593,7 +724,7 @@ func (x *DeleteCollectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteCollectionRequest.ProtoReflect.Descriptor instead.
 func (*DeleteCollectionRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{5}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *DeleteCollectionRequest) GetTeamId() string {
@@ -620,7 +751,7 @@ type GetCollectionMetadataRequest struct {
 
 func (x *GetCollectionMetadataRequest) Reset() {
 	*x = GetCollectionMetadataRequest{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[6]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -632,7 +763,7 @@ func (x *GetCollectionMetadataRequest) String() string {
 func (*GetCollectionMetadataRequest) ProtoMessage() {}
 
 func (x *GetCollectionMetadataRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[6]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -645,7 +776,7 @@ func (x *GetCollectionMetadataRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCollectionMetadataRequest.ProtoReflect.Descriptor instead.
 func (*GetCollectionMetadataRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{6}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *GetCollectionMetadataRequest) GetTeamId() string {
@@ -671,7 +802,7 @@ type ListAvailableEmbeddingModelsRequest struct {
 
 func (x *ListAvailableEmbeddingModelsRequest) Reset() {
 	*x = ListAvailableEmbeddingModelsRequest{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[7]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -683,7 +814,7 @@ func (x *ListAvailableEmbeddingModelsRequest) String() string {
 func (*ListAvailableEmbeddingModelsRequest) ProtoMessage() {}
 
 func (x *ListAvailableEmbeddingModelsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[7]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -696,7 +827,7 @@ func (x *ListAvailableEmbeddingModelsRequest) ProtoReflect() protoreflect.Messag
 
 // Deprecated: Use ListAvailableEmbeddingModelsRequest.ProtoReflect.Descriptor instead.
 func (*ListAvailableEmbeddingModelsRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{7}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ListAvailableEmbeddingModelsRequest) GetTeamId() string {
@@ -715,7 +846,7 @@ type ListAvailableEmbeddingModelsResponse struct {
 
 func (x *ListAvailableEmbeddingModelsResponse) Reset() {
 	*x = ListAvailableEmbeddingModelsResponse{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[8]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -727,7 +858,7 @@ func (x *ListAvailableEmbeddingModelsResponse) String() string {
 func (*ListAvailableEmbeddingModelsResponse) ProtoMessage() {}
 
 func (x *ListAvailableEmbeddingModelsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[8]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -740,7 +871,7 @@ func (x *ListAvailableEmbeddingModelsResponse) ProtoReflect() protoreflect.Messa
 
 // Deprecated: Use ListAvailableEmbeddingModelsResponse.ProtoReflect.Descriptor instead.
 func (*ListAvailableEmbeddingModelsResponse) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{8}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ListAvailableEmbeddingModelsResponse) GetEmbeddingModels() []string {
@@ -759,7 +890,7 @@ type ListAvailableTokenEncodingsRequest struct {
 
 func (x *ListAvailableTokenEncodingsRequest) Reset() {
 	*x = ListAvailableTokenEncodingsRequest{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[9]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -771,7 +902,7 @@ func (x *ListAvailableTokenEncodingsRequest) String() string {
 func (*ListAvailableTokenEncodingsRequest) ProtoMessage() {}
 
 func (x *ListAvailableTokenEncodingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[9]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -784,7 +915,7 @@ func (x *ListAvailableTokenEncodingsRequest) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use ListAvailableTokenEncodingsRequest.ProtoReflect.Descriptor instead.
 func (*ListAvailableTokenEncodingsRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{9}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ListAvailableTokenEncodingsRequest) GetTeamId() string {
@@ -803,7 +934,7 @@ type ListAvailableTokenEncodingsResponse struct {
 
 func (x *ListAvailableTokenEncodingsResponse) Reset() {
 	*x = ListAvailableTokenEncodingsResponse{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[10]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -815,7 +946,7 @@ func (x *ListAvailableTokenEncodingsResponse) String() string {
 func (*ListAvailableTokenEncodingsResponse) ProtoMessage() {}
 
 func (x *ListAvailableTokenEncodingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[10]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -828,7 +959,7 @@ func (x *ListAvailableTokenEncodingsResponse) ProtoReflect() protoreflect.Messag
 
 // Deprecated: Use ListAvailableTokenEncodingsResponse.ProtoReflect.Descriptor instead.
 func (*ListAvailableTokenEncodingsResponse) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{10}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ListAvailableTokenEncodingsResponse) GetEncodings() []string {
@@ -852,7 +983,7 @@ type UploadDocumentRequest struct {
 
 func (x *UploadDocumentRequest) Reset() {
 	*x = UploadDocumentRequest{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[11]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -864,7 +995,7 @@ func (x *UploadDocumentRequest) String() string {
 func (*UploadDocumentRequest) ProtoMessage() {}
 
 func (x *UploadDocumentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[11]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -877,7 +1008,7 @@ func (x *UploadDocumentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadDocumentRequest.ProtoReflect.Descriptor instead.
 func (*UploadDocumentRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{11}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *UploadDocumentRequest) GetTeamId() string {
@@ -933,13 +1064,15 @@ type FileMetadata struct {
 	Hash               string                 `protobuf:"bytes,7,opt,name=hash,proto3" json:"hash,omitempty"`
 	UploadStatus       *string                `protobuf:"bytes,8,opt,name=upload_status,json=uploadStatus,proto3,oneof" json:"upload_status,omitempty"`
 	UploadErrorMessage *string                `protobuf:"bytes,9,opt,name=upload_error_message,json=uploadErrorMessage,proto3,oneof" json:"upload_error_message,omitempty"`
+	ProcessingStatus   *string                `protobuf:"bytes,10,opt,name=processing_status,json=processingStatus,proto3,oneof" json:"processing_status,omitempty"`
+	FilePath           *string                `protobuf:"bytes,11,opt,name=file_path,json=filePath,proto3,oneof" json:"file_path,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
 
 func (x *FileMetadata) Reset() {
 	*x = FileMetadata{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[12]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -951,7 +1084,7 @@ func (x *FileMetadata) String() string {
 func (*FileMetadata) ProtoMessage() {}
 
 func (x *FileMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[12]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -964,7 +1097,7 @@ func (x *FileMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileMetadata.ProtoReflect.Descriptor instead.
 func (*FileMetadata) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{12}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *FileMetadata) GetFileId() string {
@@ -1030,19 +1163,36 @@ func (x *FileMetadata) GetUploadErrorMessage() string {
 	return ""
 }
 
+func (x *FileMetadata) GetProcessingStatus() string {
+	if x != nil && x.ProcessingStatus != nil {
+		return *x.ProcessingStatus
+	}
+	return ""
+}
+
+func (x *FileMetadata) GetFilePath() string {
+	if x != nil && x.FilePath != nil {
+		return *x.FilePath
+	}
+	return ""
+}
+
 type DocumentMetadata struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	FileMetadata  *FileMetadata          `protobuf:"bytes,1,opt,name=file_metadata,json=fileMetadata,proto3" json:"file_metadata,omitempty"`
-	Fields        map[string]string      `protobuf:"bytes,2,rep,name=fields,proto3" json:"fields,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	Status        DocumentStatus         `protobuf:"varint,3,opt,name=status,proto3,enum=collections.DocumentStatus" json:"status,omitempty"`
-	ErrorMessage  *string                `protobuf:"bytes,4,opt,name=error_message,json=errorMessage,proto3,oneof" json:"error_message,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	FileMetadata         *FileMetadata          `protobuf:"bytes,1,opt,name=file_metadata,json=fileMetadata,proto3" json:"file_metadata,omitempty"`
+	Fields               map[string]string      `protobuf:"bytes,2,rep,name=fields,proto3" json:"fields,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Status               DocumentStatus         `protobuf:"varint,3,opt,name=status,proto3,enum=collections.DocumentStatus" json:"status,omitempty"`
+	ErrorMessage         *string                `protobuf:"bytes,4,opt,name=error_message,json=errorMessage,proto3,oneof" json:"error_message,omitempty"`
+	LastIndexedAt        *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=last_indexed_at,json=lastIndexedAt,proto3" json:"last_indexed_at,omitempty"`
+	ChunkCount           *int32                 `protobuf:"varint,6,opt,name=chunk_count,json=chunkCount,proto3,oneof" json:"chunk_count,omitempty"`
+	ChunksProcessedCount *int64                 `protobuf:"varint,7,opt,name=chunks_processed_count,json=chunksProcessedCount,proto3,oneof" json:"chunks_processed_count,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *DocumentMetadata) Reset() {
 	*x = DocumentMetadata{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[13]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1054,7 +1204,7 @@ func (x *DocumentMetadata) String() string {
 func (*DocumentMetadata) ProtoMessage() {}
 
 func (x *DocumentMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[13]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1067,7 +1217,7 @@ func (x *DocumentMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DocumentMetadata.ProtoReflect.Descriptor instead.
 func (*DocumentMetadata) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{13}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *DocumentMetadata) GetFileMetadata() *FileMetadata {
@@ -1098,6 +1248,27 @@ func (x *DocumentMetadata) GetErrorMessage() string {
 	return ""
 }
 
+func (x *DocumentMetadata) GetLastIndexedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LastIndexedAt
+	}
+	return nil
+}
+
+func (x *DocumentMetadata) GetChunkCount() int32 {
+	if x != nil && x.ChunkCount != nil {
+		return *x.ChunkCount
+	}
+	return 0
+}
+
+func (x *DocumentMetadata) GetChunksProcessedCount() int64 {
+	if x != nil && x.ChunksProcessedCount != nil {
+		return *x.ChunksProcessedCount
+	}
+	return 0
+}
+
 type ListDocumentsRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	TeamId          *string                `protobuf:"bytes,1,opt,name=team_id,json=teamId,proto3,oneof" json:"team_id,omitempty"`
@@ -1114,7 +1285,7 @@ type ListDocumentsRequest struct {
 
 func (x *ListDocumentsRequest) Reset() {
 	*x = ListDocumentsRequest{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[14]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1126,7 +1297,7 @@ func (x *ListDocumentsRequest) String() string {
 func (*ListDocumentsRequest) ProtoMessage() {}
 
 func (x *ListDocumentsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[14]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1139,7 +1310,7 @@ func (x *ListDocumentsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDocumentsRequest.ProtoReflect.Descriptor instead.
 func (*ListDocumentsRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{14}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *ListDocumentsRequest) GetTeamId() string {
@@ -1208,7 +1379,7 @@ type ListDocumentsResponse struct {
 
 func (x *ListDocumentsResponse) Reset() {
 	*x = ListDocumentsResponse{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[15]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1220,7 +1391,7 @@ func (x *ListDocumentsResponse) String() string {
 func (*ListDocumentsResponse) ProtoMessage() {}
 
 func (x *ListDocumentsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[15]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1233,7 +1404,7 @@ func (x *ListDocumentsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDocumentsResponse.ProtoReflect.Descriptor instead.
 func (*ListDocumentsResponse) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{15}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *ListDocumentsResponse) GetDocuments() []*DocumentMetadata {
@@ -1261,7 +1432,7 @@ type GetDocumentMetadataRequest struct {
 
 func (x *GetDocumentMetadataRequest) Reset() {
 	*x = GetDocumentMetadataRequest{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[16]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1273,7 +1444,7 @@ func (x *GetDocumentMetadataRequest) String() string {
 func (*GetDocumentMetadataRequest) ProtoMessage() {}
 
 func (x *GetDocumentMetadataRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[16]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1286,7 +1457,7 @@ func (x *GetDocumentMetadataRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDocumentMetadataRequest.ProtoReflect.Descriptor instead.
 func (*GetDocumentMetadataRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{16}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *GetDocumentMetadataRequest) GetFileId() string {
@@ -1322,7 +1493,7 @@ type AddDocumentToCollectionRequest struct {
 
 func (x *AddDocumentToCollectionRequest) Reset() {
 	*x = AddDocumentToCollectionRequest{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[17]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1334,7 +1505,7 @@ func (x *AddDocumentToCollectionRequest) String() string {
 func (*AddDocumentToCollectionRequest) ProtoMessage() {}
 
 func (x *AddDocumentToCollectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[17]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1347,7 +1518,7 @@ func (x *AddDocumentToCollectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddDocumentToCollectionRequest.ProtoReflect.Descriptor instead.
 func (*AddDocumentToCollectionRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{17}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *AddDocumentToCollectionRequest) GetFileId() string {
@@ -1389,7 +1560,7 @@ type RemoveDocumentFromCollectionRequest struct {
 
 func (x *RemoveDocumentFromCollectionRequest) Reset() {
 	*x = RemoveDocumentFromCollectionRequest{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[18]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1401,7 +1572,7 @@ func (x *RemoveDocumentFromCollectionRequest) String() string {
 func (*RemoveDocumentFromCollectionRequest) ProtoMessage() {}
 
 func (x *RemoveDocumentFromCollectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[18]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1414,7 +1585,7 @@ func (x *RemoveDocumentFromCollectionRequest) ProtoReflect() protoreflect.Messag
 
 // Deprecated: Use RemoveDocumentFromCollectionRequest.ProtoReflect.Descriptor instead.
 func (*RemoveDocumentFromCollectionRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{18}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *RemoveDocumentFromCollectionRequest) GetFileId() string {
@@ -1453,7 +1624,7 @@ type UpdateDocumentRequest struct {
 
 func (x *UpdateDocumentRequest) Reset() {
 	*x = UpdateDocumentRequest{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[19]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1465,7 +1636,7 @@ func (x *UpdateDocumentRequest) String() string {
 func (*UpdateDocumentRequest) ProtoMessage() {}
 
 func (x *UpdateDocumentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[19]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1478,7 +1649,7 @@ func (x *UpdateDocumentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateDocumentRequest.ProtoReflect.Descriptor instead.
 func (*UpdateDocumentRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{19}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *UpdateDocumentRequest) GetTeamId() string {
@@ -1541,7 +1712,7 @@ type ReIndexDocumentRequest struct {
 
 func (x *ReIndexDocumentRequest) Reset() {
 	*x = ReIndexDocumentRequest{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[20]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1553,7 +1724,7 @@ func (x *ReIndexDocumentRequest) String() string {
 func (*ReIndexDocumentRequest) ProtoMessage() {}
 
 func (x *ReIndexDocumentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[20]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1566,7 +1737,7 @@ func (x *ReIndexDocumentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReIndexDocumentRequest.ProtoReflect.Descriptor instead.
 func (*ReIndexDocumentRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{20}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *ReIndexDocumentRequest) GetTeamId() string {
@@ -1591,18 +1762,20 @@ func (x *ReIndexDocumentRequest) GetFileId() string {
 }
 
 type UpdateCollectionRequest struct {
-	state              protoimpl.MessageState `protogen:"open.v1"`
-	TeamId             *string                `protobuf:"bytes,1,opt,name=team_id,json=teamId,proto3,oneof" json:"team_id,omitempty"`
-	CollectionId       string                 `protobuf:"bytes,2,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
-	CollectionName     *string                `protobuf:"bytes,3,opt,name=collection_name,json=collectionName,proto3,oneof" json:"collection_name,omitempty"`
-	ChunkConfiguration *ChunkConfiguration    `protobuf:"bytes,4,opt,name=chunk_configuration,json=chunkConfiguration,proto3,oneof" json:"chunk_configuration,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	state                  protoimpl.MessageState   `protogen:"open.v1"`
+	TeamId                 *string                  `protobuf:"bytes,1,opt,name=team_id,json=teamId,proto3,oneof" json:"team_id,omitempty"`
+	CollectionId           string                   `protobuf:"bytes,2,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
+	CollectionName         *string                  `protobuf:"bytes,3,opt,name=collection_name,json=collectionName,proto3,oneof" json:"collection_name,omitempty"`
+	ChunkConfiguration     *ChunkConfiguration      `protobuf:"bytes,4,opt,name=chunk_configuration,json=chunkConfiguration,proto3,oneof" json:"chunk_configuration,omitempty"`
+	FieldDefinitionUpdates []*FieldDefinitionUpdate `protobuf:"bytes,5,rep,name=field_definition_updates,json=fieldDefinitionUpdates,proto3" json:"field_definition_updates,omitempty"`
+	CollectionDescription  *string                  `protobuf:"bytes,6,opt,name=collection_description,json=collectionDescription,proto3,oneof" json:"collection_description,omitempty"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *UpdateCollectionRequest) Reset() {
 	*x = UpdateCollectionRequest{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[21]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1614,7 +1787,7 @@ func (x *UpdateCollectionRequest) String() string {
 func (*UpdateCollectionRequest) ProtoMessage() {}
 
 func (x *UpdateCollectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[21]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1627,7 +1800,7 @@ func (x *UpdateCollectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCollectionRequest.ProtoReflect.Descriptor instead.
 func (*UpdateCollectionRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{21}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *UpdateCollectionRequest) GetTeamId() string {
@@ -1658,6 +1831,20 @@ func (x *UpdateCollectionRequest) GetChunkConfiguration() *ChunkConfiguration {
 	return nil
 }
 
+func (x *UpdateCollectionRequest) GetFieldDefinitionUpdates() []*FieldDefinitionUpdate {
+	if x != nil {
+		return x.FieldDefinitionUpdates
+	}
+	return nil
+}
+
+func (x *UpdateCollectionRequest) GetCollectionDescription() string {
+	if x != nil && x.CollectionDescription != nil {
+		return *x.CollectionDescription
+	}
+	return ""
+}
+
 type BatchGetDocumentsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TeamId        *string                `protobuf:"bytes,1,opt,name=team_id,json=teamId,proto3,oneof" json:"team_id,omitempty"`
@@ -1669,7 +1856,7 @@ type BatchGetDocumentsRequest struct {
 
 func (x *BatchGetDocumentsRequest) Reset() {
 	*x = BatchGetDocumentsRequest{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[22]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1681,7 +1868,7 @@ func (x *BatchGetDocumentsRequest) String() string {
 func (*BatchGetDocumentsRequest) ProtoMessage() {}
 
 func (x *BatchGetDocumentsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[22]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1694,7 +1881,7 @@ func (x *BatchGetDocumentsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BatchGetDocumentsRequest.ProtoReflect.Descriptor instead.
 func (*BatchGetDocumentsRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{22}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *BatchGetDocumentsRequest) GetTeamId() string {
@@ -1727,7 +1914,7 @@ type BatchGetDocumentsResponse struct {
 
 func (x *BatchGetDocumentsResponse) Reset() {
 	*x = BatchGetDocumentsResponse{}
-	mi := &file_xai_api_v1_collections_proto_msgTypes[23]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1739,7 +1926,7 @@ func (x *BatchGetDocumentsResponse) String() string {
 func (*BatchGetDocumentsResponse) ProtoMessage() {}
 
 func (x *BatchGetDocumentsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_collections_proto_msgTypes[23]
+	mi := &file_xai_api_v1_collections_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1752,7 +1939,7 @@ func (x *BatchGetDocumentsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BatchGetDocumentsResponse.ProtoReflect.Descriptor instead.
 func (*BatchGetDocumentsResponse) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{23}
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *BatchGetDocumentsResponse) GetDocuments() []*DocumentMetadata {
@@ -1760,6 +1947,94 @@ func (x *BatchGetDocumentsResponse) GetDocuments() []*DocumentMetadata {
 		return x.Documents
 	}
 	return nil
+}
+
+type GenerateCollectionDescriptionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CollectionId  string                 `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GenerateCollectionDescriptionRequest) Reset() {
+	*x = GenerateCollectionDescriptionRequest{}
+	mi := &file_xai_api_v1_collections_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GenerateCollectionDescriptionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateCollectionDescriptionRequest) ProtoMessage() {}
+
+func (x *GenerateCollectionDescriptionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_api_v1_collections_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateCollectionDescriptionRequest.ProtoReflect.Descriptor instead.
+func (*GenerateCollectionDescriptionRequest) Descriptor() ([]byte, []int) {
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *GenerateCollectionDescriptionRequest) GetCollectionId() string {
+	if x != nil {
+		return x.CollectionId
+	}
+	return ""
+}
+
+type GenerateCollectionDescriptionResponse struct {
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	CollectionDescription string                 `protobuf:"bytes,1,opt,name=collection_description,json=collectionDescription,proto3" json:"collection_description,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *GenerateCollectionDescriptionResponse) Reset() {
+	*x = GenerateCollectionDescriptionResponse{}
+	mi := &file_xai_api_v1_collections_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GenerateCollectionDescriptionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateCollectionDescriptionResponse) ProtoMessage() {}
+
+func (x *GenerateCollectionDescriptionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_api_v1_collections_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateCollectionDescriptionResponse.ProtoReflect.Descriptor instead.
+func (*GenerateCollectionDescriptionResponse) Descriptor() ([]byte, []int) {
+	return file_xai_api_v1_collections_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *GenerateCollectionDescriptionResponse) GetCollectionDescription() string {
+	if x != nil {
+		return x.CollectionDescription
+	}
+	return ""
 }
 
 var File_xai_api_v1_collections_proto protoreflect.FileDescriptor
@@ -1773,19 +2048,25 @@ const file_xai_api_v1_collections_proto_rawDesc = "" +
 	"\x11inject_into_chunk\x18\x03 \x01(\bR\x0finjectIntoChunk\x12\x16\n" +
 	"\x06unique\x18\x04 \x01(\bR\x06unique\x12%\n" +
 	"\vdescription\x18\x05 \x01(\tH\x00R\vdescription\x88\x01\x01B\x0e\n" +
-	"\f_description\"\xcf\x03\n" +
+	"\f_description\"\xa5\x01\n" +
+	"\x15FieldDefinitionUpdate\x12G\n" +
+	"\x10field_definition\x18\x01 \x01(\v2\x1c.collections.FieldDefinitionR\x0ffieldDefinition\x12C\n" +
+	"\toperation\x18\x02 \x01(\x0e2%.collections.FieldDefinitionOperationR\toperation\"\xa6\x04\n" +
 	"\x17CreateCollectionRequest\x12\x1c\n" +
 	"\ateam_id\x18\x01 \x01(\tH\x00R\x06teamId\x88\x01\x01\x12'\n" +
 	"\x0fcollection_name\x18\x02 \x01(\tR\x0ecollectionName\x12M\n" +
 	"\x13index_configuration\x18\x04 \x01(\v2\x17.rag.IndexConfigurationH\x01R\x12indexConfiguration\x88\x01\x01\x12M\n" +
 	"\x13chunk_configuration\x18\x05 \x01(\v2\x17.rag.ChunkConfigurationH\x02R\x12chunkConfiguration\x88\x01\x01\x127\n" +
 	"\fmetric_space\x18\a \x01(\x0e2\x0f.rag.HNSWMetricH\x03R\vmetricSpace\x88\x01\x01\x12I\n" +
-	"\x11field_definitions\x18\t \x03(\v2\x1c.collections.FieldDefinitionR\x10fieldDefinitionsB\n" +
+	"\x11field_definitions\x18\t \x03(\v2\x1c.collections.FieldDefinitionR\x10fieldDefinitions\x12:\n" +
+	"\x16collection_description\x18\n" +
+	" \x01(\tH\x04R\x15collectionDescription\x88\x01\x01B\n" +
 	"\n" +
 	"\b_team_idB\x16\n" +
 	"\x14_index_configurationB\x16\n" +
 	"\x14_chunk_configurationB\x0f\n" +
-	"\r_metric_space\"\xa5\x03\n" +
+	"\r_metric_spaceB\x19\n" +
+	"\x17_collection_description\"\xa4\x04\n" +
 	"\x12CollectionMetadata\x12#\n" +
 	"\rcollection_id\x18\x01 \x01(\tR\fcollectionId\x12'\n" +
 	"\x0fcollection_name\x18\x02 \x01(\tR\x0ecollectionName\x129\n" +
@@ -1794,7 +2075,11 @@ const file_xai_api_v1_collections_proto_rawDesc = "" +
 	"\x13index_configuration\x18\x04 \x01(\v2\x17.rag.IndexConfigurationR\x12indexConfiguration\x12H\n" +
 	"\x13chunk_configuration\x18\x05 \x01(\v2\x17.rag.ChunkConfigurationR\x12chunkConfiguration\x12'\n" +
 	"\x0fdocuments_count\x18\x06 \x01(\x05R\x0edocumentsCount\x12I\n" +
-	"\x11field_definitions\x18\b \x03(\v2\x1c.collections.FieldDefinitionR\x10fieldDefinitions\"\xd5\x02\n" +
+	"\x11field_definitions\x18\b \x03(\v2\x1c.collections.FieldDefinitionR\x10fieldDefinitions\x12:\n" +
+	"\x16collection_description\x18\t \x01(\tH\x00R\x15collectionDescription\x88\x01\x01\x12&\n" +
+	"\x0ftotal_file_size\x18\n" +
+	" \x01(\x03R\rtotalFileSizeB\x19\n" +
+	"\x17_collection_description\"\xd5\x02\n" +
 	"\x16ListCollectionsRequest\x12\x1c\n" +
 	"\ateam_id\x18\x01 \x01(\tH\x00R\x06teamId\x88\x01\x01\x12\x19\n" +
 	"\x05limit\x18\x02 \x01(\x05H\x01R\x05limit\x88\x01\x01\x12+\n" +
@@ -1847,7 +2132,7 @@ const file_xai_api_v1_collections_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\n" +
 	"\n" +
-	"\b_team_id\"\x93\x03\n" +
+	"\b_team_id\"\x8b\x04\n" +
 	"\fFileMetadata\x12\x17\n" +
 	"\afile_id\x18\x01 \x01(\tR\x06fileId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1d\n" +
@@ -1860,18 +2145,30 @@ const file_xai_api_v1_collections_proto_rawDesc = "" +
 	"expires_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x12\x12\n" +
 	"\x04hash\x18\a \x01(\tR\x04hash\x12(\n" +
 	"\rupload_status\x18\b \x01(\tH\x00R\fuploadStatus\x88\x01\x01\x125\n" +
-	"\x14upload_error_message\x18\t \x01(\tH\x01R\x12uploadErrorMessage\x88\x01\x01B\x10\n" +
+	"\x14upload_error_message\x18\t \x01(\tH\x01R\x12uploadErrorMessage\x88\x01\x01\x120\n" +
+	"\x11processing_status\x18\n" +
+	" \x01(\tH\x02R\x10processingStatus\x88\x01\x01\x12 \n" +
+	"\tfile_path\x18\v \x01(\tH\x03R\bfilePath\x88\x01\x01B\x10\n" +
 	"\x0e_upload_statusB\x17\n" +
-	"\x15_upload_error_message\"\xc1\x02\n" +
+	"\x15_upload_error_messageB\x14\n" +
+	"\x12_processing_statusB\f\n" +
+	"\n" +
+	"_file_path\"\x91\x04\n" +
 	"\x10DocumentMetadata\x12>\n" +
 	"\rfile_metadata\x18\x01 \x01(\v2\x19.collections.FileMetadataR\ffileMetadata\x12A\n" +
 	"\x06fields\x18\x02 \x03(\v2).collections.DocumentMetadata.FieldsEntryR\x06fields\x123\n" +
 	"\x06status\x18\x03 \x01(\x0e2\x1b.collections.DocumentStatusR\x06status\x12(\n" +
-	"\rerror_message\x18\x04 \x01(\tH\x00R\ferrorMessage\x88\x01\x01\x1a9\n" +
+	"\rerror_message\x18\x04 \x01(\tH\x00R\ferrorMessage\x88\x01\x01\x12B\n" +
+	"\x0flast_indexed_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\rlastIndexedAt\x12$\n" +
+	"\vchunk_count\x18\x06 \x01(\x05H\x01R\n" +
+	"chunkCount\x88\x01\x01\x129\n" +
+	"\x16chunks_processed_count\x18\a \x01(\x03H\x02R\x14chunksProcessedCount\x88\x01\x01\x1a9\n" +
 	"\vFieldsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x10\n" +
-	"\x0e_error_message\"\x98\x03\n" +
+	"\x0e_error_messageB\x0e\n" +
+	"\f_chunk_countB\x19\n" +
+	"\x17_chunks_processed_count\"\x98\x03\n" +
 	"\x14ListDocumentsRequest\x12\x1c\n" +
 	"\ateam_id\x18\x01 \x01(\tH\x00R\x06teamId\x88\x01\x01\x12#\n" +
 	"\rcollection_id\x18\x02 \x01(\tR\fcollectionId\x12\x19\n" +
@@ -1937,16 +2234,19 @@ const file_xai_api_v1_collections_proto_rawDesc = "" +
 	"\rcollection_id\x18\x02 \x01(\tR\fcollectionId\x12\x17\n" +
 	"\afile_id\x18\x03 \x01(\tR\x06fileIdB\n" +
 	"\n" +
-	"\b_team_id\"\x91\x02\n" +
+	"\b_team_id\"\xc6\x03\n" +
 	"\x17UpdateCollectionRequest\x12\x1c\n" +
 	"\ateam_id\x18\x01 \x01(\tH\x00R\x06teamId\x88\x01\x01\x12#\n" +
 	"\rcollection_id\x18\x02 \x01(\tR\fcollectionId\x12,\n" +
 	"\x0fcollection_name\x18\x03 \x01(\tH\x01R\x0ecollectionName\x88\x01\x01\x12M\n" +
-	"\x13chunk_configuration\x18\x04 \x01(\v2\x17.rag.ChunkConfigurationH\x02R\x12chunkConfiguration\x88\x01\x01B\n" +
+	"\x13chunk_configuration\x18\x04 \x01(\v2\x17.rag.ChunkConfigurationH\x02R\x12chunkConfiguration\x88\x01\x01\x12\\\n" +
+	"\x18field_definition_updates\x18\x05 \x03(\v2\".collections.FieldDefinitionUpdateR\x16fieldDefinitionUpdates\x12:\n" +
+	"\x16collection_description\x18\x06 \x01(\tH\x03R\x15collectionDescription\x88\x01\x01B\n" +
 	"\n" +
 	"\b_team_idB\x12\n" +
 	"\x10_collection_nameB\x16\n" +
-	"\x14_chunk_configuration\"\x84\x01\n" +
+	"\x14_chunk_configurationB\x19\n" +
+	"\x17_collection_description\"\x84\x01\n" +
 	"\x18BatchGetDocumentsRequest\x12\x1c\n" +
 	"\ateam_id\x18\x01 \x01(\tH\x00R\x06teamId\x88\x01\x01\x12#\n" +
 	"\rcollection_id\x18\x02 \x01(\tR\fcollectionId\x12\x19\n" +
@@ -1954,19 +2254,29 @@ const file_xai_api_v1_collections_proto_rawDesc = "" +
 	"\n" +
 	"\b_team_id\"X\n" +
 	"\x19BatchGetDocumentsResponse\x12;\n" +
-	"\tdocuments\x18\x01 \x03(\v2\x1d.collections.DocumentMetadataR\tdocuments*N\n" +
+	"\tdocuments\x18\x01 \x03(\v2\x1d.collections.DocumentMetadataR\tdocuments\"K\n" +
+	"$GenerateCollectionDescriptionRequest\x12#\n" +
+	"\rcollection_id\x18\x01 \x01(\tR\fcollectionId\"^\n" +
+	"%GenerateCollectionDescriptionResponse\x125\n" +
+	"\x16collection_description\x18\x01 \x01(\tR\x15collectionDescription*N\n" +
 	"\x11CollectionsSortBy\x12\x1c\n" +
 	"\x18COLLECTIONS_SORT_BY_NAME\x10\x00\x12\x1b\n" +
-	"\x17COLLECTIONS_SORT_BY_AGE\x10\x01*d\n" +
+	"\x17COLLECTIONS_SORT_BY_AGE\x10\x01*Q\n" +
+	"\x18FieldDefinitionOperation\x12\x18\n" +
+	"\x14FIELD_DEFINITION_ADD\x10\x00\x12\x1b\n" +
+	"\x17FIELD_DEFINITION_DELETE\x10\x01*d\n" +
 	"\x0fDocumentsSortBy\x12\x1a\n" +
 	"\x16DOCUMENTS_SORT_BY_NAME\x10\x00\x12\x1a\n" +
 	"\x16DOCUMENTS_SORT_BY_SIZE\x10\x01\x12\x19\n" +
-	"\x15DOCUMENTS_SORT_BY_AGE\x10\x02*\x88\x01\n" +
+	"\x15DOCUMENTS_SORT_BY_AGE\x10\x02*\xe1\x01\n" +
 	"\x0eDocumentStatus\x12\x1b\n" +
 	"\x17DOCUMENT_STATUS_UNKNOWN\x10\x00\x12\x1e\n" +
 	"\x1aDOCUMENT_STATUS_PROCESSING\x10\x01\x12\x1d\n" +
 	"\x19DOCUMENT_STATUS_PROCESSED\x10\x02\x12\x1a\n" +
-	"\x16DOCUMENT_STATUS_FAILED\x10\x032\xde\v\n" +
+	"\x16DOCUMENT_STATUS_FAILED\x10\x03\x12\x1b\n" +
+	"\x17DOCUMENT_STATUS_CHUNKED\x10\x04\x12\x1d\n" +
+	"\x19DOCUMENT_STATUS_EMBEDDING\x10\x05\x12\x1b\n" +
+	"\x17DOCUMENT_STATUS_WRITING\x10\x062\xe9\f\n" +
 	"\vCollections\x12[\n" +
 	"\x10CreateCollection\x12$.collections.CreateCollectionRequest\x1a\x1f.collections.CollectionMetadata\"\x00\x12^\n" +
 	"\x0fListCollections\x12#.collections.ListCollectionsRequest\x1a$.collections.ListCollectionsResponse\"\x00\x12R\n" +
@@ -1982,7 +2292,8 @@ const file_xai_api_v1_collections_proto_rawDesc = "" +
 	"\x1cRemoveDocumentFromCollection\x120.collections.RemoveDocumentFromCollectionRequest\x1a\x16.google.protobuf.Empty\"\x00\x12P\n" +
 	"\x0fReIndexDocument\x12#.collections.ReIndexDocumentRequest\x1a\x16.google.protobuf.Empty\"\x00\x12[\n" +
 	"\x10UpdateCollection\x12$.collections.UpdateCollectionRequest\x1a\x1f.collections.CollectionMetadata\"\x00\x12d\n" +
-	"\x11BatchGetDocuments\x12%.collections.BatchGetDocumentsRequest\x1a&.collections.BatchGetDocumentsResponse\"\x00B\xa9\x01\n" +
+	"\x11BatchGetDocuments\x12%.collections.BatchGetDocumentsRequest\x1a&.collections.BatchGetDocumentsResponse\"\x00\x12\x88\x01\n" +
+	"\x1dGenerateCollectionDescription\x121.collections.GenerateCollectionDescriptionRequest\x1a2.collections.GenerateCollectionDescriptionResponse\"\x00B\xa9\x01\n" +
 	"\x0fcom.collectionsB\x10CollectionsProtoP\x01Z8github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1\xa2\x02\x03CXX\xaa\x02\vCollections\xca\x02\vCollections\xe2\x02\x17Collections\\GPBMetadata\xea\x02\vCollectionsb\x06proto3"
 
 var (
@@ -1997,107 +2308,117 @@ func file_xai_api_v1_collections_proto_rawDescGZIP() []byte {
 	return file_xai_api_v1_collections_proto_rawDescData
 }
 
-var file_xai_api_v1_collections_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_xai_api_v1_collections_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
+var file_xai_api_v1_collections_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_xai_api_v1_collections_proto_msgTypes = make([]protoimpl.MessageInfo, 31)
 var file_xai_api_v1_collections_proto_goTypes = []any{
-	(CollectionsSortBy)(0),                       // 0: collections.CollectionsSortBy
-	(DocumentsSortBy)(0),                         // 1: collections.DocumentsSortBy
-	(DocumentStatus)(0),                          // 2: collections.DocumentStatus
-	(*FieldDefinition)(nil),                      // 3: collections.FieldDefinition
-	(*CreateCollectionRequest)(nil),              // 4: collections.CreateCollectionRequest
-	(*CollectionMetadata)(nil),                   // 5: collections.CollectionMetadata
-	(*ListCollectionsRequest)(nil),               // 6: collections.ListCollectionsRequest
-	(*ListCollectionsResponse)(nil),              // 7: collections.ListCollectionsResponse
-	(*DeleteCollectionRequest)(nil),              // 8: collections.DeleteCollectionRequest
-	(*GetCollectionMetadataRequest)(nil),         // 9: collections.GetCollectionMetadataRequest
-	(*ListAvailableEmbeddingModelsRequest)(nil),  // 10: collections.ListAvailableEmbeddingModelsRequest
-	(*ListAvailableEmbeddingModelsResponse)(nil), // 11: collections.ListAvailableEmbeddingModelsResponse
-	(*ListAvailableTokenEncodingsRequest)(nil),   // 12: collections.ListAvailableTokenEncodingsRequest
-	(*ListAvailableTokenEncodingsResponse)(nil),  // 13: collections.ListAvailableTokenEncodingsResponse
-	(*UploadDocumentRequest)(nil),                // 14: collections.UploadDocumentRequest
-	(*FileMetadata)(nil),                         // 15: collections.FileMetadata
-	(*DocumentMetadata)(nil),                     // 16: collections.DocumentMetadata
-	(*ListDocumentsRequest)(nil),                 // 17: collections.ListDocumentsRequest
-	(*ListDocumentsResponse)(nil),                // 18: collections.ListDocumentsResponse
-	(*GetDocumentMetadataRequest)(nil),           // 19: collections.GetDocumentMetadataRequest
-	(*AddDocumentToCollectionRequest)(nil),       // 20: collections.AddDocumentToCollectionRequest
-	(*RemoveDocumentFromCollectionRequest)(nil),  // 21: collections.RemoveDocumentFromCollectionRequest
-	(*UpdateDocumentRequest)(nil),                // 22: collections.UpdateDocumentRequest
-	(*ReIndexDocumentRequest)(nil),               // 23: collections.ReIndexDocumentRequest
-	(*UpdateCollectionRequest)(nil),              // 24: collections.UpdateCollectionRequest
-	(*BatchGetDocumentsRequest)(nil),             // 25: collections.BatchGetDocumentsRequest
-	(*BatchGetDocumentsResponse)(nil),            // 26: collections.BatchGetDocumentsResponse
-	nil,                                          // 27: collections.UploadDocumentRequest.FieldsEntry
-	nil,                                          // 28: collections.DocumentMetadata.FieldsEntry
-	nil,                                          // 29: collections.AddDocumentToCollectionRequest.FieldsEntry
-	nil,                                          // 30: collections.UpdateDocumentRequest.FieldsEntry
-	(*IndexConfiguration)(nil),                   // 31: rag.IndexConfiguration
-	(*ChunkConfiguration)(nil),                   // 32: rag.ChunkConfiguration
-	(HNSWMetric)(0),                              // 33: rag.HNSWMetric
-	(*timestamppb.Timestamp)(nil),                // 34: google.protobuf.Timestamp
-	(Ordering)(0),                                // 35: shared.Ordering
-	(*emptypb.Empty)(nil),                        // 36: google.protobuf.Empty
+	(CollectionsSortBy)(0),                        // 0: collections.CollectionsSortBy
+	(FieldDefinitionOperation)(0),                 // 1: collections.FieldDefinitionOperation
+	(DocumentsSortBy)(0),                          // 2: collections.DocumentsSortBy
+	(DocumentStatus)(0),                           // 3: collections.DocumentStatus
+	(*FieldDefinition)(nil),                       // 4: collections.FieldDefinition
+	(*FieldDefinitionUpdate)(nil),                 // 5: collections.FieldDefinitionUpdate
+	(*CreateCollectionRequest)(nil),               // 6: collections.CreateCollectionRequest
+	(*CollectionMetadata)(nil),                    // 7: collections.CollectionMetadata
+	(*ListCollectionsRequest)(nil),                // 8: collections.ListCollectionsRequest
+	(*ListCollectionsResponse)(nil),               // 9: collections.ListCollectionsResponse
+	(*DeleteCollectionRequest)(nil),               // 10: collections.DeleteCollectionRequest
+	(*GetCollectionMetadataRequest)(nil),          // 11: collections.GetCollectionMetadataRequest
+	(*ListAvailableEmbeddingModelsRequest)(nil),   // 12: collections.ListAvailableEmbeddingModelsRequest
+	(*ListAvailableEmbeddingModelsResponse)(nil),  // 13: collections.ListAvailableEmbeddingModelsResponse
+	(*ListAvailableTokenEncodingsRequest)(nil),    // 14: collections.ListAvailableTokenEncodingsRequest
+	(*ListAvailableTokenEncodingsResponse)(nil),   // 15: collections.ListAvailableTokenEncodingsResponse
+	(*UploadDocumentRequest)(nil),                 // 16: collections.UploadDocumentRequest
+	(*FileMetadata)(nil),                          // 17: collections.FileMetadata
+	(*DocumentMetadata)(nil),                      // 18: collections.DocumentMetadata
+	(*ListDocumentsRequest)(nil),                  // 19: collections.ListDocumentsRequest
+	(*ListDocumentsResponse)(nil),                 // 20: collections.ListDocumentsResponse
+	(*GetDocumentMetadataRequest)(nil),            // 21: collections.GetDocumentMetadataRequest
+	(*AddDocumentToCollectionRequest)(nil),        // 22: collections.AddDocumentToCollectionRequest
+	(*RemoveDocumentFromCollectionRequest)(nil),   // 23: collections.RemoveDocumentFromCollectionRequest
+	(*UpdateDocumentRequest)(nil),                 // 24: collections.UpdateDocumentRequest
+	(*ReIndexDocumentRequest)(nil),                // 25: collections.ReIndexDocumentRequest
+	(*UpdateCollectionRequest)(nil),               // 26: collections.UpdateCollectionRequest
+	(*BatchGetDocumentsRequest)(nil),              // 27: collections.BatchGetDocumentsRequest
+	(*BatchGetDocumentsResponse)(nil),             // 28: collections.BatchGetDocumentsResponse
+	(*GenerateCollectionDescriptionRequest)(nil),  // 29: collections.GenerateCollectionDescriptionRequest
+	(*GenerateCollectionDescriptionResponse)(nil), // 30: collections.GenerateCollectionDescriptionResponse
+	nil,                           // 31: collections.UploadDocumentRequest.FieldsEntry
+	nil,                           // 32: collections.DocumentMetadata.FieldsEntry
+	nil,                           // 33: collections.AddDocumentToCollectionRequest.FieldsEntry
+	nil,                           // 34: collections.UpdateDocumentRequest.FieldsEntry
+	(*IndexConfiguration)(nil),    // 35: rag.IndexConfiguration
+	(*ChunkConfiguration)(nil),    // 36: rag.ChunkConfiguration
+	(HNSWMetric)(0),               // 37: rag.HNSWMetric
+	(*timestamppb.Timestamp)(nil), // 38: google.protobuf.Timestamp
+	(Ordering)(0),                 // 39: shared.Ordering
+	(*emptypb.Empty)(nil),         // 40: google.protobuf.Empty
 }
 var file_xai_api_v1_collections_proto_depIdxs = []int32{
-	31, // 0: collections.CreateCollectionRequest.index_configuration:type_name -> rag.IndexConfiguration
-	32, // 1: collections.CreateCollectionRequest.chunk_configuration:type_name -> rag.ChunkConfiguration
-	33, // 2: collections.CreateCollectionRequest.metric_space:type_name -> rag.HNSWMetric
-	3,  // 3: collections.CreateCollectionRequest.field_definitions:type_name -> collections.FieldDefinition
-	34, // 4: collections.CollectionMetadata.created_at:type_name -> google.protobuf.Timestamp
-	31, // 5: collections.CollectionMetadata.index_configuration:type_name -> rag.IndexConfiguration
-	32, // 6: collections.CollectionMetadata.chunk_configuration:type_name -> rag.ChunkConfiguration
-	3,  // 7: collections.CollectionMetadata.field_definitions:type_name -> collections.FieldDefinition
-	35, // 8: collections.ListCollectionsRequest.order:type_name -> shared.Ordering
-	0,  // 9: collections.ListCollectionsRequest.sort_by:type_name -> collections.CollectionsSortBy
-	5,  // 10: collections.ListCollectionsResponse.collections:type_name -> collections.CollectionMetadata
-	27, // 11: collections.UploadDocumentRequest.fields:type_name -> collections.UploadDocumentRequest.FieldsEntry
-	34, // 12: collections.FileMetadata.created_at:type_name -> google.protobuf.Timestamp
-	34, // 13: collections.FileMetadata.expires_at:type_name -> google.protobuf.Timestamp
-	15, // 14: collections.DocumentMetadata.file_metadata:type_name -> collections.FileMetadata
-	28, // 15: collections.DocumentMetadata.fields:type_name -> collections.DocumentMetadata.FieldsEntry
-	2,  // 16: collections.DocumentMetadata.status:type_name -> collections.DocumentStatus
-	35, // 17: collections.ListDocumentsRequest.order:type_name -> shared.Ordering
-	1,  // 18: collections.ListDocumentsRequest.sort_by:type_name -> collections.DocumentsSortBy
-	16, // 19: collections.ListDocumentsResponse.documents:type_name -> collections.DocumentMetadata
-	29, // 20: collections.AddDocumentToCollectionRequest.fields:type_name -> collections.AddDocumentToCollectionRequest.FieldsEntry
-	30, // 21: collections.UpdateDocumentRequest.fields:type_name -> collections.UpdateDocumentRequest.FieldsEntry
-	32, // 22: collections.UpdateCollectionRequest.chunk_configuration:type_name -> rag.ChunkConfiguration
-	16, // 23: collections.BatchGetDocumentsResponse.documents:type_name -> collections.DocumentMetadata
-	4,  // 24: collections.Collections.CreateCollection:input_type -> collections.CreateCollectionRequest
-	6,  // 25: collections.Collections.ListCollections:input_type -> collections.ListCollectionsRequest
-	8,  // 26: collections.Collections.DeleteCollection:input_type -> collections.DeleteCollectionRequest
-	9,  // 27: collections.Collections.GetCollectionMetadata:input_type -> collections.GetCollectionMetadataRequest
-	10, // 28: collections.Collections.ListAvailableEmbeddingModels:input_type -> collections.ListAvailableEmbeddingModelsRequest
-	12, // 29: collections.Collections.ListAvailableTokenEncodings:input_type -> collections.ListAvailableTokenEncodingsRequest
-	14, // 30: collections.Collections.UploadDocument:input_type -> collections.UploadDocumentRequest
-	22, // 31: collections.Collections.UpdateDocument:input_type -> collections.UpdateDocumentRequest
-	17, // 32: collections.Collections.ListDocuments:input_type -> collections.ListDocumentsRequest
-	19, // 33: collections.Collections.GetDocumentMetadata:input_type -> collections.GetDocumentMetadataRequest
-	20, // 34: collections.Collections.AddDocumentToCollection:input_type -> collections.AddDocumentToCollectionRequest
-	21, // 35: collections.Collections.RemoveDocumentFromCollection:input_type -> collections.RemoveDocumentFromCollectionRequest
-	23, // 36: collections.Collections.ReIndexDocument:input_type -> collections.ReIndexDocumentRequest
-	24, // 37: collections.Collections.UpdateCollection:input_type -> collections.UpdateCollectionRequest
-	25, // 38: collections.Collections.BatchGetDocuments:input_type -> collections.BatchGetDocumentsRequest
-	5,  // 39: collections.Collections.CreateCollection:output_type -> collections.CollectionMetadata
-	7,  // 40: collections.Collections.ListCollections:output_type -> collections.ListCollectionsResponse
-	36, // 41: collections.Collections.DeleteCollection:output_type -> google.protobuf.Empty
-	5,  // 42: collections.Collections.GetCollectionMetadata:output_type -> collections.CollectionMetadata
-	11, // 43: collections.Collections.ListAvailableEmbeddingModels:output_type -> collections.ListAvailableEmbeddingModelsResponse
-	13, // 44: collections.Collections.ListAvailableTokenEncodings:output_type -> collections.ListAvailableTokenEncodingsResponse
-	16, // 45: collections.Collections.UploadDocument:output_type -> collections.DocumentMetadata
-	16, // 46: collections.Collections.UpdateDocument:output_type -> collections.DocumentMetadata
-	18, // 47: collections.Collections.ListDocuments:output_type -> collections.ListDocumentsResponse
-	16, // 48: collections.Collections.GetDocumentMetadata:output_type -> collections.DocumentMetadata
-	36, // 49: collections.Collections.AddDocumentToCollection:output_type -> google.protobuf.Empty
-	36, // 50: collections.Collections.RemoveDocumentFromCollection:output_type -> google.protobuf.Empty
-	36, // 51: collections.Collections.ReIndexDocument:output_type -> google.protobuf.Empty
-	5,  // 52: collections.Collections.UpdateCollection:output_type -> collections.CollectionMetadata
-	26, // 53: collections.Collections.BatchGetDocuments:output_type -> collections.BatchGetDocumentsResponse
-	39, // [39:54] is the sub-list for method output_type
-	24, // [24:39] is the sub-list for method input_type
-	24, // [24:24] is the sub-list for extension type_name
-	24, // [24:24] is the sub-list for extension extendee
-	0,  // [0:24] is the sub-list for field type_name
+	4,  // 0: collections.FieldDefinitionUpdate.field_definition:type_name -> collections.FieldDefinition
+	1,  // 1: collections.FieldDefinitionUpdate.operation:type_name -> collections.FieldDefinitionOperation
+	35, // 2: collections.CreateCollectionRequest.index_configuration:type_name -> rag.IndexConfiguration
+	36, // 3: collections.CreateCollectionRequest.chunk_configuration:type_name -> rag.ChunkConfiguration
+	37, // 4: collections.CreateCollectionRequest.metric_space:type_name -> rag.HNSWMetric
+	4,  // 5: collections.CreateCollectionRequest.field_definitions:type_name -> collections.FieldDefinition
+	38, // 6: collections.CollectionMetadata.created_at:type_name -> google.protobuf.Timestamp
+	35, // 7: collections.CollectionMetadata.index_configuration:type_name -> rag.IndexConfiguration
+	36, // 8: collections.CollectionMetadata.chunk_configuration:type_name -> rag.ChunkConfiguration
+	4,  // 9: collections.CollectionMetadata.field_definitions:type_name -> collections.FieldDefinition
+	39, // 10: collections.ListCollectionsRequest.order:type_name -> shared.Ordering
+	0,  // 11: collections.ListCollectionsRequest.sort_by:type_name -> collections.CollectionsSortBy
+	7,  // 12: collections.ListCollectionsResponse.collections:type_name -> collections.CollectionMetadata
+	31, // 13: collections.UploadDocumentRequest.fields:type_name -> collections.UploadDocumentRequest.FieldsEntry
+	38, // 14: collections.FileMetadata.created_at:type_name -> google.protobuf.Timestamp
+	38, // 15: collections.FileMetadata.expires_at:type_name -> google.protobuf.Timestamp
+	17, // 16: collections.DocumentMetadata.file_metadata:type_name -> collections.FileMetadata
+	32, // 17: collections.DocumentMetadata.fields:type_name -> collections.DocumentMetadata.FieldsEntry
+	3,  // 18: collections.DocumentMetadata.status:type_name -> collections.DocumentStatus
+	38, // 19: collections.DocumentMetadata.last_indexed_at:type_name -> google.protobuf.Timestamp
+	39, // 20: collections.ListDocumentsRequest.order:type_name -> shared.Ordering
+	2,  // 21: collections.ListDocumentsRequest.sort_by:type_name -> collections.DocumentsSortBy
+	18, // 22: collections.ListDocumentsResponse.documents:type_name -> collections.DocumentMetadata
+	33, // 23: collections.AddDocumentToCollectionRequest.fields:type_name -> collections.AddDocumentToCollectionRequest.FieldsEntry
+	34, // 24: collections.UpdateDocumentRequest.fields:type_name -> collections.UpdateDocumentRequest.FieldsEntry
+	36, // 25: collections.UpdateCollectionRequest.chunk_configuration:type_name -> rag.ChunkConfiguration
+	5,  // 26: collections.UpdateCollectionRequest.field_definition_updates:type_name -> collections.FieldDefinitionUpdate
+	18, // 27: collections.BatchGetDocumentsResponse.documents:type_name -> collections.DocumentMetadata
+	6,  // 28: collections.Collections.CreateCollection:input_type -> collections.CreateCollectionRequest
+	8,  // 29: collections.Collections.ListCollections:input_type -> collections.ListCollectionsRequest
+	10, // 30: collections.Collections.DeleteCollection:input_type -> collections.DeleteCollectionRequest
+	11, // 31: collections.Collections.GetCollectionMetadata:input_type -> collections.GetCollectionMetadataRequest
+	12, // 32: collections.Collections.ListAvailableEmbeddingModels:input_type -> collections.ListAvailableEmbeddingModelsRequest
+	14, // 33: collections.Collections.ListAvailableTokenEncodings:input_type -> collections.ListAvailableTokenEncodingsRequest
+	16, // 34: collections.Collections.UploadDocument:input_type -> collections.UploadDocumentRequest
+	24, // 35: collections.Collections.UpdateDocument:input_type -> collections.UpdateDocumentRequest
+	19, // 36: collections.Collections.ListDocuments:input_type -> collections.ListDocumentsRequest
+	21, // 37: collections.Collections.GetDocumentMetadata:input_type -> collections.GetDocumentMetadataRequest
+	22, // 38: collections.Collections.AddDocumentToCollection:input_type -> collections.AddDocumentToCollectionRequest
+	23, // 39: collections.Collections.RemoveDocumentFromCollection:input_type -> collections.RemoveDocumentFromCollectionRequest
+	25, // 40: collections.Collections.ReIndexDocument:input_type -> collections.ReIndexDocumentRequest
+	26, // 41: collections.Collections.UpdateCollection:input_type -> collections.UpdateCollectionRequest
+	27, // 42: collections.Collections.BatchGetDocuments:input_type -> collections.BatchGetDocumentsRequest
+	29, // 43: collections.Collections.GenerateCollectionDescription:input_type -> collections.GenerateCollectionDescriptionRequest
+	7,  // 44: collections.Collections.CreateCollection:output_type -> collections.CollectionMetadata
+	9,  // 45: collections.Collections.ListCollections:output_type -> collections.ListCollectionsResponse
+	40, // 46: collections.Collections.DeleteCollection:output_type -> google.protobuf.Empty
+	7,  // 47: collections.Collections.GetCollectionMetadata:output_type -> collections.CollectionMetadata
+	13, // 48: collections.Collections.ListAvailableEmbeddingModels:output_type -> collections.ListAvailableEmbeddingModelsResponse
+	15, // 49: collections.Collections.ListAvailableTokenEncodings:output_type -> collections.ListAvailableTokenEncodingsResponse
+	18, // 50: collections.Collections.UploadDocument:output_type -> collections.DocumentMetadata
+	18, // 51: collections.Collections.UpdateDocument:output_type -> collections.DocumentMetadata
+	20, // 52: collections.Collections.ListDocuments:output_type -> collections.ListDocumentsResponse
+	18, // 53: collections.Collections.GetDocumentMetadata:output_type -> collections.DocumentMetadata
+	40, // 54: collections.Collections.AddDocumentToCollection:output_type -> google.protobuf.Empty
+	40, // 55: collections.Collections.RemoveDocumentFromCollection:output_type -> google.protobuf.Empty
+	40, // 56: collections.Collections.ReIndexDocument:output_type -> google.protobuf.Empty
+	7,  // 57: collections.Collections.UpdateCollection:output_type -> collections.CollectionMetadata
+	28, // 58: collections.Collections.BatchGetDocuments:output_type -> collections.BatchGetDocumentsResponse
+	30, // 59: collections.Collections.GenerateCollectionDescription:output_type -> collections.GenerateCollectionDescriptionResponse
+	44, // [44:60] is the sub-list for method output_type
+	28, // [28:44] is the sub-list for method input_type
+	28, // [28:28] is the sub-list for extension type_name
+	28, // [28:28] is the sub-list for extension extendee
+	0,  // [0:28] is the sub-list for field type_name
 }
 
 func init() { file_xai_api_v1_collections_proto_init() }
@@ -2108,14 +2429,14 @@ func file_xai_api_v1_collections_proto_init() {
 	file_xai_api_v1_shared_proto_init()
 	file_xai_api_v1_types_proto_init()
 	file_xai_api_v1_collections_proto_msgTypes[0].OneofWrappers = []any{}
-	file_xai_api_v1_collections_proto_msgTypes[1].OneofWrappers = []any{}
+	file_xai_api_v1_collections_proto_msgTypes[2].OneofWrappers = []any{}
 	file_xai_api_v1_collections_proto_msgTypes[3].OneofWrappers = []any{}
 	file_xai_api_v1_collections_proto_msgTypes[4].OneofWrappers = []any{}
 	file_xai_api_v1_collections_proto_msgTypes[5].OneofWrappers = []any{}
 	file_xai_api_v1_collections_proto_msgTypes[6].OneofWrappers = []any{}
 	file_xai_api_v1_collections_proto_msgTypes[7].OneofWrappers = []any{}
-	file_xai_api_v1_collections_proto_msgTypes[9].OneofWrappers = []any{}
-	file_xai_api_v1_collections_proto_msgTypes[11].OneofWrappers = []any{}
+	file_xai_api_v1_collections_proto_msgTypes[8].OneofWrappers = []any{}
+	file_xai_api_v1_collections_proto_msgTypes[10].OneofWrappers = []any{}
 	file_xai_api_v1_collections_proto_msgTypes[12].OneofWrappers = []any{}
 	file_xai_api_v1_collections_proto_msgTypes[13].OneofWrappers = []any{}
 	file_xai_api_v1_collections_proto_msgTypes[14].OneofWrappers = []any{}
@@ -2127,13 +2448,14 @@ func file_xai_api_v1_collections_proto_init() {
 	file_xai_api_v1_collections_proto_msgTypes[20].OneofWrappers = []any{}
 	file_xai_api_v1_collections_proto_msgTypes[21].OneofWrappers = []any{}
 	file_xai_api_v1_collections_proto_msgTypes[22].OneofWrappers = []any{}
+	file_xai_api_v1_collections_proto_msgTypes[23].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_xai_api_v1_collections_proto_rawDesc), len(file_xai_api_v1_collections_proto_rawDesc)),
-			NumEnums:      3,
-			NumMessages:   28,
+			NumEnums:      4,
+			NumMessages:   31,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
