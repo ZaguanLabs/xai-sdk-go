@@ -1561,7 +1561,7 @@ var file_xai_api_v1_batch_proto_goTypes = []any{
 	(*GetChatCompletionResponse)(nil),        // 25: xai_api.GetChatCompletionResponse
 	(*ImageResponse)(nil),                    // 26: xai_api.ImageResponse
 	(*VideoResponse)(nil),                    // 27: xai_api.VideoResponse
-	(*status.Status)(nil),                       // 28: google.rpc.Status
+	(*status.Status)(nil),                    // 28: google.rpc.Status
 	(*emptypb.Empty)(nil),                    // 29: google.protobuf.Empty
 }
 var file_xai_api_v1_batch_proto_depIdxs = []int32{
