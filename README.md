@@ -1,6 +1,6 @@
 # xAI SDK for Go
 
-[![Go Version](https://img.shields.io/badge/Go-1.24+-blue.svg)](https://golang.org)
+[![Go Version](https://img.shields.io/badge/Go-1.25+-blue.svg)](https://golang.org)
 [![Release](https://img.shields.io/github/v/release/ZaguanLabs/xai-sdk-go)](https://github.com/ZaguanLabs/xai-sdk-go/releases/latest)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -8,7 +8,7 @@
 
 > **Note**: This is an unofficial, community-maintained SDK and is not affiliated with or endorsed by xAI.
 
-> **Status**: **v0.9.0 Released** - Python SDK v1.4.1 parity with include options, inline citations, and tool call type tracking. **Requires Go 1.24+** due to gRPC v1.76.0 dependency.
+> **Status**: **v0.9.0 Released** - Python SDK v1.4.1 parity with include options, inline citations, and tool call type tracking. **Requires Go 1.25+**.
 
 ## ✨ Features
 
@@ -44,7 +44,7 @@
 
 ### Installation
 
-**Requirements**: Go 1.24 or later (required by gRPC v1.76.0)
+**Requirements**: Go 1.25 or later
 
 ```bash
 go get github.com/ZaguanLabs/xai-sdk-go@v0.9.0

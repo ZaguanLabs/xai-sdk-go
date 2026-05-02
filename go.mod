@@ -1,8 +1,8 @@
 module github.com/ZaguanLabs/xai-sdk-go
 
-go 1.24.0
+go 1.25.0
 
-toolchain go1.24.11
+toolchain go1.25.9
 
 require (
 	google.golang.org/grpc v1.76.0
