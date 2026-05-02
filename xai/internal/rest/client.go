@@ -143,7 +143,9 @@ func (c *Client) Do(ctx context.Context, req Request) (*Response, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute request: %w", err)
 	}
-	defer httpResp.Body.Close()
+	defer func() {
+		_ = httpResp.Body.Close()
+	}()
 
 	// Limit response size to prevent memory exhaustion
 	limitedReader := io.LimitReader(httpResp.Body, MaxResponseSize)
