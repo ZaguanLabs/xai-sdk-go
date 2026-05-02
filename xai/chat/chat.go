@@ -559,7 +559,7 @@ const (
 
 func WithAgentCount(agentCount AgentCount) RequestOption {
 	return func(r *Request) {
-		value := xaiv1.AgentCount(agentCount)
+		value := agentCount
 		r.proto.AgentCount = &value
 	}
 }
@@ -632,13 +632,13 @@ func (r *Request) SetSeed(seed int32) *Request {
 }
 
 func (r *Request) SetAgentCount(agentCount AgentCount) *Request {
-	value := xaiv1.AgentCount(agentCount)
+	value := agentCount
 	r.proto.AgentCount = &value
 	return r
 }
 
 func (r *Request) AgentCount() AgentCount {
-	return AgentCount(r.proto.GetAgentCount())
+	return r.proto.GetAgentCount()
 }
 
 func (r *Request) SetBatchRequestID(batchRequestID string) *Request {
@@ -1014,7 +1014,7 @@ func (r *Request) validateMessage(msg *xaiv1.Message, index int) error {
 		xaiv1.MessageRole_ROLE_SYSTEM:    true,
 		xaiv1.MessageRole_ROLE_USER:      true,
 		xaiv1.MessageRole_ROLE_ASSISTANT: true,
-		xaiv1.MessageRole_ROLE_FUNCTION:  true,
+		roleToProto("function"):          true,
 		xaiv1.MessageRole_ROLE_TOOL:      true,
 		xaiv1.MessageRole_ROLE_DEVELOPER: true,
 	}

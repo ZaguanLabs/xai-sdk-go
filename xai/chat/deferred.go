@@ -104,43 +104,14 @@ func (r *DeferredRequest) Proto() *xaiv1.GetCompletionsRequest {
 
 // Submit submits a deferred chat completion request.
 func (r *DeferredRequest) Submit(ctx context.Context, client ServiceClient) (*DeferredResponse, error) {
-	if client == nil {
-		return nil, fmt.Errorf("chat client is nil")
-	}
-	if r.proto == nil {
-		return nil, fmt.Errorf("request proto is nil")
-	}
-	if r.proto.Model == "" {
-		return nil, fmt.Errorf("model is required")
+	if err := r.validateForSubmit(client); err != nil {
+		return nil, err
 	}
 
-	// Submit the deferred request
 	start, err := client.StartDeferredCompletion(ctx, r.proto)
 	if err != nil {
-		// Handle specific gRPC errors
-		if st, ok := status.FromError(err); ok {
-			switch st.Code() {
-			case codes.Unauthenticated:
-				return nil, fmt.Errorf("authentication failed: %s", st.Message())
-			case codes.PermissionDenied:
-				return nil, fmt.Errorf("permission denied: %s", st.Message())
-			case codes.InvalidArgument:
-				return nil, fmt.Errorf("invalid request: %s", st.Message())
-			case codes.NotFound:
-				return nil, fmt.Errorf("model not found: %s", st.Message())
-			case codes.ResourceExhausted:
-				return nil, fmt.Errorf("quota exceeded: %s", st.Message())
-			case codes.Unavailable:
-				return nil, fmt.Errorf("service unavailable: %s", st.Message())
-			case codes.DeadlineExceeded:
-				return nil, fmt.Errorf("request timeout: %s", st.Message())
-			default:
-				return nil, fmt.Errorf("deferred request failed (%s): %s", st.Code().String(), st.Message())
-			}
-		}
-		return nil, fmt.Errorf("deferred request failed: %w", err)
+		return nil, formatDeferredSubmitError(err)
 	}
-
 	if start == nil {
 		return nil, fmt.Errorf("received nil response")
 	}
@@ -154,6 +125,43 @@ func (r *DeferredRequest) Submit(ctx context.Context, client ServiceClient) (*De
 	}
 
 	return &DeferredResponse{proto: result.Response}, nil
+}
+
+func (r *DeferredRequest) validateForSubmit(client ServiceClient) error {
+	if client == nil {
+		return fmt.Errorf("chat client is nil")
+	}
+	if r.proto == nil {
+		return fmt.Errorf("request proto is nil")
+	}
+	if r.proto.Model == "" {
+		return fmt.Errorf("model is required")
+	}
+	return nil
+}
+
+func formatDeferredSubmitError(err error) error {
+	if st, ok := status.FromError(err); ok {
+		switch st.Code() {
+		case codes.Unauthenticated:
+			return fmt.Errorf("authentication failed: %s", st.Message())
+		case codes.PermissionDenied:
+			return fmt.Errorf("permission denied: %s", st.Message())
+		case codes.InvalidArgument:
+			return fmt.Errorf("invalid request: %s", st.Message())
+		case codes.NotFound:
+			return fmt.Errorf("model not found: %s", st.Message())
+		case codes.ResourceExhausted:
+			return fmt.Errorf("quota exceeded: %s", st.Message())
+		case codes.Unavailable:
+			return fmt.Errorf("service unavailable: %s", st.Message())
+		case codes.DeadlineExceeded:
+			return fmt.Errorf("request timeout: %s", st.Message())
+		default:
+			return fmt.Errorf("deferred request failed (%s): %s", st.Code().String(), st.Message())
+		}
+	}
+	return fmt.Errorf("deferred request failed: %w", err)
 }
 
 // DeferredResponse represents a deferred chat completion response.
@@ -207,18 +215,10 @@ type PollResult struct {
 
 // Poll polls a deferred request until completion or timeout.
 func (r *DeferredRequest) Poll(ctx context.Context, client ServiceClient, interval time.Duration, timeout time.Duration) (*PollResult, error) {
-	if client == nil {
-		return nil, fmt.Errorf("chat client is nil")
+	if err := r.validateForPoll(client); err != nil {
+		return nil, err
 	}
-	if r.proto == nil {
-		return nil, fmt.Errorf("request proto is nil")
-	}
-	if interval <= 0 {
-		interval = 100 * time.Millisecond
-	}
-	if timeout <= 0 {
-		timeout = 10 * time.Minute
-	}
+	interval, timeout = normalizePollDurations(interval, timeout)
 
 	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
@@ -239,30 +239,61 @@ func (r *DeferredRequest) Poll(ctx context.Context, client ServiceClient, interv
 		case <-timeoutCtx.Done():
 			return &PollResult{Done: false}, timeoutCtx.Err()
 		case <-ticker.C:
-			result, err := client.GetDeferredCompletion(timeoutCtx, &xaiv1.GetDeferredRequest{RequestId: start.RequestId})
-			if err != nil {
-				return &PollResult{Done: false}, err
-			}
-			if result == nil {
-				return &PollResult{Done: false}, fmt.Errorf("received nil deferred completion response")
-			}
-
-			switch result.Status {
-			case xaiv1.DeferredStatus_DONE:
-				if result.Response == nil {
-					return &PollResult{Done: false}, fmt.Errorf("deferred request completed without a response")
-				}
-				return &PollResult{
-					Response: &DeferredResponse{proto: result.Response},
-					Done:     true,
-				}, nil
-			case xaiv1.DeferredStatus_PENDING:
-			case xaiv1.DeferredStatus_EXPIRED:
-				return &PollResult{Done: false}, fmt.Errorf("deferred request expired")
-			default:
-				return &PollResult{Done: false}, fmt.Errorf("unknown deferred status: %s", result.Status.String())
+			result, err := pollDeferredCompletion(timeoutCtx, client, start.RequestId)
+			if result != nil || err != nil {
+				return result, err
 			}
 		}
+	}
+}
+
+func (r *DeferredRequest) validateForPoll(client ServiceClient) error {
+	if client == nil {
+		return fmt.Errorf("chat client is nil")
+	}
+	if r.proto == nil {
+		return fmt.Errorf("request proto is nil")
+	}
+	return nil
+}
+
+func normalizePollDurations(interval, timeout time.Duration) (time.Duration, time.Duration) {
+	if interval <= 0 {
+		interval = 100 * time.Millisecond
+	}
+	if timeout <= 0 {
+		timeout = 10 * time.Minute
+	}
+	return interval, timeout
+}
+
+func pollDeferredCompletion(ctx context.Context, client ServiceClient, requestID string) (*PollResult, error) {
+	result, err := client.GetDeferredCompletion(ctx, &xaiv1.GetDeferredRequest{RequestId: requestID})
+	if err != nil {
+		return &PollResult{Done: false}, err
+	}
+	if result == nil {
+		return &PollResult{Done: false}, fmt.Errorf("received nil deferred completion response")
+	}
+	return pollResultFromDeferredCompletion(result)
+}
+
+func pollResultFromDeferredCompletion(result *xaiv1.GetDeferredCompletionResponse) (*PollResult, error) {
+	switch result.Status {
+	case xaiv1.DeferredStatus_DONE:
+		if result.Response == nil {
+			return &PollResult{Done: false}, fmt.Errorf("deferred request completed without a response")
+		}
+		return &PollResult{
+			Response: &DeferredResponse{proto: result.Response},
+			Done:     true,
+		}, nil
+	case xaiv1.DeferredStatus_PENDING:
+		return nil, nil
+	case xaiv1.DeferredStatus_EXPIRED:
+		return &PollResult{Done: false}, fmt.Errorf("deferred request expired")
+	default:
+		return &PollResult{Done: false}, fmt.Errorf("unknown deferred status: %s", result.Status.String())
 	}
 }
 

@@ -9,9 +9,9 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/status"
 )
 
-func TestBatchRequestFromImageRequest(t *testing.T) {
+func TestRequestFromImageRequest(t *testing.T) {
 	req := image.NewRequest("prompt", "image-model").WithCount(2)
-	batchReq := BatchRequestFromImageRequest(req, "image-1")
+	batchReq := RequestFromImageRequest(req, "image-1")
 
 	if batchReq.GetBatchRequestId() != "image-1" {
 		t.Errorf("batch request id = %q, want image-1", batchReq.GetBatchRequestId())
@@ -24,9 +24,9 @@ func TestBatchRequestFromImageRequest(t *testing.T) {
 	}
 }
 
-func TestBatchRequestFromVideoRequest(t *testing.T) {
+func TestRequestFromVideoRequest(t *testing.T) {
 	req := video.NewGenerateRequest("prompt", "video-model")
-	batchReq := BatchRequestFromVideoRequest(req, "video-1")
+	batchReq := RequestFromVideoRequest(req, "video-1")
 
 	if batchReq.GetBatchRequestId() != "video-1" {
 		t.Errorf("batch request id = %q, want video-1", batchReq.GetBatchRequestId())
@@ -63,8 +63,8 @@ func TestBatchResultDataSupportsImageAndVideo(t *testing.T) {
 	}
 }
 
-func TestBatchResultWrappers(t *testing.T) {
-	success := NewBatchResult(&xaiv1.BatchResult{
+func TestResultWrappers(t *testing.T) {
+	success := NewResult(&xaiv1.BatchResult{
 		BatchRequestId: "request-1",
 		Result: &xaiv1.BatchResult_Response{Response: &xaiv1.BatchResultData{
 			Response: &xaiv1.BatchResultData_ImageResponse{ImageResponse: &xaiv1.ImageResponse{Model: "image-model"}},
@@ -78,7 +78,7 @@ func TestBatchResultWrappers(t *testing.T) {
 		t.Fatalf("success wrapper mismatch: %v", success)
 	}
 
-	failed := NewBatchResult(&xaiv1.BatchResult{
+	failed := NewResult(&xaiv1.BatchResult{
 		BatchRequestId: "request-2",
 		Result:         &xaiv1.BatchResult_Error{Error: &status.Status{Message: "failed"}},
 	})
