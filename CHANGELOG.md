@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.0] - 2026-06-04
+
+### 🎯 Focus: Python SDK v1.15.0 Parity
+
+This release updates the Go SDK for parity with the official Python SDK v1.15.0, including the upstream v1.13.0 and v1.14.0 public-surface additions.
+
+### Added
+
+#### Protobuf and Service Surface Parity
+- Added `WebSearch.enable_image_search` to mirror Python `tools.web_search(enable_image_search=...)`.
+- Added `BatchRequest.video_extension_request` for batch video extension requests.
+
+#### Python-Style Client Conveniences
+- Added `video.PrepareExtension()` and `(*video.Client).PrepareExtension()` for preparing video extension requests for the Batch API.
+- Added `batch.RequestFromVideoExtensionRequest()` and `batch.PrepareVideoExtensionRequest()` helpers.
+- Extended `batch.Client.Add()` to accept `*xaiv1.ExtendVideoRequest`.
+- Added `tools.WebSearchOptions.EnableImageSearch`.
+
+### Fixed
+
+- Preserved canonical `google.golang.org/genproto/googleapis/rpc/status` usage for `google/rpc/status.proto` to avoid duplicate protobuf descriptor registration.
+
+### Testing
+
+- ✅ `go test ./...`
+- ✅ `go build ./...`
+- ✅ `go vet ./...`
+
 ## [1.12.1] - 2026-05-02
 
 ### 🎯 Focus: Python SDK v1.12.1 Parity

@@ -12,6 +12,7 @@ type WebSearchOptions struct {
 	ExcludedDomains          []string
 	AllowedDomains           []string
 	EnableImageUnderstanding bool
+	EnableImageSearch        bool
 	UserLocationCountry      string
 	UserLocationCity         string
 	UserLocationRegion       string
@@ -48,6 +49,7 @@ func WebSearch(opts WebSearchOptions) *xaiv1.Tool {
 		ExcludedDomains:          opts.ExcludedDomains,
 		AllowedDomains:           opts.AllowedDomains,
 		EnableImageUnderstanding: &opts.EnableImageUnderstanding,
+		EnableImageSearch:        &opts.EnableImageSearch,
 	}
 	if opts.UserLocationCountry != "" || opts.UserLocationCity != "" || opts.UserLocationRegion != "" || opts.UserLocationTimezone != "" {
 		ws.UserLocation = &xaiv1.WebSearchUserLocation{

@@ -72,6 +72,24 @@ func TestPrepare(t *testing.T) {
 	}
 }
 
+func TestPrepareExtension(t *testing.T) {
+	duration := int32(6)
+	batchReq := PrepareExtension("continue", "model", "https://example.com/video.mp4", "extension-1", &duration)
+
+	if batchReq.GetBatchRequestId() != "extension-1" {
+		t.Errorf("batch request id = %q, want extension-1", batchReq.GetBatchRequestId())
+	}
+	if batchReq.GetVideoExtensionRequest() == nil {
+		t.Fatal("video extension request is nil")
+	}
+	if batchReq.GetVideoExtensionRequest().GetVideo().GetUrl() != "https://example.com/video.mp4" {
+		t.Errorf("video url = %q", batchReq.GetVideoExtensionRequest().GetVideo().GetUrl())
+	}
+	if batchReq.GetVideoExtensionRequest().GetDuration() != duration {
+		t.Errorf("duration = %d, want %d", batchReq.GetVideoExtensionRequest().GetDuration(), duration)
+	}
+}
+
 func TestResponse(t *testing.T) {
 	ticks := int64(100)
 	resp := NewResponse(&xaiv1.VideoResponse{

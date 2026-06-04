@@ -51,6 +51,21 @@ func TestPrepareVideoRequest(t *testing.T) {
 	}
 }
 
+func TestPrepareVideoExtensionRequest(t *testing.T) {
+	duration := int32(6)
+	batchReq := PrepareVideoExtensionRequest("continue", "video-model", "https://example.com/video.mp4", "video-ext-1", &duration)
+
+	if batchReq.GetBatchRequestId() != "video-ext-1" {
+		t.Errorf("batch request id = %q, want video-ext-1", batchReq.GetBatchRequestId())
+	}
+	if batchReq.GetVideoExtensionRequest() == nil {
+		t.Fatal("video extension request is nil")
+	}
+	if batchReq.GetVideoExtensionRequest().GetModel() != "video-model" {
+		t.Errorf("model = %q, want video-model", batchReq.GetVideoExtensionRequest().GetModel())
+	}
+}
+
 func TestBatchResultDataSupportsImageAndVideo(t *testing.T) {
 	imageResult := &xaiv1.BatchResultData{Response: &xaiv1.BatchResultData_ImageResponse{ImageResponse: &xaiv1.ImageResponse{Model: "image-model"}}}
 	videoResult := &xaiv1.BatchResultData{Response: &xaiv1.BatchResultData_VideoResponse{VideoResponse: &xaiv1.VideoResponse{Model: "video-model"}}}

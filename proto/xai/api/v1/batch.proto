@@ -48,6 +48,7 @@ message BatchRequest {
     GetCompletionsRequest completion_request = 2;
     GenerateImageRequest image_request = 3;
     GenerateVideoRequest video_request = 4;
+    ExtendVideoRequest video_extension_request = 5;
   }
 }
 

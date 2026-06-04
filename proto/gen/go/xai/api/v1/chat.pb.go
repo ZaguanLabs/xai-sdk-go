@@ -2587,6 +2587,7 @@ type WebSearch struct {
 	// When true, the server may add image viewing tools to the active MCP toolset.
 	EnableImageUnderstanding *bool                  `protobuf:"varint,3,opt,name=enable_image_understanding,json=enableImageUnderstanding,proto3,oneof" json:"enable_image_understanding,omitempty"`
 	UserLocation             *WebSearchUserLocation `protobuf:"bytes,4,opt,name=user_location,json=userLocation,proto3,oneof" json:"user_location,omitempty"`
+	EnableImageSearch        *bool                  `protobuf:"varint,5,opt,name=enable_image_search,json=enableImageSearch,proto3,oneof" json:"enable_image_search,omitempty"`
 	unknownFields            protoimpl.UnknownFields
 	sizeCache                protoimpl.SizeCache
 }
@@ -2647,6 +2648,13 @@ func (x *WebSearch) GetUserLocation() *WebSearchUserLocation {
 		return x.UserLocation
 	}
 	return nil
+}
+
+func (x *WebSearch) GetEnableImageSearch() bool {
+	if x != nil && x.EnableImageSearch != nil {
+		return *x.EnableImageSearch
+	}
+	return false
 }
 
 type WebSearchUserLocation struct {
@@ -4492,14 +4500,16 @@ const file_xai_api_v1_chat_proto_rawDesc = "" +
 	"\x11ExtraHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x10\n" +
-	"\x0e_authorization\"\x9d\x02\n" +
+	"\x0e_authorization\"\xea\x02\n" +
 	"\tWebSearch\x12)\n" +
 	"\x10excluded_domains\x18\x01 \x03(\tR\x0fexcludedDomains\x12'\n" +
 	"\x0fallowed_domains\x18\x02 \x03(\tR\x0eallowedDomains\x12A\n" +
 	"\x1aenable_image_understanding\x18\x03 \x01(\bH\x00R\x18enableImageUnderstanding\x88\x01\x01\x12H\n" +
-	"\ruser_location\x18\x04 \x01(\v2\x1e.xai_api.WebSearchUserLocationH\x01R\fuserLocation\x88\x01\x01B\x1d\n" +
+	"\ruser_location\x18\x04 \x01(\v2\x1e.xai_api.WebSearchUserLocationH\x01R\fuserLocation\x88\x01\x01\x123\n" +
+	"\x13enable_image_search\x18\x05 \x01(\bH\x02R\x11enableImageSearch\x88\x01\x01B\x1d\n" +
 	"\x1b_enable_image_understandingB\x10\n" +
-	"\x0e_user_location\"\xba\x01\n" +
+	"\x0e_user_locationB\x16\n" +
+	"\x14_enable_image_search\"\xba\x01\n" +
 	"\x15WebSearchUserLocation\x12\x1d\n" +
 	"\acountry\x18\x01 \x01(\tH\x00R\acountry\x88\x01\x01\x12\x17\n" +
 	"\x04city\x18\x02 \x01(\tH\x01R\x04city\x88\x01\x01\x12\x1b\n" +

@@ -617,6 +617,8 @@ message WebSearch {
   optional bool enable_image_understanding = 3;
 
   optional WebSearchUserLocation user_location = 4;
+
+  optional bool enable_image_search = 5;
 }
 
 message WebSearchUserLocation {

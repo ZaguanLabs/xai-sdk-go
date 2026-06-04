@@ -126,6 +126,8 @@ func (c *Client) Add(ctx context.Context, batchID string, requests ...interface{
 			}
 		case *xaiv1.GenerateVideoRequest:
 			batchRequests = append(batchRequests, RequestFromVideoRequest(value, ""))
+		case *xaiv1.ExtendVideoRequest:
+			batchRequests = append(batchRequests, RequestFromVideoExtensionRequest(value, ""))
 		default:
 			return fmt.Errorf("unsupported batch request type: %T", request)
 		}
@@ -246,8 +248,27 @@ func RequestFromVideoRequest(req *xaiv1.GenerateVideoRequest, batchRequestID str
 	return batchReq
 }
 
+func RequestFromVideoExtensionRequest(req *xaiv1.ExtendVideoRequest, batchRequestID string) *xaiv1.BatchRequest {
+	if req == nil {
+		return nil
+	}
+	batchReq := &xaiv1.BatchRequest{
+		Request: &xaiv1.BatchRequest_VideoExtensionRequest{
+			VideoExtensionRequest: req,
+		},
+	}
+	if batchRequestID != "" {
+		batchReq.BatchRequestId = &batchRequestID
+	}
+	return batchReq
+}
+
 func PrepareVideoRequest(prompt, model, batchRequestID string, opts *video.GenerateOptions) *xaiv1.BatchRequest {
 	return video.Prepare(prompt, model, batchRequestID, opts)
+}
+
+func PrepareVideoExtensionRequest(prompt, model, videoURL, batchRequestID string, duration *int32) *xaiv1.BatchRequest {
+	return video.PrepareExtension(prompt, model, videoURL, batchRequestID, duration)
 }
 
 func NewListBatchResultsResponse(proto *xaiv1.ListBatchResultsResponse) *ListBatchResultsResponse {

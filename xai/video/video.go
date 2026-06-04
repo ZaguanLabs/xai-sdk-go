@@ -148,8 +148,25 @@ func Prepare(prompt, model, batchRequestID string, opts *GenerateOptions) *xaiv1
 	return batchReq
 }
 
+func PrepareExtension(prompt, model, videoURL, batchRequestID string, duration *int32) *xaiv1.BatchRequest {
+	req := NewExtendRequest(prompt, model, videoURL, duration)
+	batchReq := &xaiv1.BatchRequest{
+		Request: &xaiv1.BatchRequest_VideoExtensionRequest{
+			VideoExtensionRequest: req,
+		},
+	}
+	if batchRequestID != "" {
+		batchReq.BatchRequestId = &batchRequestID
+	}
+	return batchReq
+}
+
 func (c *Client) Prepare(prompt, model, batchRequestID string, opts *GenerateOptions) *xaiv1.BatchRequest {
 	return Prepare(prompt, model, batchRequestID, opts)
+}
+
+func (c *Client) PrepareExtension(prompt, model, videoURL, batchRequestID string, duration *int32) *xaiv1.BatchRequest {
+	return PrepareExtension(prompt, model, videoURL, batchRequestID, duration)
 }
 
 func (c *Client) GenerateDeferred(ctx context.Context, req *xaiv1.GenerateVideoRequest) (*xaiv1.StartDeferredResponse, error) {

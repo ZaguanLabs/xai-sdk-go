@@ -3,8 +3,8 @@ package tools
 import "testing"
 
 func TestToolHelpers(t *testing.T) {
-	web := WebSearch(WebSearchOptions{ExcludedDomains: []string{"example.com"}, EnableImageUnderstanding: true, UserLocationCountry: "US"})
-	if web.GetWebSearch() == nil || !web.GetWebSearch().GetEnableImageUnderstanding() || web.GetWebSearch().GetUserLocation().GetCountry() != "US" {
+	web := WebSearch(WebSearchOptions{ExcludedDomains: []string{"example.com"}, EnableImageUnderstanding: true, EnableImageSearch: true, UserLocationCountry: "US"})
+	if web.GetWebSearch() == nil || !web.GetWebSearch().GetEnableImageUnderstanding() || !web.GetWebSearch().GetEnableImageSearch() || web.GetWebSearch().GetUserLocation().GetCountry() != "US" {
 		t.Fatalf("WebSearch() = %v", web)
 	}
 
