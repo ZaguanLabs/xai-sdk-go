@@ -9,6 +9,7 @@ import (
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/cost"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/files"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
 	"google.golang.org/protobuf/encoding/protojson"
 )
@@ -36,11 +37,13 @@ type GenerateRequest struct {
 	Format      xaiv1.ImageFormat
 	AspectRatio *xaiv1.ImageAspectRatio
 	Resolution  *xaiv1.ImageResolution
+	Storage     *files.StorageOptions
 }
 
 // Input represents an input image for image-to-image generation.
 type Input struct {
 	ImageURL string
+	FileID   string
 	Detail   xaiv1.ImageDetail
 }
 
@@ -90,6 +93,38 @@ func (i *GeneratedImage) RespectModeration() bool {
 		return false
 	}
 	return i.proto.RespectModeration
+}
+
+// FileOutput returns Files API metadata when storage was requested.
+func (i *GeneratedImage) FileOutput() *xaiv1.FileOutput {
+	if i == nil || i.proto == nil {
+		return nil
+	}
+	return i.proto.GetFileOutput()
+}
+
+// StorageError returns the storage failure message, if storing the image failed.
+func (i *GeneratedImage) StorageError() string {
+	if i == nil || i.proto == nil {
+		return ""
+	}
+	return i.proto.GetStorageError()
+}
+
+// PublicURL returns the generated file's public URL, if one was created.
+func (i *GeneratedImage) PublicURL() string {
+	if output := i.FileOutput(); output != nil {
+		return output.GetPublicUrl()
+	}
+	return ""
+}
+
+// PublicURLError returns the public URL creation error, if one occurred.
+func (i *GeneratedImage) PublicURLError() string {
+	if output := i.FileOutput(); output != nil {
+		return output.GetPublicUrlError()
+	}
+	return ""
 }
 
 // Response represents an image generation response.
@@ -150,6 +185,15 @@ func (r *GenerateRequest) WithImage(imageURL string, detail xaiv1.ImageDetail) *
 	return r
 }
 
+// WithImageFileID sets a Files API image file ID for image-to-image generation.
+func (r *GenerateRequest) WithImageFileID(fileID string, detail xaiv1.ImageDetail) *GenerateRequest {
+	r.Image = &Input{
+		FileID: fileID,
+		Detail: detail,
+	}
+	return r
+}
+
 func (r *GenerateRequest) WithImages(images ...*Input) *GenerateRequest {
 	r.Images = append(r.Images, images...)
 	return r
@@ -157,6 +201,13 @@ func (r *GenerateRequest) WithImages(images ...*Input) *GenerateRequest {
 
 func (r *GenerateRequest) WithImageURL(imageURL string, detail xaiv1.ImageDetail) *GenerateRequest {
 	return r.WithImage(imageURL, detail)
+}
+
+func (r *GenerateRequest) WithImageFileIDs(fileIDs ...string) *GenerateRequest {
+	for _, fileID := range fileIDs {
+		r.Images = append(r.Images, &Input{FileID: fileID, Detail: xaiv1.ImageDetail_DETAIL_AUTO})
+	}
+	return r
 }
 
 func (r *GenerateRequest) WithAspectRatio(aspectRatio xaiv1.ImageAspectRatio) *GenerateRequest {
@@ -169,6 +220,24 @@ func (r *GenerateRequest) WithResolution(resolution xaiv1.ImageResolution) *Gene
 	return r
 }
 
+func (r *GenerateRequest) WithStorageOptions(storage *files.StorageOptions) *GenerateRequest {
+	r.Storage = storage
+	return r
+}
+
+func inputProto(input *Input) *xaiv1.ImageUrlContent {
+	if input == nil {
+		return nil
+	}
+	pb := &xaiv1.ImageUrlContent{Detail: input.Detail}
+	if input.FileID != "" {
+		pb.FileId = input.FileID
+	} else {
+		pb.ImageUrl = input.ImageURL
+	}
+	return pb
+}
+
 func (r *GenerateRequest) Proto() *xaiv1.GenerateImageRequest {
 	protoReq := &xaiv1.GenerateImageRequest{
 		Prompt: r.Prompt,
@@ -179,10 +248,7 @@ func (r *GenerateRequest) Proto() *xaiv1.GenerateImageRequest {
 	}
 
 	if r.Image != nil {
-		protoReq.Image = &xaiv1.ImageUrlContent{
-			ImageUrl: r.Image.ImageURL,
-			Detail:   r.Image.Detail,
-		}
+		protoReq.Image = inputProto(r.Image)
 	}
 	if len(r.Images) > 0 {
 		protoReq.Images = make([]*xaiv1.ImageUrlContent, 0, len(r.Images))
@@ -190,10 +256,7 @@ func (r *GenerateRequest) Proto() *xaiv1.GenerateImageRequest {
 			if img == nil {
 				continue
 			}
-			protoReq.Images = append(protoReq.Images, &xaiv1.ImageUrlContent{
-				ImageUrl: img.ImageURL,
-				Detail:   img.Detail,
-			})
+			protoReq.Images = append(protoReq.Images, inputProto(img))
 		}
 	}
 	if r.AspectRatio != nil {
@@ -201,6 +264,9 @@ func (r *GenerateRequest) Proto() *xaiv1.GenerateImageRequest {
 	}
 	if r.Resolution != nil {
 		protoReq.Resolution = r.Resolution
+	}
+	if r.Storage != nil {
+		protoReq.StorageOptions = r.Storage.Proto()
 	}
 
 	return protoReq

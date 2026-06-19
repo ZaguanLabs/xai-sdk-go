@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
@@ -70,6 +71,77 @@ func TestContent(t *testing.T) {
 	}
 	if string(content) != "file content" {
 		t.Errorf("Content() = %q, want file content", string(content))
+	}
+}
+
+func TestListWithFilter(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/files/list" {
+			t.Fatalf("path = %q, want /files/list", r.URL.Path)
+		}
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			t.Fatalf("ReadAll() error = %v", err)
+		}
+		var req xaiv1.ListFilesRequest
+		if err := protojson.Unmarshal(body, &req); err != nil {
+			t.Fatalf("protojson.Unmarshal() error = %v; body=%s", err, body)
+		}
+		if req.GetFilter() != `public_url != null` {
+			t.Fatalf("filter = %q", req.GetFilter())
+		}
+		data, _ := protojson.Marshal(&xaiv1.ListFilesResponse{})
+		w.Write(data)
+	}))
+	defer server.Close()
+
+	client := NewClient(rest.NewClient(rest.Config{BaseURL: server.URL, APIKey: "test"}))
+	if _, err := client.List(context.Background(), &ListOptions{Filter: `public_url != null`}); err != nil {
+		t.Fatalf("List() error = %v", err)
+	}
+}
+
+func TestPublicURLMethods(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.Method == http.MethodPost && r.URL.Path == "/files/file-1/public-url":
+			body, err := io.ReadAll(r.Body)
+			if err != nil {
+				t.Fatalf("ReadAll() error = %v", err)
+			}
+			var req xaiv1.CreatePublicUrlRequest
+			if err := protojson.Unmarshal(body, &req); err != nil {
+				t.Fatalf("protojson.Unmarshal() error = %v", err)
+			}
+			if req.GetFileId() != "file-1" || req.GetExpiresAfter() != 3600 {
+				t.Fatalf("file_id = %q, expires_after = %d", req.GetFileId(), req.GetExpiresAfter())
+			}
+			data, _ := protojson.Marshal(&xaiv1.CreatePublicUrlResponse{PublicUrl: "https://public.example/file-1"})
+			w.Write(data)
+		case r.Method == http.MethodDelete && r.URL.Path == "/files/file-1/public-url":
+			publicURL := "https://public.example/file-1"
+			data, _ := protojson.Marshal(&xaiv1.RevokePublicUrlResponse{FileId: "file-1", Revoked: true, PublicUrl: &publicURL})
+			w.Write(data)
+		default:
+			t.Fatalf("unexpected request: %s %s", r.Method, r.URL.Path)
+		}
+	}))
+	defer server.Close()
+
+	client := NewClient(rest.NewClient(rest.Config{BaseURL: server.URL, APIKey: "test"}))
+	createResp, err := client.CreatePublicURL(context.Background(), "file-1", time.Hour)
+	if err != nil {
+		t.Fatalf("CreatePublicURL() error = %v", err)
+	}
+	if createResp.GetPublicUrl() != "https://public.example/file-1" {
+		t.Fatalf("public_url = %q", createResp.GetPublicUrl())
+	}
+	revokeResp, err := client.RevokePublicURL(context.Background(), "file-1")
+	if err != nil {
+		t.Fatalf("RevokePublicURL() error = %v", err)
+	}
+	if !revokeResp.GetRevoked() || revokeResp.GetPublicUrl() == "" {
+		t.Fatalf("revoke response = %+v", revokeResp)
 	}
 }
 

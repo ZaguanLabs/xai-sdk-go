@@ -107,19 +107,26 @@ func (c *Client) Do(ctx context.Context, req Request) (*Response, error) {
 
 	var body io.Reader
 	if req.Body != nil {
-		// Use buffer pool to reduce allocations
-		buf := bufferPool.Get().(*bytes.Buffer)
-		buf.Reset()
-		defer bufferPool.Put(buf)
+		switch value := req.Body.(type) {
+		case []byte:
+			body = bytes.NewReader(value)
+		case json.RawMessage:
+			body = bytes.NewReader(value)
+		default:
+			// Use buffer pool to reduce allocations
+			buf := bufferPool.Get().(*bytes.Buffer)
+			buf.Reset()
+			defer bufferPool.Put(buf)
 
-		if err := json.NewEncoder(buf).Encode(req.Body); err != nil {
-			return nil, fmt.Errorf("failed to marshal request body: %w", err)
+			if err := json.NewEncoder(buf).Encode(req.Body); err != nil {
+				return nil, fmt.Errorf("failed to marshal request body: %w", err)
+			}
+
+			// Create a copy since buf will be returned to pool
+			bodyBytes := make([]byte, buf.Len())
+			copy(bodyBytes, buf.Bytes())
+			body = bytes.NewReader(bodyBytes)
 		}
-
-		// Create a copy since buf will be returned to pool
-		bodyBytes := make([]byte, buf.Len())
-		copy(bodyBytes, buf.Bytes())
-		body = bytes.NewReader(bodyBytes)
 	}
 
 	httpReq, err := http.NewRequestWithContext(ctx, req.Method, url, body)

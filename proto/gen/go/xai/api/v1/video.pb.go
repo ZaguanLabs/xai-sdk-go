@@ -137,6 +137,7 @@ func (VideoResolution) EnumDescriptor() ([]byte, []int) {
 type VideoUrlContent struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	FileId        string                 `protobuf:"bytes,2,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -174,6 +175,13 @@ func (*VideoUrlContent) Descriptor() ([]byte, []int) {
 func (x *VideoUrlContent) GetUrl() string {
 	if x != nil {
 		return x.Url
+	}
+	return ""
+}
+
+func (x *VideoUrlContent) GetFileId() string {
+	if x != nil {
+		return x.FileId
 	}
 	return ""
 }
@@ -227,6 +235,8 @@ type GeneratedVideo struct {
 	Url               string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
 	Duration          int32                  `protobuf:"varint,4,opt,name=duration,proto3" json:"duration,omitempty"`
 	RespectModeration bool                   `protobuf:"varint,5,opt,name=respect_moderation,json=respectModeration,proto3" json:"respect_moderation,omitempty"`
+	FileOutput        *FileOutput            `protobuf:"bytes,6,opt,name=file_output,json=fileOutput,proto3,oneof" json:"file_output,omitempty"`
+	StorageError      *string                `protobuf:"bytes,7,opt,name=storage_error,json=storageError,proto3,oneof" json:"storage_error,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -282,6 +292,20 @@ func (x *GeneratedVideo) GetRespectModeration() bool {
 	return false
 }
 
+func (x *GeneratedVideo) GetFileOutput() *FileOutput {
+	if x != nil {
+		return x.FileOutput
+	}
+	return nil
+}
+
+func (x *GeneratedVideo) GetStorageError() string {
+	if x != nil && x.StorageError != nil {
+		return *x.StorageError
+	}
+	return ""
+}
+
 type GenerateVideoRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Prompt          string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
@@ -292,6 +316,7 @@ type GenerateVideoRequest struct {
 	AspectRatio     *VideoAspectRatio      `protobuf:"varint,7,opt,name=aspect_ratio,json=aspectRatio,proto3,enum=xai_api.VideoAspectRatio,oneof" json:"aspect_ratio,omitempty"`
 	Resolution      *VideoResolution       `protobuf:"varint,8,opt,name=resolution,proto3,enum=xai_api.VideoResolution,oneof" json:"resolution,omitempty"`
 	ReferenceImages []*ImageUrlContent     `protobuf:"bytes,13,rep,name=reference_images,json=referenceImages,proto3" json:"reference_images,omitempty"`
+	StorageOptions  *StorageOptions        `protobuf:"bytes,14,opt,name=storage_options,json=storageOptions,proto3,oneof" json:"storage_options,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -378,6 +403,13 @@ func (x *GenerateVideoRequest) GetResolution() VideoResolution {
 func (x *GenerateVideoRequest) GetReferenceImages() []*ImageUrlContent {
 	if x != nil {
 		return x.ReferenceImages
+	}
+	return nil
+}
+
+func (x *GenerateVideoRequest) GetStorageOptions() *StorageOptions {
+	if x != nil {
+		return x.StorageOptions
 	}
 	return nil
 }
@@ -607,13 +639,14 @@ func (x *VideoError) GetMessage() string {
 }
 
 type ExtendVideoRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Prompt        string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
-	Video         *VideoUrlContent       `protobuf:"bytes,2,opt,name=video,proto3" json:"video,omitempty"`
-	Model         string                 `protobuf:"bytes,3,opt,name=model,proto3" json:"model,omitempty"`
-	Duration      *int32                 `protobuf:"varint,4,opt,name=duration,proto3,oneof" json:"duration,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Prompt         string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
+	Video          *VideoUrlContent       `protobuf:"bytes,2,opt,name=video,proto3" json:"video,omitempty"`
+	Model          string                 `protobuf:"bytes,3,opt,name=model,proto3" json:"model,omitempty"`
+	Duration       *int32                 `protobuf:"varint,4,opt,name=duration,proto3,oneof" json:"duration,omitempty"`
+	StorageOptions *StorageOptions        `protobuf:"bytes,6,opt,name=storage_options,json=storageOptions,proto3,oneof" json:"storage_options,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ExtendVideoRequest) Reset() {
@@ -674,20 +707,33 @@ func (x *ExtendVideoRequest) GetDuration() int32 {
 	return 0
 }
 
+func (x *ExtendVideoRequest) GetStorageOptions() *StorageOptions {
+	if x != nil {
+		return x.StorageOptions
+	}
+	return nil
+}
+
 var File_xai_api_v1_video_proto protoreflect.FileDescriptor
 
 const file_xai_api_v1_video_proto_rawDesc = "" +
 	"\n" +
-	"\x16xai/api/v1/video.proto\x12\axai_api\x1a\x19xai/api/v1/deferred.proto\x1a\x16xai/api/v1/image.proto\x1a\x16xai/api/v1/usage.proto\"#\n" +
+	"\x16xai/api/v1/video.proto\x12\axai_api\x1a\x19xai/api/v1/deferred.proto\x1a\x16xai/api/v1/image.proto\x1a\x16xai/api/v1/usage.proto\"<\n" +
 	"\x0fVideoUrlContent\x12\x10\n" +
-	"\x03url\x18\x01 \x01(\tR\x03url\",\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url\x12\x17\n" +
+	"\afile_id\x18\x02 \x01(\tR\x06fileId\",\n" +
 	"\vVideoOutput\x12\x1d\n" +
 	"\n" +
-	"upload_url\x18\x01 \x01(\tR\tuploadUrl\"m\n" +
+	"upload_url\x18\x01 \x01(\tR\tuploadUrl\"\xf4\x01\n" +
 	"\x0eGeneratedVideo\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12\x1a\n" +
 	"\bduration\x18\x04 \x01(\x05R\bduration\x12-\n" +
-	"\x12respect_moderation\x18\x05 \x01(\bR\x11respectModeration\"\xb9\x03\n" +
+	"\x12respect_moderation\x18\x05 \x01(\bR\x11respectModeration\x129\n" +
+	"\vfile_output\x18\x06 \x01(\v2\x13.xai_api.FileOutputH\x00R\n" +
+	"fileOutput\x88\x01\x01\x12(\n" +
+	"\rstorage_error\x18\a \x01(\tH\x01R\fstorageError\x88\x01\x01B\x0e\n" +
+	"\f_file_outputB\x10\n" +
+	"\x0e_storage_error\"\x94\x04\n" +
 	"\x14GenerateVideoRequest\x12\x16\n" +
 	"\x06prompt\x18\x01 \x01(\tR\x06prompt\x12.\n" +
 	"\x05image\x18\x02 \x01(\v2\x18.xai_api.ImageUrlContentR\x05image\x12\x14\n" +
@@ -698,10 +744,12 @@ const file_xai_api_v1_video_proto_rawDesc = "" +
 	"\n" +
 	"resolution\x18\b \x01(\x0e2\x18.xai_api.VideoResolutionH\x02R\n" +
 	"resolution\x88\x01\x01\x12C\n" +
-	"\x10reference_images\x18\r \x03(\v2\x18.xai_api.ImageUrlContentR\x0freferenceImagesB\v\n" +
+	"\x10reference_images\x18\r \x03(\v2\x18.xai_api.ImageUrlContentR\x0freferenceImages\x12E\n" +
+	"\x0fstorage_options\x18\x0e \x01(\v2\x17.xai_api.StorageOptionsH\x03R\x0estorageOptions\x88\x01\x01B\v\n" +
 	"\t_durationB\x0f\n" +
 	"\r_aspect_ratioB\r\n" +
-	"\v_resolution\"8\n" +
+	"\v_resolutionB\x12\n" +
+	"\x10_storage_options\"8\n" +
 	"\x17GetDeferredVideoRequest\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\tR\trequestId\"\xd8\x01\n" +
@@ -719,13 +767,15 @@ const file_xai_api_v1_video_proto_rawDesc = "" +
 	"\n" +
 	"VideoError\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\tR\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\xa0\x01\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\xfb\x01\n" +
 	"\x12ExtendVideoRequest\x12\x16\n" +
 	"\x06prompt\x18\x01 \x01(\tR\x06prompt\x12.\n" +
 	"\x05video\x18\x02 \x01(\v2\x18.xai_api.VideoUrlContentR\x05video\x12\x14\n" +
 	"\x05model\x18\x03 \x01(\tR\x05model\x12\x1f\n" +
-	"\bduration\x18\x04 \x01(\x05H\x00R\bduration\x88\x01\x01B\v\n" +
-	"\t_duration*\xfc\x01\n" +
+	"\bduration\x18\x04 \x01(\x05H\x00R\bduration\x88\x01\x01\x12E\n" +
+	"\x0fstorage_options\x18\x06 \x01(\v2\x17.xai_api.StorageOptionsH\x01R\x0estorageOptions\x88\x01\x01B\v\n" +
+	"\t_durationB\x12\n" +
+	"\x10_storage_options*\xfc\x01\n" +
 	"\x10VideoAspectRatio\x12\"\n" +
 	"\x1eVIDEO_ASPECT_RATIO_UNSPECIFIED\x10\x00\x12\x1a\n" +
 	"\x16VIDEO_ASPECT_RATIO_1_1\x10\x01\x12\x1b\n" +
@@ -772,34 +822,39 @@ var file_xai_api_v1_video_proto_goTypes = []any{
 	(*GetDeferredVideoResponse)(nil), // 8: xai_api.GetDeferredVideoResponse
 	(*VideoError)(nil),               // 9: xai_api.VideoError
 	(*ExtendVideoRequest)(nil),       // 10: xai_api.ExtendVideoRequest
-	(*ImageUrlContent)(nil),          // 11: xai_api.ImageUrlContent
-	(*SamplingUsage)(nil),            // 12: xai_api.SamplingUsage
-	(DeferredStatus)(0),              // 13: xai_api.DeferredStatus
-	(*StartDeferredResponse)(nil),    // 14: xai_api.StartDeferredResponse
+	(*FileOutput)(nil),               // 11: xai_api.FileOutput
+	(*ImageUrlContent)(nil),          // 12: xai_api.ImageUrlContent
+	(*StorageOptions)(nil),           // 13: xai_api.StorageOptions
+	(*SamplingUsage)(nil),            // 14: xai_api.SamplingUsage
+	(DeferredStatus)(0),              // 15: xai_api.DeferredStatus
+	(*StartDeferredResponse)(nil),    // 16: xai_api.StartDeferredResponse
 }
 var file_xai_api_v1_video_proto_depIdxs = []int32{
-	11, // 0: xai_api.GenerateVideoRequest.image:type_name -> xai_api.ImageUrlContent
-	2,  // 1: xai_api.GenerateVideoRequest.video:type_name -> xai_api.VideoUrlContent
-	0,  // 2: xai_api.GenerateVideoRequest.aspect_ratio:type_name -> xai_api.VideoAspectRatio
-	1,  // 3: xai_api.GenerateVideoRequest.resolution:type_name -> xai_api.VideoResolution
-	11, // 4: xai_api.GenerateVideoRequest.reference_images:type_name -> xai_api.ImageUrlContent
-	4,  // 5: xai_api.VideoResponse.video:type_name -> xai_api.GeneratedVideo
-	12, // 6: xai_api.VideoResponse.usage:type_name -> xai_api.SamplingUsage
-	9,  // 7: xai_api.VideoResponse.error:type_name -> xai_api.VideoError
-	13, // 8: xai_api.GetDeferredVideoResponse.status:type_name -> xai_api.DeferredStatus
-	7,  // 9: xai_api.GetDeferredVideoResponse.response:type_name -> xai_api.VideoResponse
-	2,  // 10: xai_api.ExtendVideoRequest.video:type_name -> xai_api.VideoUrlContent
-	5,  // 11: xai_api.Video.GenerateVideo:input_type -> xai_api.GenerateVideoRequest
-	10, // 12: xai_api.Video.ExtendVideo:input_type -> xai_api.ExtendVideoRequest
-	6,  // 13: xai_api.Video.GetDeferredVideo:input_type -> xai_api.GetDeferredVideoRequest
-	14, // 14: xai_api.Video.GenerateVideo:output_type -> xai_api.StartDeferredResponse
-	14, // 15: xai_api.Video.ExtendVideo:output_type -> xai_api.StartDeferredResponse
-	8,  // 16: xai_api.Video.GetDeferredVideo:output_type -> xai_api.GetDeferredVideoResponse
-	14, // [14:17] is the sub-list for method output_type
-	11, // [11:14] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	11, // 0: xai_api.GeneratedVideo.file_output:type_name -> xai_api.FileOutput
+	12, // 1: xai_api.GenerateVideoRequest.image:type_name -> xai_api.ImageUrlContent
+	2,  // 2: xai_api.GenerateVideoRequest.video:type_name -> xai_api.VideoUrlContent
+	0,  // 3: xai_api.GenerateVideoRequest.aspect_ratio:type_name -> xai_api.VideoAspectRatio
+	1,  // 4: xai_api.GenerateVideoRequest.resolution:type_name -> xai_api.VideoResolution
+	12, // 5: xai_api.GenerateVideoRequest.reference_images:type_name -> xai_api.ImageUrlContent
+	13, // 6: xai_api.GenerateVideoRequest.storage_options:type_name -> xai_api.StorageOptions
+	4,  // 7: xai_api.VideoResponse.video:type_name -> xai_api.GeneratedVideo
+	14, // 8: xai_api.VideoResponse.usage:type_name -> xai_api.SamplingUsage
+	9,  // 9: xai_api.VideoResponse.error:type_name -> xai_api.VideoError
+	15, // 10: xai_api.GetDeferredVideoResponse.status:type_name -> xai_api.DeferredStatus
+	7,  // 11: xai_api.GetDeferredVideoResponse.response:type_name -> xai_api.VideoResponse
+	2,  // 12: xai_api.ExtendVideoRequest.video:type_name -> xai_api.VideoUrlContent
+	13, // 13: xai_api.ExtendVideoRequest.storage_options:type_name -> xai_api.StorageOptions
+	5,  // 14: xai_api.Video.GenerateVideo:input_type -> xai_api.GenerateVideoRequest
+	10, // 15: xai_api.Video.ExtendVideo:input_type -> xai_api.ExtendVideoRequest
+	6,  // 16: xai_api.Video.GetDeferredVideo:input_type -> xai_api.GetDeferredVideoRequest
+	16, // 17: xai_api.Video.GenerateVideo:output_type -> xai_api.StartDeferredResponse
+	16, // 18: xai_api.Video.ExtendVideo:output_type -> xai_api.StartDeferredResponse
+	8,  // 19: xai_api.Video.GetDeferredVideo:output_type -> xai_api.GetDeferredVideoResponse
+	17, // [17:20] is the sub-list for method output_type
+	14, // [14:17] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_xai_api_v1_video_proto_init() }
@@ -810,6 +865,7 @@ func file_xai_api_v1_video_proto_init() {
 	file_xai_api_v1_deferred_proto_init()
 	file_xai_api_v1_image_proto_init()
 	file_xai_api_v1_usage_proto_init()
+	file_xai_api_v1_video_proto_msgTypes[2].OneofWrappers = []any{}
 	file_xai_api_v1_video_proto_msgTypes[3].OneofWrappers = []any{}
 	file_xai_api_v1_video_proto_msgTypes[5].OneofWrappers = []any{}
 	file_xai_api_v1_video_proto_msgTypes[6].OneofWrappers = []any{}

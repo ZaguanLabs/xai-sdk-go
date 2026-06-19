@@ -11,6 +11,8 @@ service Files {
   rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse) {}
   rpc GetFileContent(GetFileContentRequest) returns (stream FileContentChunk) {}
   rpc RetrieveFileURL(RetrieveFileURLRequest) returns (RetrieveFileURLResponse) {}
+  rpc CreatePublicUrl(CreatePublicUrlRequest) returns (CreatePublicUrlResponse) {}
+  rpc RevokePublicUrl(RevokePublicUrlRequest) returns (RevokePublicUrlResponse) {}
 }
 
 message File {
@@ -20,6 +22,8 @@ message File {
   string team_id = 4;
   google.protobuf.Timestamp created_at = 5;
   google.protobuf.Timestamp expires_at = 6;
+  optional string public_url = 7;
+  optional google.protobuf.Timestamp public_url_expires_at = 8;
 }
 
 message UploadFileChunk {
@@ -37,6 +41,7 @@ message ListFilesRequest {
   FilesOrdering order = 2;
   string pagination_token = 3;
   FilesSortBy sort_by = 4;
+  optional string filter = 5;
 }
 
 message ListFilesResponse {
@@ -68,6 +73,26 @@ message RetrieveFileURLRequest {
 
 message RetrieveFileURLResponse {
   string url = 1;
+}
+
+message CreatePublicUrlRequest {
+  string file_id = 1;
+  optional int64 expires_after = 2;
+}
+
+message CreatePublicUrlResponse {
+  string public_url = 1;
+  optional google.protobuf.Timestamp expires_at = 2;
+}
+
+message RevokePublicUrlRequest {
+  string file_id = 1;
+}
+
+message RevokePublicUrlResponse {
+  string file_id = 1;
+  bool revoked = 2;
+  optional string public_url = 3;
 }
 
 enum FilesOrdering {

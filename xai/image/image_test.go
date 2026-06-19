@@ -5,8 +5,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
+	xaifiles "github.com/ZaguanLabs/xai-sdk-go/xai/files"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/internal/rest"
 	"google.golang.org/protobuf/encoding/protojson"
 )
@@ -79,6 +81,59 @@ func TestRequestBuilders(t *testing.T) {
 	}
 	if protoReq.GetResolution() != resolution {
 		t.Errorf("Resolution = %v, want %v", protoReq.GetResolution(), resolution)
+	}
+}
+
+func TestRequestBuildersV117InputsAndStorage(t *testing.T) {
+	req := NewRequest("test", "model").
+		WithImageFileID("file-image", xaiv1.ImageDetail_DETAIL_HIGH).
+		WithImageFileIDs("file-ref-1").
+		WithImages(&Input{ImageURL: "http://example.com/ref.jpg", Detail: xaiv1.ImageDetail_DETAIL_AUTO}).
+		WithStorageOptions(&xaifiles.StorageOptions{
+			Filename:     "output.png",
+			ExpiresAfter: 2 * time.Hour,
+			PublicURL:    xaifiles.PublicURLWithExpiry(24 * time.Hour),
+		})
+
+	protoReq := req.Proto()
+	if protoReq.GetImage().GetFileId() != "file-image" {
+		t.Fatalf("image file id = %q", protoReq.GetImage().GetFileId())
+	}
+	if len(protoReq.Images) != 2 {
+		t.Fatalf("image count = %d, want 2", len(protoReq.Images))
+	}
+	if protoReq.Images[0].GetFileId() != "file-ref-1" {
+		t.Fatalf("first reference file id = %q", protoReq.Images[0].GetFileId())
+	}
+	if protoReq.Images[1].GetImageUrl() != "http://example.com/ref.jpg" {
+		t.Fatalf("second reference image url = %q", protoReq.Images[1].GetImageUrl())
+	}
+	if protoReq.GetStorageOptions().GetFilename() != "output.png" {
+		t.Fatalf("storage filename = %q", protoReq.GetStorageOptions().GetFilename())
+	}
+	if protoReq.GetStorageOptions().GetExpiresAfter() != int64((2 * time.Hour).Seconds()) {
+		t.Fatalf("storage expires_after = %d", protoReq.GetStorageOptions().GetExpiresAfter())
+	}
+	if protoReq.GetStorageOptions().GetPublicUrl().GetExpiresAfter() != int64((24 * time.Hour).Seconds()) {
+		t.Fatalf("public url expires_after = %d", protoReq.GetStorageOptions().GetPublicUrl().GetExpiresAfter())
+	}
+}
+
+func TestGeneratedImageStorageAccessors(t *testing.T) {
+	publicURL := "https://public.example/image.png"
+	publicURLError := "public URL failed"
+	storageError := "storage failed"
+	img := &GeneratedImage{proto: &xaiv1.GeneratedImage{
+		FileOutput: &xaiv1.FileOutput{
+			FileId:         "file-1",
+			Filename:       "image.png",
+			PublicUrl:      &publicURL,
+			PublicUrlError: &publicURLError,
+		},
+		StorageError: &storageError,
+	}}
+	if img.FileOutput().GetFileId() != "file-1" || img.PublicURL() != publicURL || img.PublicURLError() != publicURLError || img.StorageError() != storageError {
+		t.Fatalf("unexpected storage accessors")
 	}
 }
 

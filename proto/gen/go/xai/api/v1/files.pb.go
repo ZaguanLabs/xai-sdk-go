@@ -118,15 +118,17 @@ func (FilesSortBy) EnumDescriptor() ([]byte, []int) {
 }
 
 type File struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Filename      string                 `protobuf:"bytes,2,opt,name=filename,proto3" json:"filename,omitempty"`
-	Size          int64                  `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty"`
-	TeamId        string                 `protobuf:"bytes,4,opt,name=team_id,json=teamId,proto3" json:"team_id,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	Id                 string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Filename           string                 `protobuf:"bytes,2,opt,name=filename,proto3" json:"filename,omitempty"`
+	Size               int64                  `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty"`
+	TeamId             string                 `protobuf:"bytes,4,opt,name=team_id,json=teamId,proto3" json:"team_id,omitempty"`
+	CreatedAt          *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	ExpiresAt          *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	PublicUrl          *string                `protobuf:"bytes,7,opt,name=public_url,json=publicUrl,proto3,oneof" json:"public_url,omitempty"`
+	PublicUrlExpiresAt *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=public_url_expires_at,json=publicUrlExpiresAt,proto3,oneof" json:"public_url_expires_at,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *File) Reset() {
@@ -197,6 +199,20 @@ func (x *File) GetCreatedAt() *timestamppb.Timestamp {
 func (x *File) GetExpiresAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.ExpiresAt
+	}
+	return nil
+}
+
+func (x *File) GetPublicUrl() string {
+	if x != nil && x.PublicUrl != nil {
+		return *x.PublicUrl
+	}
+	return ""
+}
+
+func (x *File) GetPublicUrlExpiresAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.PublicUrlExpiresAt
 	}
 	return nil
 }
@@ -311,6 +327,7 @@ type ListFilesRequest struct {
 	Order           FilesOrdering          `protobuf:"varint,2,opt,name=order,proto3,enum=xai_api.FilesOrdering" json:"order,omitempty"`
 	PaginationToken string                 `protobuf:"bytes,3,opt,name=pagination_token,json=paginationToken,proto3" json:"pagination_token,omitempty"`
 	SortBy          FilesSortBy            `protobuf:"varint,4,opt,name=sort_by,json=sortBy,proto3,enum=xai_api.FilesSortBy" json:"sort_by,omitempty"`
+	Filter          *string                `protobuf:"bytes,5,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -371,6 +388,13 @@ func (x *ListFilesRequest) GetSortBy() FilesSortBy {
 		return x.SortBy
 	}
 	return FilesSortBy_FILES_SORT_BY_CREATED_AT
+}
+
+func (x *ListFilesRequest) GetFilter() string {
+	if x != nil && x.Filter != nil {
+		return *x.Filter
+	}
+	return ""
 }
 
 type ListFilesResponse struct {
@@ -725,11 +749,219 @@ func (x *RetrieveFileURLResponse) GetUrl() string {
 	return ""
 }
 
+type CreatePublicUrlRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FileId        string                 `protobuf:"bytes,1,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+	ExpiresAfter  *int64                 `protobuf:"varint,2,opt,name=expires_after,json=expiresAfter,proto3,oneof" json:"expires_after,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreatePublicUrlRequest) Reset() {
+	*x = CreatePublicUrlRequest{}
+	mi := &file_xai_api_v1_files_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreatePublicUrlRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreatePublicUrlRequest) ProtoMessage() {}
+
+func (x *CreatePublicUrlRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_api_v1_files_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreatePublicUrlRequest.ProtoReflect.Descriptor instead.
+func (*CreatePublicUrlRequest) Descriptor() ([]byte, []int) {
+	return file_xai_api_v1_files_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *CreatePublicUrlRequest) GetFileId() string {
+	if x != nil {
+		return x.FileId
+	}
+	return ""
+}
+
+func (x *CreatePublicUrlRequest) GetExpiresAfter() int64 {
+	if x != nil && x.ExpiresAfter != nil {
+		return *x.ExpiresAfter
+	}
+	return 0
+}
+
+type CreatePublicUrlResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PublicUrl     string                 `protobuf:"bytes,1,opt,name=public_url,json=publicUrl,proto3" json:"public_url,omitempty"`
+	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=expires_at,json=expiresAt,proto3,oneof" json:"expires_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreatePublicUrlResponse) Reset() {
+	*x = CreatePublicUrlResponse{}
+	mi := &file_xai_api_v1_files_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreatePublicUrlResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreatePublicUrlResponse) ProtoMessage() {}
+
+func (x *CreatePublicUrlResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_api_v1_files_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreatePublicUrlResponse.ProtoReflect.Descriptor instead.
+func (*CreatePublicUrlResponse) Descriptor() ([]byte, []int) {
+	return file_xai_api_v1_files_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *CreatePublicUrlResponse) GetPublicUrl() string {
+	if x != nil {
+		return x.PublicUrl
+	}
+	return ""
+}
+
+func (x *CreatePublicUrlResponse) GetExpiresAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return nil
+}
+
+type RevokePublicUrlRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FileId        string                 `protobuf:"bytes,1,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RevokePublicUrlRequest) Reset() {
+	*x = RevokePublicUrlRequest{}
+	mi := &file_xai_api_v1_files_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RevokePublicUrlRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RevokePublicUrlRequest) ProtoMessage() {}
+
+func (x *RevokePublicUrlRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_api_v1_files_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RevokePublicUrlRequest.ProtoReflect.Descriptor instead.
+func (*RevokePublicUrlRequest) Descriptor() ([]byte, []int) {
+	return file_xai_api_v1_files_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *RevokePublicUrlRequest) GetFileId() string {
+	if x != nil {
+		return x.FileId
+	}
+	return ""
+}
+
+type RevokePublicUrlResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FileId        string                 `protobuf:"bytes,1,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+	Revoked       bool                   `protobuf:"varint,2,opt,name=revoked,proto3" json:"revoked,omitempty"`
+	PublicUrl     *string                `protobuf:"bytes,3,opt,name=public_url,json=publicUrl,proto3,oneof" json:"public_url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RevokePublicUrlResponse) Reset() {
+	*x = RevokePublicUrlResponse{}
+	mi := &file_xai_api_v1_files_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RevokePublicUrlResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RevokePublicUrlResponse) ProtoMessage() {}
+
+func (x *RevokePublicUrlResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_api_v1_files_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RevokePublicUrlResponse.ProtoReflect.Descriptor instead.
+func (*RevokePublicUrlResponse) Descriptor() ([]byte, []int) {
+	return file_xai_api_v1_files_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *RevokePublicUrlResponse) GetFileId() string {
+	if x != nil {
+		return x.FileId
+	}
+	return ""
+}
+
+func (x *RevokePublicUrlResponse) GetRevoked() bool {
+	if x != nil {
+		return x.Revoked
+	}
+	return false
+}
+
+func (x *RevokePublicUrlResponse) GetPublicUrl() string {
+	if x != nil && x.PublicUrl != nil {
+		return *x.PublicUrl
+	}
+	return ""
+}
+
 var File_xai_api_v1_files_proto protoreflect.FileDescriptor
 
 const file_xai_api_v1_files_proto_rawDesc = "" +
 	"\n" +
-	"\x16xai/api/v1/files.proto\x12\axai_api\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd5\x01\n" +
+	"\x16xai/api/v1/files.proto\x12\axai_api\x1a\x1fgoogle/protobuf/timestamp.proto\"\xf6\x02\n" +
 	"\x04File\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\bfilename\x18\x02 \x01(\tR\bfilename\x12\x12\n" +
@@ -738,18 +970,25 @@ const file_xai_api_v1_files_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"expires_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"R\n" +
+	"expires_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x12\"\n" +
+	"\n" +
+	"public_url\x18\a \x01(\tH\x00R\tpublicUrl\x88\x01\x01\x12R\n" +
+	"\x15public_url_expires_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampH\x01R\x12publicUrlExpiresAt\x88\x01\x01B\r\n" +
+	"\v_public_urlB\x18\n" +
+	"\x16_public_url_expires_at\"R\n" +
 	"\x0fUploadFileChunk\x12+\n" +
 	"\x04init\x18\x01 \x01(\v2\x17.xai_api.UploadFileInitR\x04init\x12\x12\n" +
 	"\x04data\x18\x02 \x01(\fR\x04data\">\n" +
 	"\x0eUploadFileInit\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
-	"\apurpose\x18\x02 \x01(\tR\apurpose\"\xb0\x01\n" +
+	"\apurpose\x18\x02 \x01(\tR\apurpose\"\xd8\x01\n" +
 	"\x10ListFilesRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12,\n" +
 	"\x05order\x18\x02 \x01(\x0e2\x16.xai_api.FilesOrderingR\x05order\x12)\n" +
 	"\x10pagination_token\x18\x03 \x01(\tR\x0fpaginationToken\x12-\n" +
-	"\asort_by\x18\x04 \x01(\x0e2\x14.xai_api.FilesSortByR\x06sortBy\"a\n" +
+	"\asort_by\x18\x04 \x01(\x0e2\x14.xai_api.FilesSortByR\x06sortBy\x12\x1b\n" +
+	"\x06filter\x18\x05 \x01(\tH\x00R\x06filter\x88\x01\x01B\t\n" +
+	"\a_filter\"a\n" +
 	"\x11ListFilesResponse\x12!\n" +
 	"\x04data\x18\x01 \x03(\v2\r.xai_api.FileR\x04data\x12)\n" +
 	"\x10pagination_token\x18\x02 \x01(\tR\x0fpaginationToken\")\n" +
@@ -765,14 +1004,32 @@ const file_xai_api_v1_files_proto_rawDesc = "" +
 	"\x16RetrieveFileURLRequest\x12\x17\n" +
 	"\afile_id\x18\x01 \x01(\tR\x06fileId\"+\n" +
 	"\x17RetrieveFileURLResponse\x12\x10\n" +
-	"\x03url\x18\x01 \x01(\tR\x03url*@\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url\"m\n" +
+	"\x16CreatePublicUrlRequest\x12\x17\n" +
+	"\afile_id\x18\x01 \x01(\tR\x06fileId\x12(\n" +
+	"\rexpires_after\x18\x02 \x01(\x03H\x00R\fexpiresAfter\x88\x01\x01B\x10\n" +
+	"\x0e_expires_after\"\x87\x01\n" +
+	"\x17CreatePublicUrlResponse\x12\x1d\n" +
+	"\n" +
+	"public_url\x18\x01 \x01(\tR\tpublicUrl\x12>\n" +
+	"\n" +
+	"expires_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\texpiresAt\x88\x01\x01B\r\n" +
+	"\v_expires_at\"1\n" +
+	"\x16RevokePublicUrlRequest\x12\x17\n" +
+	"\afile_id\x18\x01 \x01(\tR\x06fileId\"\x7f\n" +
+	"\x17RevokePublicUrlResponse\x12\x17\n" +
+	"\afile_id\x18\x01 \x01(\tR\x06fileId\x12\x18\n" +
+	"\arevoked\x18\x02 \x01(\bR\arevoked\x12\"\n" +
+	"\n" +
+	"public_url\x18\x03 \x01(\tH\x00R\tpublicUrl\x88\x01\x01B\r\n" +
+	"\v_public_url*@\n" +
 	"\rFilesOrdering\x12\x17\n" +
 	"\x13FILES_ORDERING_DESC\x10\x00\x12\x16\n" +
 	"\x12FILES_ORDERING_ASC\x10\x01*[\n" +
 	"\vFilesSortBy\x12\x1c\n" +
 	"\x18FILES_SORT_BY_CREATED_AT\x10\x00\x12\x16\n" +
 	"\x12FILES_SORT_BY_SIZE\x10\x01\x12\x16\n" +
-	"\x12FILES_SORT_BY_NAME\x10\x022\xaf\x03\n" +
+	"\x12FILES_SORT_BY_NAME\x10\x022\xdf\x04\n" +
 	"\x05Files\x129\n" +
 	"\n" +
 	"UploadFile\x12\x18.xai_api.UploadFileChunk\x1a\r.xai_api.File\"\x00(\x01\x12D\n" +
@@ -781,7 +1038,9 @@ const file_xai_api_v1_files_proto_rawDesc = "" +
 	"\n" +
 	"DeleteFile\x12\x1a.xai_api.DeleteFileRequest\x1a\x1b.xai_api.DeleteFileResponse\"\x00\x12O\n" +
 	"\x0eGetFileContent\x12\x1e.xai_api.GetFileContentRequest\x1a\x19.xai_api.FileContentChunk\"\x000\x01\x12V\n" +
-	"\x0fRetrieveFileURL\x12\x1f.xai_api.RetrieveFileURLRequest\x1a .xai_api.RetrieveFileURLResponse\"\x00B\x8b\x01\n" +
+	"\x0fRetrieveFileURL\x12\x1f.xai_api.RetrieveFileURLRequest\x1a .xai_api.RetrieveFileURLResponse\"\x00\x12V\n" +
+	"\x0fCreatePublicUrl\x12\x1f.xai_api.CreatePublicUrlRequest\x1a .xai_api.CreatePublicUrlResponse\"\x00\x12V\n" +
+	"\x0fRevokePublicUrl\x12\x1f.xai_api.RevokePublicUrlRequest\x1a .xai_api.RevokePublicUrlResponse\"\x00B\x8b\x01\n" +
 	"\vcom.xai_apiB\n" +
 	"FilesProtoP\x01Z8github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1\xa2\x02\x03XXX\xaa\x02\x06XaiApi\xca\x02\x06XaiApi\xe2\x02\x12XaiApi\\GPBMetadata\xea\x02\x06XaiApib\x06proto3"
 
@@ -798,7 +1057,7 @@ func file_xai_api_v1_files_proto_rawDescGZIP() []byte {
 }
 
 var file_xai_api_v1_files_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_xai_api_v1_files_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_xai_api_v1_files_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_xai_api_v1_files_proto_goTypes = []any{
 	(FilesOrdering)(0),              // 0: xai_api.FilesOrdering
 	(FilesSortBy)(0),                // 1: xai_api.FilesSortBy
@@ -814,32 +1073,42 @@ var file_xai_api_v1_files_proto_goTypes = []any{
 	(*FileContentChunk)(nil),        // 11: xai_api.FileContentChunk
 	(*RetrieveFileURLRequest)(nil),  // 12: xai_api.RetrieveFileURLRequest
 	(*RetrieveFileURLResponse)(nil), // 13: xai_api.RetrieveFileURLResponse
-	(*timestamppb.Timestamp)(nil),   // 14: google.protobuf.Timestamp
+	(*CreatePublicUrlRequest)(nil),  // 14: xai_api.CreatePublicUrlRequest
+	(*CreatePublicUrlResponse)(nil), // 15: xai_api.CreatePublicUrlResponse
+	(*RevokePublicUrlRequest)(nil),  // 16: xai_api.RevokePublicUrlRequest
+	(*RevokePublicUrlResponse)(nil), // 17: xai_api.RevokePublicUrlResponse
+	(*timestamppb.Timestamp)(nil),   // 18: google.protobuf.Timestamp
 }
 var file_xai_api_v1_files_proto_depIdxs = []int32{
-	14, // 0: xai_api.File.created_at:type_name -> google.protobuf.Timestamp
-	14, // 1: xai_api.File.expires_at:type_name -> google.protobuf.Timestamp
-	4,  // 2: xai_api.UploadFileChunk.init:type_name -> xai_api.UploadFileInit
-	0,  // 3: xai_api.ListFilesRequest.order:type_name -> xai_api.FilesOrdering
-	1,  // 4: xai_api.ListFilesRequest.sort_by:type_name -> xai_api.FilesSortBy
-	2,  // 5: xai_api.ListFilesResponse.data:type_name -> xai_api.File
-	3,  // 6: xai_api.Files.UploadFile:input_type -> xai_api.UploadFileChunk
-	5,  // 7: xai_api.Files.ListFiles:input_type -> xai_api.ListFilesRequest
-	7,  // 8: xai_api.Files.GetFile:input_type -> xai_api.GetFileRequest
-	8,  // 9: xai_api.Files.DeleteFile:input_type -> xai_api.DeleteFileRequest
-	10, // 10: xai_api.Files.GetFileContent:input_type -> xai_api.GetFileContentRequest
-	12, // 11: xai_api.Files.RetrieveFileURL:input_type -> xai_api.RetrieveFileURLRequest
-	2,  // 12: xai_api.Files.UploadFile:output_type -> xai_api.File
-	6,  // 13: xai_api.Files.ListFiles:output_type -> xai_api.ListFilesResponse
-	2,  // 14: xai_api.Files.GetFile:output_type -> xai_api.File
-	9,  // 15: xai_api.Files.DeleteFile:output_type -> xai_api.DeleteFileResponse
-	11, // 16: xai_api.Files.GetFileContent:output_type -> xai_api.FileContentChunk
-	13, // 17: xai_api.Files.RetrieveFileURL:output_type -> xai_api.RetrieveFileURLResponse
-	12, // [12:18] is the sub-list for method output_type
-	6,  // [6:12] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	18, // 0: xai_api.File.created_at:type_name -> google.protobuf.Timestamp
+	18, // 1: xai_api.File.expires_at:type_name -> google.protobuf.Timestamp
+	18, // 2: xai_api.File.public_url_expires_at:type_name -> google.protobuf.Timestamp
+	4,  // 3: xai_api.UploadFileChunk.init:type_name -> xai_api.UploadFileInit
+	0,  // 4: xai_api.ListFilesRequest.order:type_name -> xai_api.FilesOrdering
+	1,  // 5: xai_api.ListFilesRequest.sort_by:type_name -> xai_api.FilesSortBy
+	2,  // 6: xai_api.ListFilesResponse.data:type_name -> xai_api.File
+	18, // 7: xai_api.CreatePublicUrlResponse.expires_at:type_name -> google.protobuf.Timestamp
+	3,  // 8: xai_api.Files.UploadFile:input_type -> xai_api.UploadFileChunk
+	5,  // 9: xai_api.Files.ListFiles:input_type -> xai_api.ListFilesRequest
+	7,  // 10: xai_api.Files.GetFile:input_type -> xai_api.GetFileRequest
+	8,  // 11: xai_api.Files.DeleteFile:input_type -> xai_api.DeleteFileRequest
+	10, // 12: xai_api.Files.GetFileContent:input_type -> xai_api.GetFileContentRequest
+	12, // 13: xai_api.Files.RetrieveFileURL:input_type -> xai_api.RetrieveFileURLRequest
+	14, // 14: xai_api.Files.CreatePublicUrl:input_type -> xai_api.CreatePublicUrlRequest
+	16, // 15: xai_api.Files.RevokePublicUrl:input_type -> xai_api.RevokePublicUrlRequest
+	2,  // 16: xai_api.Files.UploadFile:output_type -> xai_api.File
+	6,  // 17: xai_api.Files.ListFiles:output_type -> xai_api.ListFilesResponse
+	2,  // 18: xai_api.Files.GetFile:output_type -> xai_api.File
+	9,  // 19: xai_api.Files.DeleteFile:output_type -> xai_api.DeleteFileResponse
+	11, // 20: xai_api.Files.GetFileContent:output_type -> xai_api.FileContentChunk
+	13, // 21: xai_api.Files.RetrieveFileURL:output_type -> xai_api.RetrieveFileURLResponse
+	15, // 22: xai_api.Files.CreatePublicUrl:output_type -> xai_api.CreatePublicUrlResponse
+	17, // 23: xai_api.Files.RevokePublicUrl:output_type -> xai_api.RevokePublicUrlResponse
+	16, // [16:24] is the sub-list for method output_type
+	8,  // [8:16] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_xai_api_v1_files_proto_init() }
@@ -847,13 +1116,18 @@ func file_xai_api_v1_files_proto_init() {
 	if File_xai_api_v1_files_proto != nil {
 		return
 	}
+	file_xai_api_v1_files_proto_msgTypes[0].OneofWrappers = []any{}
+	file_xai_api_v1_files_proto_msgTypes[3].OneofWrappers = []any{}
+	file_xai_api_v1_files_proto_msgTypes[12].OneofWrappers = []any{}
+	file_xai_api_v1_files_proto_msgTypes[13].OneofWrappers = []any{}
+	file_xai_api_v1_files_proto_msgTypes[15].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_xai_api_v1_files_proto_rawDesc), len(file_xai_api_v1_files_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   12,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

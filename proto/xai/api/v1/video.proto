@@ -8,6 +8,7 @@ import "xai/api/v1/usage.proto";
 
 message VideoUrlContent {
   string url = 1;
+  string file_id = 2;
 }
 
 message VideoOutput {
@@ -18,6 +19,8 @@ message GeneratedVideo {
   string url = 1;
   int32 duration = 4;
   bool respect_moderation = 5;
+  optional FileOutput file_output = 6;
+  optional string storage_error = 7;
 }
 
 message GenerateVideoRequest {
@@ -29,6 +32,7 @@ message GenerateVideoRequest {
   optional VideoAspectRatio aspect_ratio = 7;
   optional VideoResolution resolution = 8;
   repeated ImageUrlContent reference_images = 13;
+  optional StorageOptions storage_options = 14;
 }
 
 message GetDeferredVideoRequest {
@@ -58,6 +62,7 @@ message ExtendVideoRequest {
   VideoUrlContent video = 2;
   string model = 3;
   optional int32 duration = 4;
+  optional StorageOptions storage_options = 6;
 }
 
 enum VideoAspectRatio {

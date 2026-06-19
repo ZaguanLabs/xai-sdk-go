@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.17.0] - 2026-06-19
+
+### Focus: Python SDK v1.17.0 Parity
+
+### Added
+
+- Added Files API public URL support with `files.Client.CreatePublicURL()` and `files.Client.RevokePublicURL()`.
+- Added `files.ListOptions.Filter` for server-side Files API list filtering.
+- Added generated proto support for image/video generation storage options, file output metadata, storage errors, public URL metadata, and file-ID inputs.
+- Added image request helpers for `image_file_id`, multi-reference image file IDs, and Files API storage options.
+- Added video generation and extension helpers for image/video file IDs, reference image file IDs, and Files API storage options.
+- Added image/video response accessors for stored file output, storage errors, public URLs, and public URL errors.
+
+### Fixed
+
+- Regenerated protos with a managed-mode exception for Google APIs so `google/rpc/status.proto` resolves to the canonical `google.golang.org/genproto` package.
+- Corrected REST request handling so pre-marshaled protobuf JSON is sent as raw JSON instead of being JSON-encoded as bytes.
+
 ## [1.15.0] - 2026-06-04
 
 ### 🎯 Focus: Python SDK v1.15.0 Parity

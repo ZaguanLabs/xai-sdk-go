@@ -29,12 +29,14 @@ func NewClient(restClient *rest.Client) *Client {
 
 // File represents a file with metadata.
 type File struct {
-	ID        string
-	Filename  string
-	Size      int64
-	CreatedAt time.Time
-	ExpiresAt time.Time
-	TeamID    string
+	ID                 string
+	Filename           string
+	Size               int64
+	CreatedAt          time.Time
+	ExpiresAt          time.Time
+	TeamID             string
+	PublicURL          string
+	PublicURLExpiresAt time.Time
 }
 
 // ListOptions contains options for listing files.
@@ -43,6 +45,7 @@ type ListOptions struct {
 	Order           xaiv1.FilesOrdering
 	PaginationToken string
 	SortBy          xaiv1.FilesSortBy
+	Filter          string
 }
 
 // ListResult contains the result of a list operation.
@@ -57,6 +60,48 @@ type UploadOptions struct {
 	Purpose string
 	// MaxSize is the maximum file size in bytes. If 0, defaults to DefaultMaxFileSize (100MB).
 	MaxSize int64
+}
+
+// PublicURLOptions configures public URL creation for stored generated assets.
+type PublicURLOptions struct {
+	ExpiresAfter time.Duration
+}
+
+// StorageOptions configures Files API persistence for generated images and videos.
+type StorageOptions struct {
+	Filename     string
+	ExpiresAfter time.Duration
+	PublicURL    *PublicURLOptions
+}
+
+// PublicURLWithDefaults requests a public URL using the API's default expiry behavior.
+func PublicURLWithDefaults() *PublicURLOptions {
+	return &PublicURLOptions{}
+}
+
+// PublicURLWithExpiry requests a public URL with an independent expiry.
+func PublicURLWithExpiry(expiresAfter time.Duration) *PublicURLOptions {
+	return &PublicURLOptions{ExpiresAfter: expiresAfter}
+}
+
+// Proto converts storage options into the generated protobuf form.
+func (o *StorageOptions) Proto() *xaiv1.StorageOptions {
+	if o == nil {
+		return nil
+	}
+	pb := &xaiv1.StorageOptions{Filename: o.Filename}
+	if o.ExpiresAfter != 0 {
+		seconds := int64(o.ExpiresAfter.Seconds())
+		pb.ExpiresAfter = &seconds
+	}
+	if o.PublicURL != nil {
+		pb.PublicUrl = &xaiv1.PublicUrlOptions{}
+		if o.PublicURL.ExpiresAfter != 0 {
+			seconds := int64(o.PublicURL.ExpiresAfter.Seconds())
+			pb.PublicUrl.ExpiresAfter = &seconds
+		}
+	}
+	return pb
 }
 
 // fromProto converts a proto File to a File.
@@ -78,6 +123,12 @@ func fromProto(pf *xaiv1.File) *File {
 
 	if pf.ExpiresAt != nil {
 		f.ExpiresAt = pf.ExpiresAt.AsTime()
+	}
+	if pf.GetPublicUrl() != "" {
+		f.PublicURL = pf.GetPublicUrl()
+	}
+	if pf.PublicUrlExpiresAt != nil {
+		f.PublicURLExpiresAt = pf.PublicUrlExpiresAt.AsTime()
 	}
 
 	return f
@@ -180,6 +231,9 @@ func (c *Client) List(ctx context.Context, opts *ListOptions) (*ListResult, erro
 		req.Order = opts.Order
 		req.PaginationToken = opts.PaginationToken
 		req.SortBy = opts.SortBy
+		if opts.Filter != "" {
+			req.Filter = &opts.Filter
+		}
 	}
 
 	jsonData, err := protojson.Marshal(req)
@@ -206,6 +260,53 @@ func (c *Client) List(ctx context.Context, opts *ListOptions) (*ListResult, erro
 		Files:           files,
 		PaginationToken: listResp.PaginationToken,
 	}, nil
+}
+
+// CreatePublicURL creates a publicly shareable URL for a stored file.
+func (c *Client) CreatePublicURL(ctx context.Context, fileID string, expiresAfter time.Duration) (*xaiv1.CreatePublicUrlResponse, error) {
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+
+	req := &xaiv1.CreatePublicUrlRequest{FileId: fileID}
+	if expiresAfter != 0 {
+		seconds := int64(expiresAfter.Seconds())
+		req.ExpiresAfter = &seconds
+	}
+
+	jsonData, err := protojson.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.restClient.Post(ctx, fmt.Sprintf("/files/%s/public-url", fileID), jsonData)
+	if err != nil {
+		return nil, err
+	}
+
+	var publicURLResp xaiv1.CreatePublicUrlResponse
+	if err := protojson.Unmarshal(resp.Body, &publicURLResp); err != nil {
+		return nil, err
+	}
+	return &publicURLResp, nil
+}
+
+// RevokePublicURL revokes the public URL for a stored file.
+func (c *Client) RevokePublicURL(ctx context.Context, fileID string) (*xaiv1.RevokePublicUrlResponse, error) {
+	if c.restClient == nil {
+		return nil, ErrClientNotInitialized
+	}
+
+	resp, err := c.restClient.Delete(ctx, fmt.Sprintf("/files/%s/public-url", fileID))
+	if err != nil {
+		return nil, err
+	}
+
+	var revokeResp xaiv1.RevokePublicUrlResponse
+	if err := protojson.Unmarshal(resp.Body, &revokeResp); err != nil {
+		return nil, err
+	}
+	return &revokeResp, nil
 }
 
 // Get retrieves file metadata by ID.

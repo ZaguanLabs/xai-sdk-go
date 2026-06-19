@@ -7,6 +7,7 @@ import (
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/cost"
+	"github.com/ZaguanLabs/xai-sdk-go/xai/files"
 )
 
 const (
@@ -19,14 +20,18 @@ type Client struct {
 }
 
 type GenerateOptions struct {
-	ImageURL           string
-	VideoURL           string
-	ReferenceImageURLs []string
-	Duration           *int32
-	AspectRatio        *xaiv1.VideoAspectRatio
-	Resolution         *xaiv1.VideoResolution
-	Timeout            time.Duration
-	Interval           time.Duration
+	ImageURL              string
+	ImageFileID           string
+	VideoURL              string
+	VideoFileID           string
+	ReferenceImageURLs    []string
+	ReferenceImageFileIDs []string
+	Storage               *files.StorageOptions
+	Duration              *int32
+	AspectRatio           *xaiv1.VideoAspectRatio
+	Resolution            *xaiv1.VideoResolution
+	Timeout               time.Duration
+	Interval              time.Duration
 }
 
 type Response struct {
@@ -89,6 +94,34 @@ func (r *Response) RespectModeration() bool {
 	return r.proto.Video.RespectModeration
 }
 
+func (r *Response) FileOutput() *xaiv1.FileOutput {
+	if r == nil || r.proto == nil || r.proto.Video == nil {
+		return nil
+	}
+	return r.proto.Video.GetFileOutput()
+}
+
+func (r *Response) StorageError() string {
+	if r == nil || r.proto == nil || r.proto.Video == nil {
+		return ""
+	}
+	return r.proto.Video.GetStorageError()
+}
+
+func (r *Response) PublicURL() string {
+	if output := r.FileOutput(); output != nil {
+		return output.GetPublicUrl()
+	}
+	return ""
+}
+
+func (r *Response) PublicURLError() string {
+	if output := r.FileOutput(); output != nil {
+		return output.GetPublicUrlError()
+	}
+	return ""
+}
+
 func NewClient(grpcClient xaiv1.VideoClient) *Client {
 	return &Client{grpcClient: grpcClient}
 }
@@ -106,13 +139,20 @@ func NewGenerateRequestWithOptions(prompt, model string, opts *GenerateOptions) 
 		return req
 	}
 	if opts.ImageURL != "" {
-		req.Image = &xaiv1.ImageUrlContent{ImageUrl: opts.ImageURL}
+		req.Image = imageURLContent(opts.ImageURL)
+	} else if opts.ImageFileID != "" {
+		req.Image = imageFileContent(opts.ImageFileID)
 	}
 	if opts.VideoURL != "" {
-		req.Video = &xaiv1.VideoUrlContent{Url: opts.VideoURL}
+		req.Video = videoURLContent(opts.VideoURL)
+	} else if opts.VideoFileID != "" {
+		req.Video = videoFileContent(opts.VideoFileID)
+	}
+	for _, fileID := range opts.ReferenceImageFileIDs {
+		req.ReferenceImages = append(req.ReferenceImages, imageFileContent(fileID))
 	}
 	for _, imageURL := range opts.ReferenceImageURLs {
-		req.ReferenceImages = append(req.ReferenceImages, &xaiv1.ImageUrlContent{ImageUrl: imageURL})
+		req.ReferenceImages = append(req.ReferenceImages, imageURLContent(imageURL))
 	}
 	if opts.Duration != nil {
 		req.Duration = opts.Duration
@@ -123,16 +163,62 @@ func NewGenerateRequestWithOptions(prompt, model string, opts *GenerateOptions) 
 	if opts.Resolution != nil {
 		req.Resolution = opts.Resolution
 	}
+	if opts.Storage != nil {
+		req.StorageOptions = opts.Storage.Proto()
+	}
 	return req
 }
 
 func NewExtendRequest(prompt, model, videoURL string, duration *int32) *xaiv1.ExtendVideoRequest {
+	return NewExtendRequestWithOptions(prompt, model, videoURL, duration, nil)
+}
+
+func NewExtendRequestWithOptions(prompt, model, videoURL string, duration *int32, opts *GenerateOptions) *xaiv1.ExtendVideoRequest {
+	video := videoURLContent(videoURL)
+	if opts != nil && opts.VideoFileID != "" {
+		video = videoFileContent(opts.VideoFileID)
+	}
+	req := &xaiv1.ExtendVideoRequest{
+		Prompt:   prompt,
+		Model:    model,
+		Video:    video,
+		Duration: duration,
+	}
+	if opts != nil && opts.Storage != nil {
+		req.StorageOptions = opts.Storage.Proto()
+	}
+	return req
+}
+
+func NewExtendRequestFromFileID(prompt, model, videoFileID string, duration *int32) *xaiv1.ExtendVideoRequest {
 	return &xaiv1.ExtendVideoRequest{
 		Prompt:   prompt,
 		Model:    model,
-		Video:    &xaiv1.VideoUrlContent{Url: videoURL},
+		Video:    videoFileContent(videoFileID),
 		Duration: duration,
 	}
+}
+
+func imageURLContent(imageURL string) *xaiv1.ImageUrlContent {
+	return &xaiv1.ImageUrlContent{
+		ImageUrl: imageURL,
+		Detail:   xaiv1.ImageDetail_DETAIL_AUTO,
+	}
+}
+
+func imageFileContent(fileID string) *xaiv1.ImageUrlContent {
+	return &xaiv1.ImageUrlContent{
+		FileId: fileID,
+		Detail: xaiv1.ImageDetail_DETAIL_AUTO,
+	}
+}
+
+func videoURLContent(videoURL string) *xaiv1.VideoUrlContent {
+	return &xaiv1.VideoUrlContent{Url: videoURL}
+}
+
+func videoFileContent(fileID string) *xaiv1.VideoUrlContent {
+	return &xaiv1.VideoUrlContent{FileId: fileID}
 }
 
 func Prepare(prompt, model, batchRequestID string, opts *GenerateOptions) *xaiv1.BatchRequest {
@@ -149,7 +235,11 @@ func Prepare(prompt, model, batchRequestID string, opts *GenerateOptions) *xaiv1
 }
 
 func PrepareExtension(prompt, model, videoURL, batchRequestID string, duration *int32) *xaiv1.BatchRequest {
-	req := NewExtendRequest(prompt, model, videoURL, duration)
+	return PrepareExtensionWithOptions(prompt, model, videoURL, batchRequestID, duration, nil)
+}
+
+func PrepareExtensionWithOptions(prompt, model, videoURL, batchRequestID string, duration *int32, opts *GenerateOptions) *xaiv1.BatchRequest {
+	req := NewExtendRequestWithOptions(prompt, model, videoURL, duration, opts)
 	batchReq := &xaiv1.BatchRequest{
 		Request: &xaiv1.BatchRequest_VideoExtensionRequest{
 			VideoExtensionRequest: req,
@@ -169,6 +259,10 @@ func (c *Client) PrepareExtension(prompt, model, videoURL, batchRequestID string
 	return PrepareExtension(prompt, model, videoURL, batchRequestID, duration)
 }
 
+func (c *Client) PrepareExtensionWithOptions(prompt, model, videoURL, batchRequestID string, duration *int32, opts *GenerateOptions) *xaiv1.BatchRequest {
+	return PrepareExtensionWithOptions(prompt, model, videoURL, batchRequestID, duration, opts)
+}
+
 func (c *Client) GenerateDeferred(ctx context.Context, req *xaiv1.GenerateVideoRequest) (*xaiv1.StartDeferredResponse, error) {
 	if c.grpcClient == nil {
 		return nil, fmt.Errorf("video client not initialized")
@@ -181,10 +275,14 @@ func (c *Client) Start(ctx context.Context, prompt, model string, opts *Generate
 }
 
 func (c *Client) ExtendStart(ctx context.Context, prompt, model, videoURL string, duration *int32) (*xaiv1.StartDeferredResponse, error) {
+	return c.ExtendStartWithOptions(ctx, prompt, model, videoURL, duration, nil)
+}
+
+func (c *Client) ExtendStartWithOptions(ctx context.Context, prompt, model, videoURL string, duration *int32, opts *GenerateOptions) (*xaiv1.StartDeferredResponse, error) {
 	if c.grpcClient == nil {
 		return nil, fmt.Errorf("video client not initialized")
 	}
-	return c.grpcClient.ExtendVideo(ctx, NewExtendRequest(prompt, model, videoURL, duration))
+	return c.grpcClient.ExtendVideo(ctx, NewExtendRequestWithOptions(prompt, model, videoURL, duration, opts))
 }
 
 func (c *Client) GetDeferred(ctx context.Context, requestID string) (*xaiv1.GetDeferredVideoResponse, error) {
@@ -217,7 +315,7 @@ func (c *Client) GenerateSync(ctx context.Context, prompt, model string, opts *G
 }
 
 func (c *Client) Extend(ctx context.Context, prompt, model, videoURL string, duration *int32, opts *GenerateOptions) (*xaiv1.VideoResponse, error) {
-	start, err := c.ExtendStart(ctx, prompt, model, videoURL, duration)
+	start, err := c.ExtendStartWithOptions(ctx, prompt, model, videoURL, duration, opts)
 	if err != nil {
 		return nil, err
 	}
