@@ -8,7 +8,7 @@
 
 > **Note**: This is an unofficial, community-maintained SDK and is not affiliated with or endorsed by xAI.
 
-> **Status**: **v0.9.0 Released** - Python SDK v1.4.1 parity with include options, inline citations, and tool call type tracking. **Requires Go 1.25+**.
+> **Status**: **v1.17.1 Released** - Python SDK v1.17.1 parity. **Requires Go 1.25+**.
 
 ## ✨ Features
 
@@ -47,7 +47,7 @@
 **Requirements**: Go 1.25 or later
 
 ```bash
-go get github.com/ZaguanLabs/xai-sdk-go@v0.9.0
+go get github.com/ZaguanLabs/xai-sdk-go@v1.17.1
 ```
 
 ### Basic Usage

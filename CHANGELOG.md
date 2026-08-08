@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.17.1] - 2026-08-08
+
+### Focus: Python SDK v1.17.1 Parity
+
+- Updated the Go SDK version to match the official Python SDK v1.17.1 tag.
+- Verified that the upstream v1.17.1 source differs from v1.17.0 only in package version metadata, so no API or behavior changes were required.
+
 ## [1.17.0] - 2026-06-19
 
 ### Focus: Python SDK v1.17.0 Parity
