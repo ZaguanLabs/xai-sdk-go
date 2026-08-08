@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.17.1-security.1] - 2026-08-08
+
+### Security
+
+- Updated `google.golang.org/grpc` from v1.76.0 to v1.82.1 to address GO-2026-6061.
+- Updated the required Go toolchain from 1.25.11 to 1.25.12 to address GO-2026-5856 in `crypto/tls`.
+- Refreshed the matching generated RPC and protobuf dependencies.
+- Verified the release with unit tests, race tests, build, vet, and `govulncheck`.
+
 ## [1.17.1] - 2026-08-08
 
 ### Focus: Python SDK v1.17.1 Parity

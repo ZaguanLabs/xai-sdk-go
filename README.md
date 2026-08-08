@@ -8,7 +8,7 @@
 
 > **Note**: This is an unofficial, community-maintained SDK and is not affiliated with or endorsed by xAI.
 
-> **Status**: **v1.17.1 Released** - Python SDK v1.17.1 parity. **Requires Go 1.25+**.
+> **Status**: **v1.17.1-security.1 Released** - Python SDK v1.17.1 parity with patched Go and gRPC dependencies. **Requires Go 1.25+**.
 
 ## ✨ Features
 
@@ -47,7 +47,7 @@
 **Requirements**: Go 1.25 or later
 
 ```bash
-go get github.com/ZaguanLabs/xai-sdk-go@v1.17.1
+go get github.com/ZaguanLabs/xai-sdk-go@v1.17.1-security.1
 ```
 
 ### Basic Usage
