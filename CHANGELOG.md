@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.18.0] - 2026-08-17
+
+### Focus: Python SDK v1.18.0 Parity
+
+### Added
+
+- Added `xhigh` reasoning effort to generated protobufs and Go conversion helpers.
+- Added `grok-4.6` to the public model catalog.
+- Completed model literal coverage for `grok-4.5`, `grok-4.5-latest`, `grok-build-0.1`, and the current Grok Imagine image/video models.
+- Added the upstream `none` reasoning effort value to generated protobufs and typed helpers.
+
+### Changed
+
+- Updated the SDK version to `1.18.0` while preserving the dependency security baseline from v1.17.1-security.1.
+- Added the Google APIs Buf dependency so checked-in protobuf generation is reproducible.
+
+### Testing
+
+- Added exact model-catalog parity tests and reasoning enum round-trip coverage.
+
 ## [1.17.1-security.1] - 2026-08-08
 
 ### Security

@@ -50,12 +50,16 @@ func roleFromProto(role xaiv1.MessageRole) string {
 // reasoningEffortToProto converts a string to ReasoningEffort enum
 func reasoningEffortToProto(effort string) xaiv1.ReasoningEffort {
 	switch effort {
+	case "none":
+		return xaiv1.ReasoningEffort_EFFORT_NONE
 	case "low":
 		return xaiv1.ReasoningEffort_EFFORT_LOW
 	case "medium":
 		return xaiv1.ReasoningEffort_EFFORT_MEDIUM
 	case "high":
 		return xaiv1.ReasoningEffort_EFFORT_HIGH
+	case "xhigh":
+		return xaiv1.ReasoningEffort_EFFORT_XHIGH
 	default:
 		return xaiv1.ReasoningEffort_INVALID_EFFORT
 	}
@@ -64,12 +68,16 @@ func reasoningEffortToProto(effort string) xaiv1.ReasoningEffort {
 // reasoningEffortFromProto converts ReasoningEffort enum to string
 func reasoningEffortFromProto(effort xaiv1.ReasoningEffort) string {
 	switch effort {
+	case xaiv1.ReasoningEffort_EFFORT_NONE:
+		return "none"
 	case xaiv1.ReasoningEffort_EFFORT_LOW:
 		return "low"
 	case xaiv1.ReasoningEffort_EFFORT_MEDIUM:
 		return "medium"
 	case xaiv1.ReasoningEffort_EFFORT_HIGH:
 		return "high"
+	case xaiv1.ReasoningEffort_EFFORT_XHIGH:
+		return "xhigh"
 	default:
 		return ""
 	}
