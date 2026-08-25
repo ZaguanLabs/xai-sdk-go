@@ -364,6 +364,9 @@ func (c *Config) ToSDKMetadata() *metadata.SDKMetadata {
 // CreateGRPCDialOptions creates gRPC dial options based on the configuration.
 func (c *Config) CreateGRPCDialOptions() ([]grpc.DialOption, error) {
 	var opts []grpc.DialOption
+	if c.UserAgent != "" {
+		opts = append(opts, grpc.WithUserAgent(c.UserAgent))
+	}
 
 	// Configure interceptors
 	var unaryInterceptors []grpc.UnaryClientInterceptor

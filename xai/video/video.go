@@ -20,18 +20,20 @@ type Client struct {
 }
 
 type GenerateOptions struct {
-	ImageURL              string
-	ImageFileID           string
-	VideoURL              string
-	VideoFileID           string
-	ReferenceImageURLs    []string
-	ReferenceImageFileIDs []string
-	Storage               *files.StorageOptions
-	Duration              *int32
-	AspectRatio           *xaiv1.VideoAspectRatio
-	Resolution            *xaiv1.VideoResolution
-	Timeout               time.Duration
-	Interval              time.Duration
+	ImageURL               string
+	ImageFileID            string
+	VideoURL               string
+	VideoFileID            string
+	ReferenceImageURLs     []string
+	ReferenceImageFileIDs  []string
+	ReferenceAudioVoiceIDs []string
+	GenerateAudio          *bool
+	Storage                *files.StorageOptions
+	Duration               *int32
+	AspectRatio            *xaiv1.VideoAspectRatio
+	Resolution             *xaiv1.VideoResolution
+	Timeout                time.Duration
+	Interval               time.Duration
 }
 
 type Response struct {
@@ -153,6 +155,12 @@ func NewGenerateRequestWithOptions(prompt, model string, opts *GenerateOptions) 
 	}
 	for _, imageURL := range opts.ReferenceImageURLs {
 		req.ReferenceImages = append(req.ReferenceImages, imageURLContent(imageURL))
+	}
+	for _, voiceID := range opts.ReferenceAudioVoiceIDs {
+		req.ReferenceAudios = append(req.ReferenceAudios, &xaiv1.AudioUrlContent{VoiceId: &voiceID})
+	}
+	if opts.GenerateAudio != nil {
+		req.GenerateAudio = opts.GenerateAudio
 	}
 	if opts.Duration != nil {
 		req.Duration = opts.Duration

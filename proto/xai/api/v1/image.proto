@@ -36,6 +36,8 @@ message GenerateImageRequest {
   // in. See ImageFormat enum for options.
   ImageFormat format = 11;
 
+  optional ImageQuality quality = 12;
+
   optional ImageAspectRatio aspect_ratio = 14;
 
   optional ImageResolution resolution = 15;

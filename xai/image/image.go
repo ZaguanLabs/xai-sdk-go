@@ -37,6 +37,7 @@ type GenerateRequest struct {
 	Format      xaiv1.ImageFormat
 	AspectRatio *xaiv1.ImageAspectRatio
 	Resolution  *xaiv1.ImageResolution
+	Quality     *xaiv1.ImageQuality
 	Storage     *files.StorageOptions
 }
 
@@ -220,6 +221,11 @@ func (r *GenerateRequest) WithResolution(resolution xaiv1.ImageResolution) *Gene
 	return r
 }
 
+func (r *GenerateRequest) WithQuality(quality xaiv1.ImageQuality) *GenerateRequest {
+	r.Quality = &quality
+	return r
+}
+
 func (r *GenerateRequest) WithStorageOptions(storage *files.StorageOptions) *GenerateRequest {
 	r.Storage = storage
 	return r
@@ -264,6 +270,9 @@ func (r *GenerateRequest) Proto() *xaiv1.GenerateImageRequest {
 	}
 	if r.Resolution != nil {
 		protoReq.Resolution = r.Resolution
+	}
+	if r.Quality != nil {
+		protoReq.Quality = r.Quality
 	}
 	if r.Storage != nil {
 		protoReq.StorageOptions = r.Storage.Proto()

@@ -146,5 +146,5 @@ const (
 var (
 	// DefaultUserAgent is the default User-Agent string.
 	// This dynamically references the version from the version package.
-	DefaultUserAgent = "xai-sdk-go/" + version.SDKVersion
+	DefaultUserAgent = "XaiSdk/" + version.SDKVersion
 )

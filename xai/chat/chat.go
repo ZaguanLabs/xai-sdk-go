@@ -3,9 +3,11 @@ package chat
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"github.com/ZaguanLabs/xai-sdk-go/xai/cost"
@@ -150,6 +152,57 @@ type Request struct {
 // Response represents a chat completion response.
 type Response struct {
 	proto *xaiv1.GetChatCompletionResponse
+}
+
+// ImageGenerationOutput is an image produced by the server-side image-generation tool.
+type ImageGenerationOutput struct {
+	Image     []byte
+	MIMEType  string
+	DataURL   string
+	ImageUUID string
+	ToolCall  *xaiv1.ToolCall
+}
+
+// ImageOutputs returns successfully completed server-side image-generation outputs.
+func (r *Response) ImageOutputs() ([]*ImageGenerationOutput, error) {
+	if r == nil || r.proto == nil {
+		return nil, nil
+	}
+	var images []*ImageGenerationOutput
+	for _, output := range r.proto.Outputs {
+		if output == nil || output.Message == nil || output.Message.Role != xaiv1.MessageRole_ROLE_TOOL {
+			continue
+		}
+		var call *xaiv1.ToolCall
+		for _, candidate := range output.Message.ToolCalls {
+			if candidate.Type == xaiv1.ToolCallType_TOOL_CALL_TYPE_IMAGE_GENERATION_TOOL && candidate.Status == xaiv1.ToolCallStatus_TOOL_CALL_STATUS_COMPLETED {
+				call = candidate
+				break
+			}
+		}
+		if call == nil {
+			continue
+		}
+		var envelope struct {
+			Type      string `json:"__type"`
+			Result    string `json:"result"`
+			ImageUUID string `json:"image_uuid"`
+		}
+		if err := json.Unmarshal([]byte(output.Message.Content), &envelope); err != nil || envelope.Type != "image_generation_result" {
+			return nil, fmt.Errorf("malformed image generation result")
+		}
+		comma := strings.Index(envelope.Result, "base64,")
+		semicolon := strings.Index(envelope.Result, ";")
+		if !strings.HasPrefix(envelope.Result, "data:image/") || comma < 0 || semicolon < len("data:") {
+			return nil, fmt.Errorf("malformed image generation data URL")
+		}
+		data, err := base64.StdEncoding.DecodeString(envelope.Result[comma+len("base64,"):])
+		if err != nil {
+			return nil, fmt.Errorf("decode image generation result: %w", err)
+		}
+		images = append(images, &ImageGenerationOutput{Image: data, MIMEType: envelope.Result[len("data:"):semicolon], DataURL: envelope.Result, ImageUUID: envelope.ImageUUID, ToolCall: call})
+	}
+	return images, nil
 }
 
 // Chunk represents a streaming response chunk.
@@ -407,6 +460,9 @@ func (r *Request) AppendResponse(resp *Response) *Request {
 			ToolCalls:        output.Message.ToolCalls,
 			ReasoningContent: &output.Message.ReasoningContent,
 			EncryptedContent: output.Message.EncryptedContent,
+		}
+		if output.Message.Role == xaiv1.MessageRole_ROLE_TOOL && len(output.Message.ToolCalls) > 0 {
+			msg.ToolCallId = &output.Message.ToolCalls[0].Id
 		}
 
 		r.proto.Messages = append(r.proto.Messages, msg)

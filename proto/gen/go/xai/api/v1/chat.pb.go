@@ -411,19 +411,21 @@ const (
 	ToolCallType_TOOL_CALL_TYPE_MCP_TOOL ToolCallType = 6
 	// Indicates the tool is a server-side attachment_search tool, and client side won't need to execute.
 	ToolCallType_TOOL_CALL_TYPE_ATTACHMENT_SEARCH_TOOL ToolCallType = 7
+	ToolCallType_TOOL_CALL_TYPE_IMAGE_GENERATION_TOOL  ToolCallType = 10
 )
 
 // Enum value maps for ToolCallType.
 var (
 	ToolCallType_name = map[int32]string{
-		0: "TOOL_CALL_TYPE_INVALID",
-		1: "TOOL_CALL_TYPE_CLIENT_SIDE_TOOL",
-		2: "TOOL_CALL_TYPE_WEB_SEARCH_TOOL",
-		3: "TOOL_CALL_TYPE_X_SEARCH_TOOL",
-		4: "TOOL_CALL_TYPE_CODE_EXECUTION_TOOL",
-		5: "TOOL_CALL_TYPE_COLLECTIONS_SEARCH_TOOL",
-		6: "TOOL_CALL_TYPE_MCP_TOOL",
-		7: "TOOL_CALL_TYPE_ATTACHMENT_SEARCH_TOOL",
+		0:  "TOOL_CALL_TYPE_INVALID",
+		1:  "TOOL_CALL_TYPE_CLIENT_SIDE_TOOL",
+		2:  "TOOL_CALL_TYPE_WEB_SEARCH_TOOL",
+		3:  "TOOL_CALL_TYPE_X_SEARCH_TOOL",
+		4:  "TOOL_CALL_TYPE_CODE_EXECUTION_TOOL",
+		5:  "TOOL_CALL_TYPE_COLLECTIONS_SEARCH_TOOL",
+		6:  "TOOL_CALL_TYPE_MCP_TOOL",
+		7:  "TOOL_CALL_TYPE_ATTACHMENT_SEARCH_TOOL",
+		10: "TOOL_CALL_TYPE_IMAGE_GENERATION_TOOL",
 	}
 	ToolCallType_value = map[string]int32{
 		"TOOL_CALL_TYPE_INVALID":                 0,
@@ -434,6 +436,7 @@ var (
 		"TOOL_CALL_TYPE_COLLECTIONS_SEARCH_TOOL": 5,
 		"TOOL_CALL_TYPE_MCP_TOOL":                6,
 		"TOOL_CALL_TYPE_ATTACHMENT_SEARCH_TOOL":  7,
+		"TOOL_CALL_TYPE_IMAGE_GENERATION_TOOL":   10,
 	}
 )
 
@@ -2328,6 +2331,7 @@ type Tool struct {
 	//	*Tool_CollectionsSearch
 	//	*Tool_Mcp
 	//	*Tool_AttachmentSearch
+	//	*Tool_ImageGeneration
 	Tool          isTool_Tool `protobuf_oneof:"tool"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2433,6 +2437,15 @@ func (x *Tool) GetAttachmentSearch() *AttachmentSearch {
 	return nil
 }
 
+func (x *Tool) GetImageGeneration() *ImageGeneration {
+	if x != nil {
+		if x, ok := x.Tool.(*Tool_ImageGeneration); ok {
+			return x.ImageGeneration
+		}
+	}
+	return nil
+}
+
 type isTool_Tool interface {
 	isTool_Tool()
 }
@@ -2472,6 +2485,11 @@ type Tool_AttachmentSearch struct {
 	AttachmentSearch *AttachmentSearch `protobuf:"bytes,8,opt,name=attachment_search,json=attachmentSearch,proto3,oneof"`
 }
 
+type Tool_ImageGeneration struct {
+	// Built in image generation and editing.
+	ImageGeneration *ImageGeneration `protobuf:"bytes,10,opt,name=image_generation,json=imageGeneration,proto3,oneof"`
+}
+
 func (*Tool_Function) isTool_Tool() {}
 
 func (*Tool_WebSearch) isTool_Tool() {}
@@ -2485,6 +2503,8 @@ func (*Tool_CollectionsSearch) isTool_Tool() {}
 func (*Tool_Mcp) isTool_Tool() {}
 
 func (*Tool_AttachmentSearch) isTool_Tool() {}
+
+func (*Tool_ImageGeneration) isTool_Tool() {}
 
 type MCP struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -2870,6 +2890,50 @@ func (*CodeExecution) Descriptor() ([]byte, []int) {
 	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{24}
 }
 
+type ImageGeneration struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Action        *string                `protobuf:"bytes,1,opt,name=action,proto3,oneof" json:"action,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ImageGeneration) Reset() {
+	*x = ImageGeneration{}
+	mi := &file_xai_api_v1_chat_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ImageGeneration) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImageGeneration) ProtoMessage() {}
+
+func (x *ImageGeneration) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_api_v1_chat_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImageGeneration.ProtoReflect.Descriptor instead.
+func (*ImageGeneration) Descriptor() ([]byte, []int) {
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *ImageGeneration) GetAction() string {
+	if x != nil && x.Action != nil {
+		return *x.Action
+	}
+	return ""
+}
+
 type CollectionsSearch struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The ID(s) of the source collection(s) within which the search should be performed.
@@ -2897,7 +2961,7 @@ type CollectionsSearch struct {
 
 func (x *CollectionsSearch) Reset() {
 	*x = CollectionsSearch{}
-	mi := &file_xai_api_v1_chat_proto_msgTypes[25]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2909,7 +2973,7 @@ func (x *CollectionsSearch) String() string {
 func (*CollectionsSearch) ProtoMessage() {}
 
 func (x *CollectionsSearch) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_chat_proto_msgTypes[25]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2922,7 +2986,7 @@ func (x *CollectionsSearch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CollectionsSearch.ProtoReflect.Descriptor instead.
 func (*CollectionsSearch) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{25}
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *CollectionsSearch) GetCollectionIds() []string {
@@ -3016,7 +3080,7 @@ type AttachmentSearch struct {
 
 func (x *AttachmentSearch) Reset() {
 	*x = AttachmentSearch{}
-	mi := &file_xai_api_v1_chat_proto_msgTypes[26]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3028,7 +3092,7 @@ func (x *AttachmentSearch) String() string {
 func (*AttachmentSearch) ProtoMessage() {}
 
 func (x *AttachmentSearch) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_chat_proto_msgTypes[26]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3041,7 +3105,7 @@ func (x *AttachmentSearch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AttachmentSearch.ProtoReflect.Descriptor instead.
 func (*AttachmentSearch) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{26}
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *AttachmentSearch) GetLimit() int32 {
@@ -3067,7 +3131,7 @@ type Function struct {
 
 func (x *Function) Reset() {
 	*x = Function{}
-	mi := &file_xai_api_v1_chat_proto_msgTypes[27]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3079,7 +3143,7 @@ func (x *Function) String() string {
 func (*Function) ProtoMessage() {}
 
 func (x *Function) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_chat_proto_msgTypes[27]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3092,7 +3156,7 @@ func (x *Function) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Function.ProtoReflect.Descriptor instead.
 func (*Function) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{27}
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *Function) GetName() string {
@@ -3147,7 +3211,7 @@ type ToolCall struct {
 
 func (x *ToolCall) Reset() {
 	*x = ToolCall{}
-	mi := &file_xai_api_v1_chat_proto_msgTypes[28]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3159,7 +3223,7 @@ func (x *ToolCall) String() string {
 func (*ToolCall) ProtoMessage() {}
 
 func (x *ToolCall) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_chat_proto_msgTypes[28]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3172,7 +3236,7 @@ func (x *ToolCall) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ToolCall.ProtoReflect.Descriptor instead.
 func (*ToolCall) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{28}
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *ToolCall) GetId() string {
@@ -3242,7 +3306,7 @@ type FunctionCall struct {
 
 func (x *FunctionCall) Reset() {
 	*x = FunctionCall{}
-	mi := &file_xai_api_v1_chat_proto_msgTypes[29]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3254,7 +3318,7 @@ func (x *FunctionCall) String() string {
 func (*FunctionCall) ProtoMessage() {}
 
 func (x *FunctionCall) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_chat_proto_msgTypes[29]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3267,7 +3331,7 @@ func (x *FunctionCall) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FunctionCall.ProtoReflect.Descriptor instead.
 func (*FunctionCall) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{29}
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *FunctionCall) GetName() string {
@@ -3298,7 +3362,7 @@ type ResponseFormat struct {
 
 func (x *ResponseFormat) Reset() {
 	*x = ResponseFormat{}
-	mi := &file_xai_api_v1_chat_proto_msgTypes[30]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3310,7 +3374,7 @@ func (x *ResponseFormat) String() string {
 func (*ResponseFormat) ProtoMessage() {}
 
 func (x *ResponseFormat) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_chat_proto_msgTypes[30]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3323,7 +3387,7 @@ func (x *ResponseFormat) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResponseFormat.ProtoReflect.Descriptor instead.
 func (*ResponseFormat) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{30}
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *ResponseFormat) GetFormatType() FormatType {
@@ -3377,7 +3441,7 @@ type SearchParameters struct {
 
 func (x *SearchParameters) Reset() {
 	*x = SearchParameters{}
-	mi := &file_xai_api_v1_chat_proto_msgTypes[31]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3389,7 +3453,7 @@ func (x *SearchParameters) String() string {
 func (*SearchParameters) ProtoMessage() {}
 
 func (x *SearchParameters) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_chat_proto_msgTypes[31]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3402,7 +3466,7 @@ func (x *SearchParameters) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchParameters.ProtoReflect.Descriptor instead.
 func (*SearchParameters) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{31}
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *SearchParameters) GetMode() SearchMode {
@@ -3465,7 +3529,7 @@ type Source struct {
 
 func (x *Source) Reset() {
 	*x = Source{}
-	mi := &file_xai_api_v1_chat_proto_msgTypes[32]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3477,7 +3541,7 @@ func (x *Source) String() string {
 func (*Source) ProtoMessage() {}
 
 func (x *Source) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_chat_proto_msgTypes[32]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3490,7 +3554,7 @@ func (x *Source) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Source.ProtoReflect.Descriptor instead.
 func (*Source) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{32}
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *Source) GetSource() isSource_Source {
@@ -3602,7 +3666,7 @@ type WebSource struct {
 
 func (x *WebSource) Reset() {
 	*x = WebSource{}
-	mi := &file_xai_api_v1_chat_proto_msgTypes[33]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3614,7 +3678,7 @@ func (x *WebSource) String() string {
 func (*WebSource) ProtoMessage() {}
 
 func (x *WebSource) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_chat_proto_msgTypes[33]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3627,7 +3691,7 @@ func (x *WebSource) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebSource.ProtoReflect.Descriptor instead.
 func (*WebSource) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{33}
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *WebSource) GetExcludedWebsites() []string {
@@ -3680,7 +3744,7 @@ type NewsSource struct {
 
 func (x *NewsSource) Reset() {
 	*x = NewsSource{}
-	mi := &file_xai_api_v1_chat_proto_msgTypes[34]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3692,7 +3756,7 @@ func (x *NewsSource) String() string {
 func (*NewsSource) ProtoMessage() {}
 
 func (x *NewsSource) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_chat_proto_msgTypes[34]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3705,7 +3769,7 @@ func (x *NewsSource) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NewsSource.ProtoReflect.Descriptor instead.
 func (*NewsSource) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{34}
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *NewsSource) GetExcludedWebsites() []string {
@@ -3758,7 +3822,7 @@ type XSource struct {
 
 func (x *XSource) Reset() {
 	*x = XSource{}
-	mi := &file_xai_api_v1_chat_proto_msgTypes[35]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3770,7 +3834,7 @@ func (x *XSource) String() string {
 func (*XSource) ProtoMessage() {}
 
 func (x *XSource) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_chat_proto_msgTypes[35]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3783,7 +3847,7 @@ func (x *XSource) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use XSource.ProtoReflect.Descriptor instead.
 func (*XSource) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{35}
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *XSource) GetIncludedXHandles() []string {
@@ -3829,7 +3893,7 @@ type RssSource struct {
 
 func (x *RssSource) Reset() {
 	*x = RssSource{}
-	mi := &file_xai_api_v1_chat_proto_msgTypes[36]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3841,7 +3905,7 @@ func (x *RssSource) String() string {
 func (*RssSource) ProtoMessage() {}
 
 func (x *RssSource) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_chat_proto_msgTypes[36]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3854,7 +3918,7 @@ func (x *RssSource) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RssSource.ProtoReflect.Descriptor instead.
 func (*RssSource) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{36}
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *RssSource) GetLinks() []string {
@@ -3918,7 +3982,7 @@ type RequestSettings struct {
 
 func (x *RequestSettings) Reset() {
 	*x = RequestSettings{}
-	mi := &file_xai_api_v1_chat_proto_msgTypes[37]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3930,7 +3994,7 @@ func (x *RequestSettings) String() string {
 func (*RequestSettings) ProtoMessage() {}
 
 func (x *RequestSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_chat_proto_msgTypes[37]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3943,7 +4007,7 @@ func (x *RequestSettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestSettings.ProtoReflect.Descriptor instead.
 func (*RequestSettings) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{37}
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *RequestSettings) GetMaxTokens() int32 {
@@ -4055,7 +4119,7 @@ type GetStoredCompletionRequest struct {
 
 func (x *GetStoredCompletionRequest) Reset() {
 	*x = GetStoredCompletionRequest{}
-	mi := &file_xai_api_v1_chat_proto_msgTypes[38]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4067,7 +4131,7 @@ func (x *GetStoredCompletionRequest) String() string {
 func (*GetStoredCompletionRequest) ProtoMessage() {}
 
 func (x *GetStoredCompletionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_chat_proto_msgTypes[38]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4080,7 +4144,7 @@ func (x *GetStoredCompletionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStoredCompletionRequest.ProtoReflect.Descriptor instead.
 func (*GetStoredCompletionRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{38}
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *GetStoredCompletionRequest) GetResponseId() string {
@@ -4101,7 +4165,7 @@ type DeleteStoredCompletionRequest struct {
 
 func (x *DeleteStoredCompletionRequest) Reset() {
 	*x = DeleteStoredCompletionRequest{}
-	mi := &file_xai_api_v1_chat_proto_msgTypes[39]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4113,7 +4177,7 @@ func (x *DeleteStoredCompletionRequest) String() string {
 func (*DeleteStoredCompletionRequest) ProtoMessage() {}
 
 func (x *DeleteStoredCompletionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_chat_proto_msgTypes[39]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4126,7 +4190,7 @@ func (x *DeleteStoredCompletionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteStoredCompletionRequest.ProtoReflect.Descriptor instead.
 func (*DeleteStoredCompletionRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{39}
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *DeleteStoredCompletionRequest) GetResponseId() string {
@@ -4147,7 +4211,7 @@ type DeleteStoredCompletionResponse struct {
 
 func (x *DeleteStoredCompletionResponse) Reset() {
 	*x = DeleteStoredCompletionResponse{}
-	mi := &file_xai_api_v1_chat_proto_msgTypes[40]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4159,7 +4223,7 @@ func (x *DeleteStoredCompletionResponse) String() string {
 func (*DeleteStoredCompletionResponse) ProtoMessage() {}
 
 func (x *DeleteStoredCompletionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_chat_proto_msgTypes[40]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4172,7 +4236,7 @@ func (x *DeleteStoredCompletionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteStoredCompletionResponse.ProtoReflect.Descriptor instead.
 func (*DeleteStoredCompletionResponse) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{40}
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *DeleteStoredCompletionResponse) GetResponseId() string {
@@ -4215,7 +4279,7 @@ type DebugOutput struct {
 
 func (x *DebugOutput) Reset() {
 	*x = DebugOutput{}
-	mi := &file_xai_api_v1_chat_proto_msgTypes[41]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4227,7 +4291,7 @@ func (x *DebugOutput) String() string {
 func (*DebugOutput) ProtoMessage() {}
 
 func (x *DebugOutput) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_chat_proto_msgTypes[41]
+	mi := &file_xai_api_v1_chat_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4240,7 +4304,7 @@ func (x *DebugOutput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DebugOutput.ProtoReflect.Descriptor instead.
 func (*DebugOutput) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{41}
+	return file_xai_api_v1_chat_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *DebugOutput) GetAttempts() int32 {
@@ -4484,7 +4548,7 @@ const file_xai_api_v1_chat_proto_rawDesc = "" +
 	"ToolChoice\x12'\n" +
 	"\x04mode\x18\x01 \x01(\x0e2\x11.xai_api.ToolModeH\x00R\x04mode\x12%\n" +
 	"\rfunction_name\x18\x02 \x01(\tH\x00R\ffunctionNameB\r\n" +
-	"\vtool_choice\"\x9d\x03\n" +
+	"\vtool_choice\"\xe4\x03\n" +
 	"\x04Tool\x12/\n" +
 	"\bfunction\x18\x01 \x01(\v2\x11.xai_api.FunctionH\x00R\bfunction\x123\n" +
 	"\n" +
@@ -4493,7 +4557,9 @@ const file_xai_api_v1_chat_proto_rawDesc = "" +
 	"\x0ecode_execution\x18\x05 \x01(\v2\x16.xai_api.CodeExecutionH\x00R\rcodeExecution\x12K\n" +
 	"\x12collections_search\x18\x06 \x01(\v2\x1a.xai_api.CollectionsSearchH\x00R\x11collectionsSearch\x12 \n" +
 	"\x03mcp\x18\a \x01(\v2\f.xai_api.MCPH\x00R\x03mcp\x12H\n" +
-	"\x11attachment_search\x18\b \x01(\v2\x19.xai_api.AttachmentSearchH\x00R\x10attachmentSearchB\x06\n" +
+	"\x11attachment_search\x18\b \x01(\v2\x19.xai_api.AttachmentSearchH\x00R\x10attachmentSearch\x12E\n" +
+	"\x10image_generation\x18\n" +
+	" \x01(\v2\x18.xai_api.ImageGenerationH\x00R\x0fimageGenerationB\x06\n" +
 	"\x04tool\"\xe7\x02\n" +
 	"\x03MCP\x12!\n" +
 	"\fserver_label\x18\x01 \x01(\tR\vserverLabel\x12-\n" +
@@ -4539,7 +4605,10 @@ const file_xai_api_v1_chat_proto_rawDesc = "" +
 	"\b_to_dateB\x1d\n" +
 	"\x1b_enable_image_understandingB\x1d\n" +
 	"\x1b_enable_video_understanding\"\x0f\n" +
-	"\rCodeExecution\"\x89\x03\n" +
+	"\rCodeExecution\"9\n" +
+	"\x0fImageGeneration\x12\x1b\n" +
+	"\x06action\x18\x01 \x01(\tH\x00R\x06action\x88\x01\x01B\t\n" +
+	"\a_action\"\x89\x03\n" +
 	"\x11CollectionsSearch\x12%\n" +
 	"\x0ecollection_ids\x18\x01 \x03(\tR\rcollectionIds\x12\x19\n" +
 	"\x05limit\x18\x02 \x01(\x05H\x01R\x05limit\x88\x01\x01\x12'\n" +
@@ -4707,7 +4776,7 @@ const file_xai_api_v1_chat_proto_rawDesc = "" +
 	"\x13FORMAT_TYPE_INVALID\x10\x00\x12\x14\n" +
 	"\x10FORMAT_TYPE_TEXT\x10\x01\x12\x1b\n" +
 	"\x17FORMAT_TYPE_JSON_OBJECT\x10\x02\x12\x1b\n" +
-	"\x17FORMAT_TYPE_JSON_SCHEMA\x10\x03*\xb1\x02\n" +
+	"\x17FORMAT_TYPE_JSON_SCHEMA\x10\x03*\xdb\x02\n" +
 	"\fToolCallType\x12\x1a\n" +
 	"\x16TOOL_CALL_TYPE_INVALID\x10\x00\x12#\n" +
 	"\x1fTOOL_CALL_TYPE_CLIENT_SIDE_TOOL\x10\x01\x12\"\n" +
@@ -4716,7 +4785,9 @@ const file_xai_api_v1_chat_proto_rawDesc = "" +
 	"\"TOOL_CALL_TYPE_CODE_EXECUTION_TOOL\x10\x04\x12*\n" +
 	"&TOOL_CALL_TYPE_COLLECTIONS_SEARCH_TOOL\x10\x05\x12\x1b\n" +
 	"\x17TOOL_CALL_TYPE_MCP_TOOL\x10\x06\x12)\n" +
-	"%TOOL_CALL_TYPE_ATTACHMENT_SEARCH_TOOL\x10\a*\x90\x01\n" +
+	"%TOOL_CALL_TYPE_ATTACHMENT_SEARCH_TOOL\x10\a\x12(\n" +
+	"$TOOL_CALL_TYPE_IMAGE_GENERATION_TOOL\x10\n" +
+	"*\x90\x01\n" +
 	"\x0eToolCallStatus\x12 \n" +
 	"\x1cTOOL_CALL_STATUS_IN_PROGRESS\x10\x00\x12\x1e\n" +
 	"\x1aTOOL_CALL_STATUS_COMPLETED\x10\x01\x12\x1f\n" +
@@ -4750,7 +4821,7 @@ func file_xai_api_v1_chat_proto_rawDescGZIP() []byte {
 }
 
 var file_xai_api_v1_chat_proto_enumTypes = make([]protoimpl.EnumInfo, 9)
-var file_xai_api_v1_chat_proto_msgTypes = make([]protoimpl.MessageInfo, 43)
+var file_xai_api_v1_chat_proto_msgTypes = make([]protoimpl.MessageInfo, 44)
 var file_xai_api_v1_chat_proto_goTypes = []any{
 	(IncludeOption)(0),                     // 0: xai_api.IncludeOption
 	(MessageRole)(0),                       // 1: xai_api.MessageRole
@@ -4786,127 +4857,129 @@ var file_xai_api_v1_chat_proto_goTypes = []any{
 	(*WebSearchUserLocation)(nil),          // 31: xai_api.WebSearchUserLocation
 	(*XSearch)(nil),                        // 32: xai_api.XSearch
 	(*CodeExecution)(nil),                  // 33: xai_api.CodeExecution
-	(*CollectionsSearch)(nil),              // 34: xai_api.CollectionsSearch
-	(*AttachmentSearch)(nil),               // 35: xai_api.AttachmentSearch
-	(*Function)(nil),                       // 36: xai_api.Function
-	(*ToolCall)(nil),                       // 37: xai_api.ToolCall
-	(*FunctionCall)(nil),                   // 38: xai_api.FunctionCall
-	(*ResponseFormat)(nil),                 // 39: xai_api.ResponseFormat
-	(*SearchParameters)(nil),               // 40: xai_api.SearchParameters
-	(*Source)(nil),                         // 41: xai_api.Source
-	(*WebSource)(nil),                      // 42: xai_api.WebSource
-	(*NewsSource)(nil),                     // 43: xai_api.NewsSource
-	(*XSource)(nil),                        // 44: xai_api.XSource
-	(*RssSource)(nil),                      // 45: xai_api.RssSource
-	(*RequestSettings)(nil),                // 46: xai_api.RequestSettings
-	(*GetStoredCompletionRequest)(nil),     // 47: xai_api.GetStoredCompletionRequest
-	(*DeleteStoredCompletionRequest)(nil),  // 48: xai_api.DeleteStoredCompletionRequest
-	(*DeleteStoredCompletionResponse)(nil), // 49: xai_api.DeleteStoredCompletionResponse
-	(*DebugOutput)(nil),                    // 50: xai_api.DebugOutput
-	nil,                                    // 51: xai_api.MCP.ExtraHeadersEntry
-	(*timestamppb.Timestamp)(nil),          // 52: google.protobuf.Timestamp
-	(*SamplingUsage)(nil),                  // 53: xai_api.SamplingUsage
-	(DeferredStatus)(0),                    // 54: xai_api.DeferredStatus
-	(FinishReason)(0),                      // 55: xai_api.FinishReason
-	(*ImageUrlContent)(nil),                // 56: xai_api.ImageUrlContent
-	(*HybridRetrieval)(nil),                // 57: xai_api.HybridRetrieval
-	(*SemanticRetrieval)(nil),              // 58: xai_api.SemanticRetrieval
-	(*KeywordRetrieval)(nil),               // 59: xai_api.KeywordRetrieval
-	(*GetDeferredRequest)(nil),             // 60: xai_api.GetDeferredRequest
-	(*StartDeferredResponse)(nil),          // 61: xai_api.StartDeferredResponse
+	(*ImageGeneration)(nil),                // 34: xai_api.ImageGeneration
+	(*CollectionsSearch)(nil),              // 35: xai_api.CollectionsSearch
+	(*AttachmentSearch)(nil),               // 36: xai_api.AttachmentSearch
+	(*Function)(nil),                       // 37: xai_api.Function
+	(*ToolCall)(nil),                       // 38: xai_api.ToolCall
+	(*FunctionCall)(nil),                   // 39: xai_api.FunctionCall
+	(*ResponseFormat)(nil),                 // 40: xai_api.ResponseFormat
+	(*SearchParameters)(nil),               // 41: xai_api.SearchParameters
+	(*Source)(nil),                         // 42: xai_api.Source
+	(*WebSource)(nil),                      // 43: xai_api.WebSource
+	(*NewsSource)(nil),                     // 44: xai_api.NewsSource
+	(*XSource)(nil),                        // 45: xai_api.XSource
+	(*RssSource)(nil),                      // 46: xai_api.RssSource
+	(*RequestSettings)(nil),                // 47: xai_api.RequestSettings
+	(*GetStoredCompletionRequest)(nil),     // 48: xai_api.GetStoredCompletionRequest
+	(*DeleteStoredCompletionRequest)(nil),  // 49: xai_api.DeleteStoredCompletionRequest
+	(*DeleteStoredCompletionResponse)(nil), // 50: xai_api.DeleteStoredCompletionResponse
+	(*DebugOutput)(nil),                    // 51: xai_api.DebugOutput
+	nil,                                    // 52: xai_api.MCP.ExtraHeadersEntry
+	(*timestamppb.Timestamp)(nil),          // 53: google.protobuf.Timestamp
+	(*SamplingUsage)(nil),                  // 54: xai_api.SamplingUsage
+	(DeferredStatus)(0),                    // 55: xai_api.DeferredStatus
+	(FinishReason)(0),                      // 56: xai_api.FinishReason
+	(*ImageUrlContent)(nil),                // 57: xai_api.ImageUrlContent
+	(*HybridRetrieval)(nil),                // 58: xai_api.HybridRetrieval
+	(*SemanticRetrieval)(nil),              // 59: xai_api.SemanticRetrieval
+	(*KeywordRetrieval)(nil),               // 60: xai_api.KeywordRetrieval
+	(*GetDeferredRequest)(nil),             // 61: xai_api.GetDeferredRequest
+	(*StartDeferredResponse)(nil),          // 62: xai_api.StartDeferredResponse
 }
 var file_xai_api_v1_chat_proto_depIdxs = []int32{
 	26, // 0: xai_api.GetCompletionsRequest.messages:type_name -> xai_api.Message
 	28, // 1: xai_api.GetCompletionsRequest.tools:type_name -> xai_api.Tool
 	27, // 2: xai_api.GetCompletionsRequest.tool_choice:type_name -> xai_api.ToolChoice
-	39, // 3: xai_api.GetCompletionsRequest.response_format:type_name -> xai_api.ResponseFormat
+	40, // 3: xai_api.GetCompletionsRequest.response_format:type_name -> xai_api.ResponseFormat
 	3,  // 4: xai_api.GetCompletionsRequest.reasoning_effort:type_name -> xai_api.ReasoningEffort
-	40, // 5: xai_api.GetCompletionsRequest.search_parameters:type_name -> xai_api.SearchParameters
+	41, // 5: xai_api.GetCompletionsRequest.search_parameters:type_name -> xai_api.SearchParameters
 	0,  // 6: xai_api.GetCompletionsRequest.include:type_name -> xai_api.IncludeOption
 	2,  // 7: xai_api.GetCompletionsRequest.agent_count:type_name -> xai_api.AgentCount
 	13, // 8: xai_api.GetChatCompletionResponse.outputs:type_name -> xai_api.CompletionOutput
-	52, // 9: xai_api.GetChatCompletionResponse.created:type_name -> google.protobuf.Timestamp
-	53, // 10: xai_api.GetChatCompletionResponse.usage:type_name -> xai_api.SamplingUsage
-	46, // 11: xai_api.GetChatCompletionResponse.settings:type_name -> xai_api.RequestSettings
-	50, // 12: xai_api.GetChatCompletionResponse.debug_output:type_name -> xai_api.DebugOutput
+	53, // 9: xai_api.GetChatCompletionResponse.created:type_name -> google.protobuf.Timestamp
+	54, // 10: xai_api.GetChatCompletionResponse.usage:type_name -> xai_api.SamplingUsage
+	47, // 11: xai_api.GetChatCompletionResponse.settings:type_name -> xai_api.RequestSettings
+	51, // 12: xai_api.GetChatCompletionResponse.debug_output:type_name -> xai_api.DebugOutput
 	15, // 13: xai_api.GetChatCompletionChunk.outputs:type_name -> xai_api.CompletionOutputChunk
-	52, // 14: xai_api.GetChatCompletionChunk.created:type_name -> google.protobuf.Timestamp
-	53, // 15: xai_api.GetChatCompletionChunk.usage:type_name -> xai_api.SamplingUsage
-	50, // 16: xai_api.GetChatCompletionChunk.debug_output:type_name -> xai_api.DebugOutput
-	54, // 17: xai_api.GetDeferredCompletionResponse.status:type_name -> xai_api.DeferredStatus
+	53, // 14: xai_api.GetChatCompletionChunk.created:type_name -> google.protobuf.Timestamp
+	54, // 15: xai_api.GetChatCompletionChunk.usage:type_name -> xai_api.SamplingUsage
+	51, // 16: xai_api.GetChatCompletionChunk.debug_output:type_name -> xai_api.DebugOutput
+	55, // 17: xai_api.GetDeferredCompletionResponse.status:type_name -> xai_api.DeferredStatus
 	10, // 18: xai_api.GetDeferredCompletionResponse.response:type_name -> xai_api.GetChatCompletionResponse
-	55, // 19: xai_api.CompletionOutput.finish_reason:type_name -> xai_api.FinishReason
+	56, // 19: xai_api.CompletionOutput.finish_reason:type_name -> xai_api.FinishReason
 	14, // 20: xai_api.CompletionOutput.message:type_name -> xai_api.CompletionMessage
 	21, // 21: xai_api.CompletionOutput.logprobs:type_name -> xai_api.LogProbs
 	1,  // 22: xai_api.CompletionMessage.role:type_name -> xai_api.MessageRole
-	37, // 23: xai_api.CompletionMessage.tool_calls:type_name -> xai_api.ToolCall
+	38, // 23: xai_api.CompletionMessage.tool_calls:type_name -> xai_api.ToolCall
 	17, // 24: xai_api.CompletionMessage.citations:type_name -> xai_api.InlineCitation
 	16, // 25: xai_api.CompletionOutputChunk.delta:type_name -> xai_api.Delta
 	21, // 26: xai_api.CompletionOutputChunk.logprobs:type_name -> xai_api.LogProbs
-	55, // 27: xai_api.CompletionOutputChunk.finish_reason:type_name -> xai_api.FinishReason
+	56, // 27: xai_api.CompletionOutputChunk.finish_reason:type_name -> xai_api.FinishReason
 	1,  // 28: xai_api.Delta.role:type_name -> xai_api.MessageRole
-	37, // 29: xai_api.Delta.tool_calls:type_name -> xai_api.ToolCall
+	38, // 29: xai_api.Delta.tool_calls:type_name -> xai_api.ToolCall
 	17, // 30: xai_api.Delta.citations:type_name -> xai_api.InlineCitation
 	18, // 31: xai_api.InlineCitation.web_citation:type_name -> xai_api.WebCitation
 	19, // 32: xai_api.InlineCitation.x_citation:type_name -> xai_api.XCitation
 	20, // 33: xai_api.InlineCitation.collections_citation:type_name -> xai_api.CollectionsCitation
 	22, // 34: xai_api.LogProbs.content:type_name -> xai_api.LogProb
 	23, // 35: xai_api.LogProb.top_logprobs:type_name -> xai_api.TopLogProb
-	56, // 36: xai_api.Content.image_url:type_name -> xai_api.ImageUrlContent
+	57, // 36: xai_api.Content.image_url:type_name -> xai_api.ImageUrlContent
 	25, // 37: xai_api.Content.file:type_name -> xai_api.FileContent
 	24, // 38: xai_api.Message.content:type_name -> xai_api.Content
 	1,  // 39: xai_api.Message.role:type_name -> xai_api.MessageRole
-	37, // 40: xai_api.Message.tool_calls:type_name -> xai_api.ToolCall
+	38, // 40: xai_api.Message.tool_calls:type_name -> xai_api.ToolCall
 	4,  // 41: xai_api.ToolChoice.mode:type_name -> xai_api.ToolMode
-	36, // 42: xai_api.Tool.function:type_name -> xai_api.Function
+	37, // 42: xai_api.Tool.function:type_name -> xai_api.Function
 	30, // 43: xai_api.Tool.web_search:type_name -> xai_api.WebSearch
 	32, // 44: xai_api.Tool.x_search:type_name -> xai_api.XSearch
 	33, // 45: xai_api.Tool.code_execution:type_name -> xai_api.CodeExecution
-	34, // 46: xai_api.Tool.collections_search:type_name -> xai_api.CollectionsSearch
+	35, // 46: xai_api.Tool.collections_search:type_name -> xai_api.CollectionsSearch
 	29, // 47: xai_api.Tool.mcp:type_name -> xai_api.MCP
-	35, // 48: xai_api.Tool.attachment_search:type_name -> xai_api.AttachmentSearch
-	51, // 49: xai_api.MCP.extra_headers:type_name -> xai_api.MCP.ExtraHeadersEntry
-	31, // 50: xai_api.WebSearch.user_location:type_name -> xai_api.WebSearchUserLocation
-	52, // 51: xai_api.XSearch.from_date:type_name -> google.protobuf.Timestamp
-	52, // 52: xai_api.XSearch.to_date:type_name -> google.protobuf.Timestamp
-	57, // 53: xai_api.CollectionsSearch.hybrid_retrieval:type_name -> xai_api.HybridRetrieval
-	58, // 54: xai_api.CollectionsSearch.semantic_retrieval:type_name -> xai_api.SemanticRetrieval
-	59, // 55: xai_api.CollectionsSearch.keyword_retrieval:type_name -> xai_api.KeywordRetrieval
-	6,  // 56: xai_api.ToolCall.type:type_name -> xai_api.ToolCallType
-	7,  // 57: xai_api.ToolCall.status:type_name -> xai_api.ToolCallStatus
-	38, // 58: xai_api.ToolCall.function:type_name -> xai_api.FunctionCall
-	5,  // 59: xai_api.ResponseFormat.format_type:type_name -> xai_api.FormatType
-	8,  // 60: xai_api.SearchParameters.mode:type_name -> xai_api.SearchMode
-	41, // 61: xai_api.SearchParameters.sources:type_name -> xai_api.Source
-	52, // 62: xai_api.SearchParameters.from_date:type_name -> google.protobuf.Timestamp
-	52, // 63: xai_api.SearchParameters.to_date:type_name -> google.protobuf.Timestamp
-	42, // 64: xai_api.Source.web:type_name -> xai_api.WebSource
-	43, // 65: xai_api.Source.news:type_name -> xai_api.NewsSource
-	44, // 66: xai_api.Source.x:type_name -> xai_api.XSource
-	45, // 67: xai_api.Source.rss:type_name -> xai_api.RssSource
-	3,  // 68: xai_api.RequestSettings.reasoning_effort:type_name -> xai_api.ReasoningEffort
-	39, // 69: xai_api.RequestSettings.response_format:type_name -> xai_api.ResponseFormat
-	27, // 70: xai_api.RequestSettings.tool_choice:type_name -> xai_api.ToolChoice
-	28, // 71: xai_api.RequestSettings.tools:type_name -> xai_api.Tool
-	40, // 72: xai_api.RequestSettings.search_parameters:type_name -> xai_api.SearchParameters
-	0,  // 73: xai_api.RequestSettings.include:type_name -> xai_api.IncludeOption
-	9,  // 74: xai_api.Chat.GetCompletion:input_type -> xai_api.GetCompletionsRequest
-	9,  // 75: xai_api.Chat.GetCompletionChunk:input_type -> xai_api.GetCompletionsRequest
-	9,  // 76: xai_api.Chat.StartDeferredCompletion:input_type -> xai_api.GetCompletionsRequest
-	60, // 77: xai_api.Chat.GetDeferredCompletion:input_type -> xai_api.GetDeferredRequest
-	47, // 78: xai_api.Chat.GetStoredCompletion:input_type -> xai_api.GetStoredCompletionRequest
-	48, // 79: xai_api.Chat.DeleteStoredCompletion:input_type -> xai_api.DeleteStoredCompletionRequest
-	10, // 80: xai_api.Chat.GetCompletion:output_type -> xai_api.GetChatCompletionResponse
-	11, // 81: xai_api.Chat.GetCompletionChunk:output_type -> xai_api.GetChatCompletionChunk
-	61, // 82: xai_api.Chat.StartDeferredCompletion:output_type -> xai_api.StartDeferredResponse
-	12, // 83: xai_api.Chat.GetDeferredCompletion:output_type -> xai_api.GetDeferredCompletionResponse
-	10, // 84: xai_api.Chat.GetStoredCompletion:output_type -> xai_api.GetChatCompletionResponse
-	49, // 85: xai_api.Chat.DeleteStoredCompletion:output_type -> xai_api.DeleteStoredCompletionResponse
-	80, // [80:86] is the sub-list for method output_type
-	74, // [74:80] is the sub-list for method input_type
-	74, // [74:74] is the sub-list for extension type_name
-	74, // [74:74] is the sub-list for extension extendee
-	0,  // [0:74] is the sub-list for field type_name
+	36, // 48: xai_api.Tool.attachment_search:type_name -> xai_api.AttachmentSearch
+	34, // 49: xai_api.Tool.image_generation:type_name -> xai_api.ImageGeneration
+	52, // 50: xai_api.MCP.extra_headers:type_name -> xai_api.MCP.ExtraHeadersEntry
+	31, // 51: xai_api.WebSearch.user_location:type_name -> xai_api.WebSearchUserLocation
+	53, // 52: xai_api.XSearch.from_date:type_name -> google.protobuf.Timestamp
+	53, // 53: xai_api.XSearch.to_date:type_name -> google.protobuf.Timestamp
+	58, // 54: xai_api.CollectionsSearch.hybrid_retrieval:type_name -> xai_api.HybridRetrieval
+	59, // 55: xai_api.CollectionsSearch.semantic_retrieval:type_name -> xai_api.SemanticRetrieval
+	60, // 56: xai_api.CollectionsSearch.keyword_retrieval:type_name -> xai_api.KeywordRetrieval
+	6,  // 57: xai_api.ToolCall.type:type_name -> xai_api.ToolCallType
+	7,  // 58: xai_api.ToolCall.status:type_name -> xai_api.ToolCallStatus
+	39, // 59: xai_api.ToolCall.function:type_name -> xai_api.FunctionCall
+	5,  // 60: xai_api.ResponseFormat.format_type:type_name -> xai_api.FormatType
+	8,  // 61: xai_api.SearchParameters.mode:type_name -> xai_api.SearchMode
+	42, // 62: xai_api.SearchParameters.sources:type_name -> xai_api.Source
+	53, // 63: xai_api.SearchParameters.from_date:type_name -> google.protobuf.Timestamp
+	53, // 64: xai_api.SearchParameters.to_date:type_name -> google.protobuf.Timestamp
+	43, // 65: xai_api.Source.web:type_name -> xai_api.WebSource
+	44, // 66: xai_api.Source.news:type_name -> xai_api.NewsSource
+	45, // 67: xai_api.Source.x:type_name -> xai_api.XSource
+	46, // 68: xai_api.Source.rss:type_name -> xai_api.RssSource
+	3,  // 69: xai_api.RequestSettings.reasoning_effort:type_name -> xai_api.ReasoningEffort
+	40, // 70: xai_api.RequestSettings.response_format:type_name -> xai_api.ResponseFormat
+	27, // 71: xai_api.RequestSettings.tool_choice:type_name -> xai_api.ToolChoice
+	28, // 72: xai_api.RequestSettings.tools:type_name -> xai_api.Tool
+	41, // 73: xai_api.RequestSettings.search_parameters:type_name -> xai_api.SearchParameters
+	0,  // 74: xai_api.RequestSettings.include:type_name -> xai_api.IncludeOption
+	9,  // 75: xai_api.Chat.GetCompletion:input_type -> xai_api.GetCompletionsRequest
+	9,  // 76: xai_api.Chat.GetCompletionChunk:input_type -> xai_api.GetCompletionsRequest
+	9,  // 77: xai_api.Chat.StartDeferredCompletion:input_type -> xai_api.GetCompletionsRequest
+	61, // 78: xai_api.Chat.GetDeferredCompletion:input_type -> xai_api.GetDeferredRequest
+	48, // 79: xai_api.Chat.GetStoredCompletion:input_type -> xai_api.GetStoredCompletionRequest
+	49, // 80: xai_api.Chat.DeleteStoredCompletion:input_type -> xai_api.DeleteStoredCompletionRequest
+	10, // 81: xai_api.Chat.GetCompletion:output_type -> xai_api.GetChatCompletionResponse
+	11, // 82: xai_api.Chat.GetCompletionChunk:output_type -> xai_api.GetChatCompletionChunk
+	62, // 83: xai_api.Chat.StartDeferredCompletion:output_type -> xai_api.StartDeferredResponse
+	12, // 84: xai_api.Chat.GetDeferredCompletion:output_type -> xai_api.GetDeferredCompletionResponse
+	10, // 85: xai_api.Chat.GetStoredCompletion:output_type -> xai_api.GetChatCompletionResponse
+	50, // 86: xai_api.Chat.DeleteStoredCompletion:output_type -> xai_api.DeleteStoredCompletionResponse
+	81, // [81:87] is the sub-list for method output_type
+	75, // [75:81] is the sub-list for method input_type
+	75, // [75:75] is the sub-list for extension type_name
+	75, // [75:75] is the sub-list for extension extendee
+	0,  // [0:75] is the sub-list for field type_name
 }
 
 func init() { file_xai_api_v1_chat_proto_init() }
@@ -4939,39 +5012,41 @@ func file_xai_api_v1_chat_proto_init() {
 		(*Tool_CollectionsSearch)(nil),
 		(*Tool_Mcp)(nil),
 		(*Tool_AttachmentSearch)(nil),
+		(*Tool_ImageGeneration)(nil),
 	}
 	file_xai_api_v1_chat_proto_msgTypes[20].OneofWrappers = []any{}
 	file_xai_api_v1_chat_proto_msgTypes[21].OneofWrappers = []any{}
 	file_xai_api_v1_chat_proto_msgTypes[22].OneofWrappers = []any{}
 	file_xai_api_v1_chat_proto_msgTypes[23].OneofWrappers = []any{}
-	file_xai_api_v1_chat_proto_msgTypes[25].OneofWrappers = []any{
+	file_xai_api_v1_chat_proto_msgTypes[25].OneofWrappers = []any{}
+	file_xai_api_v1_chat_proto_msgTypes[26].OneofWrappers = []any{
 		(*CollectionsSearch_HybridRetrieval)(nil),
 		(*CollectionsSearch_SemanticRetrieval)(nil),
 		(*CollectionsSearch_KeywordRetrieval)(nil),
 	}
-	file_xai_api_v1_chat_proto_msgTypes[26].OneofWrappers = []any{}
-	file_xai_api_v1_chat_proto_msgTypes[28].OneofWrappers = []any{
+	file_xai_api_v1_chat_proto_msgTypes[27].OneofWrappers = []any{}
+	file_xai_api_v1_chat_proto_msgTypes[29].OneofWrappers = []any{
 		(*ToolCall_Function)(nil),
 	}
-	file_xai_api_v1_chat_proto_msgTypes[30].OneofWrappers = []any{}
 	file_xai_api_v1_chat_proto_msgTypes[31].OneofWrappers = []any{}
-	file_xai_api_v1_chat_proto_msgTypes[32].OneofWrappers = []any{
+	file_xai_api_v1_chat_proto_msgTypes[32].OneofWrappers = []any{}
+	file_xai_api_v1_chat_proto_msgTypes[33].OneofWrappers = []any{
 		(*Source_Web)(nil),
 		(*Source_News)(nil),
 		(*Source_X)(nil),
 		(*Source_Rss)(nil),
 	}
-	file_xai_api_v1_chat_proto_msgTypes[33].OneofWrappers = []any{}
 	file_xai_api_v1_chat_proto_msgTypes[34].OneofWrappers = []any{}
 	file_xai_api_v1_chat_proto_msgTypes[35].OneofWrappers = []any{}
-	file_xai_api_v1_chat_proto_msgTypes[37].OneofWrappers = []any{}
+	file_xai_api_v1_chat_proto_msgTypes[36].OneofWrappers = []any{}
+	file_xai_api_v1_chat_proto_msgTypes[38].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_xai_api_v1_chat_proto_rawDesc), len(file_xai_api_v1_chat_proto_rawDesc)),
 			NumEnums:      9,
-			NumMessages:   43,
+			NumMessages:   44,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

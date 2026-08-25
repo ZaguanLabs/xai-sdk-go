@@ -82,6 +82,14 @@ func CodeExecution() *xaiv1.Tool {
 	return &xaiv1.Tool{Tool: &xaiv1.Tool_CodeExecution{CodeExecution: &xaiv1.CodeExecution{}}}
 }
 
+// ImageGeneration creates the server-side image generation/editing tool.
+// Action may be empty (auto), "auto", "generate", or "edit".
+func ImageGeneration(action string) *xaiv1.Tool {
+	return &xaiv1.Tool{Tool: &xaiv1.Tool_ImageGeneration{ImageGeneration: &xaiv1.ImageGeneration{
+		Action: stringPtr(action),
+	}}}
+}
+
 func CollectionsSearch(opts CollectionsSearchOptions) *xaiv1.Tool {
 	cs := &xaiv1.CollectionsSearch{
 		CollectionIds: opts.CollectionIDs,

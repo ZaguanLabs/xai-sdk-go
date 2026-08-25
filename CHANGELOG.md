@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.19.0] - 2026-08-25
+
+### Added
+
+- Added image quality controls and the `grok-imagine-image-2.0` model literal.
+- Added 1080p video generation, reference audio voice IDs, and generated-audio control.
+- Added the server-side image-generation/editing tool and generated-image response decoding.
+- Added default `XaiSdk/{version}` identification to gRPC connections.
+
+### Fixed
+
+- Replayed tool-role outputs now retain their originating tool-call ID.
+
 ## [1.18.0] - 2026-08-17
 
 ### Focus: Python SDK v1.18.0 Parity

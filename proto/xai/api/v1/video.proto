@@ -11,6 +11,10 @@ message VideoUrlContent {
   string file_id = 2;
 }
 
+message AudioUrlContent {
+  optional string voice_id = 2;
+}
+
 message VideoOutput {
   string upload_url = 1;
 }
@@ -33,6 +37,8 @@ message GenerateVideoRequest {
   optional VideoResolution resolution = 8;
   repeated ImageUrlContent reference_images = 13;
   optional StorageOptions storage_options = 14;
+  repeated AudioUrlContent reference_audios = 16;
+  optional bool generate_audio = 17;
 }
 
 message GetDeferredVideoRequest {
@@ -80,6 +86,7 @@ enum VideoResolution {
   VIDEO_RESOLUTION_UNSPECIFIED = 0;
   VIDEO_RESOLUTION_480P = 1;
   VIDEO_RESOLUTION_720P = 2;
+  VIDEO_RESOLUTION_1080P = 3;
 }
 
 service Video {

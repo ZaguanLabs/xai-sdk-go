@@ -6,8 +6,8 @@ func TestModelConstants(t *testing.T) {
 	if ChatModelGrok420 != "grok-4.20" {
 		t.Fatalf("ChatModelGrok420 = %q", ChatModelGrok420)
 	}
-	if ImageGenerationModelGrokImagineImagePro != "grok-imagine-image-pro" {
-		t.Fatalf("ImageGenerationModelGrokImagineImagePro = %q", ImageGenerationModelGrokImagineImagePro)
+	if ImageGenerationModelGrokImagineImage20 != "grok-imagine-image-2.0" {
+		t.Fatalf("ImageGenerationModelGrokImagineImage20 = %q", ImageGenerationModelGrokImagineImage20)
 	}
 	if VideoGenerationModelGrokImagineVideo != "grok-imagine-video" {
 		t.Fatalf("VideoGenerationModelGrokImagineVideo = %q", VideoGenerationModelGrokImagineVideo)
@@ -17,7 +17,7 @@ func TestModelConstants(t *testing.T) {
 	}
 }
 
-func TestPython1180ModelCatalogParity(t *testing.T) {
+func TestPython1190ModelCatalogParity(t *testing.T) {
 	wantChat := []string{
 		"grok-4", "grok-4-0709", "grok-4-latest", "grok-4-1-fast",
 		"grok-4-1-fast-reasoning", "grok-4-1-fast-reasoning-latest",
@@ -41,13 +41,13 @@ func TestPython1180ModelCatalogParity(t *testing.T) {
 		}
 	}
 
-	wantImages := []string{"grok-imagine-image", "grok-imagine-image-pro", "grok-imagine-image-quality"}
+	wantImages := []string{"grok-imagine-image", "grok-imagine-image-2.0", "grok-imagine-image-quality"}
 	for i := range wantImages {
 		if ImageGenerationModels[i] != wantImages[i] {
 			t.Fatalf("ImageGenerationModels[%d] = %q, want %q", i, ImageGenerationModels[i], wantImages[i])
 		}
 	}
-	wantVideos := []string{"grok-imagine-video", "grok-imagine-video-1.5-preview"}
+	wantVideos := []string{"grok-imagine-video", "grok-imagine-video-1.5"}
 	for i := range wantVideos {
 		if VideoGenerationModels[i] != wantVideos[i] {
 			t.Fatalf("VideoGenerationModels[%d] = %q, want %q", i, VideoGenerationModels[i], wantVideos[i])

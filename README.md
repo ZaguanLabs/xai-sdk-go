@@ -8,7 +8,7 @@
 
 > **Note**: This is an unofficial, community-maintained SDK and is not affiliated with or endorsed by xAI.
 
-> **Status**: **v1.18.0 Released** - Python SDK v1.18.0 parity with the patched Go and gRPC dependency baseline preserved. **Requires Go 1.25+**.
+> **Status**: **v1.19.0 Released** - Python SDK v1.19.0 parity with the patched Go and gRPC dependency baseline preserved. **Requires Go 1.25+**.
 
 ## ✨ Features
 
