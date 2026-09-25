@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.20.0 - 2026-09-25
+
+- Match Python SDK 1.20.0 video protobuf fields and first/last-frame and keyframe inputs.
+- Add `LastFrameURL`, `LastFrameFileID`, and `Keyframes` to video generation options, shared by generation, start, and batch preparation.
+- Validate video source exclusivity and keyframe images before `Start`/`Generate`; use `PrepareChecked` for validated batch preparation. Existing `Prepare` and request builders retain their signatures.
+- Timestamp bounds, keyframe count, and model support remain server-side as in Python.
+
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),

@@ -3,6 +3,7 @@ package video
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
@@ -19,7 +20,17 @@ type Client struct {
 	grpcClient xaiv1.VideoClient
 }
 
+// Keyframe pins an image at Timestamp seconds. Timing limits are checked by the server.
+type Keyframe struct {
+	ImageURL    string
+	ImageFileID string
+	Timestamp   float32
+}
+
 type GenerateOptions struct {
+	LastFrameURL           string
+	LastFrameFileID        string
+	Keyframes              []Keyframe
 	ImageURL               string
 	ImageFileID            string
 	VideoURL               string
@@ -144,6 +155,18 @@ func NewGenerateRequestWithOptions(prompt, model string, opts *GenerateOptions) 
 		req.Image = imageURLContent(opts.ImageURL)
 	} else if opts.ImageFileID != "" {
 		req.Image = imageFileContent(opts.ImageFileID)
+	}
+	if opts.LastFrameURL != "" {
+		req.LastFrame = imageURLContent(opts.LastFrameURL)
+	} else if opts.LastFrameFileID != "" {
+		req.LastFrame = imageFileContent(opts.LastFrameFileID)
+	}
+	for _, frame := range opts.Keyframes {
+		image := imageURLContent(strings.TrimSpace(frame.ImageURL))
+		if frame.ImageURL == "" {
+			image = imageFileContent(strings.TrimSpace(frame.ImageFileID))
+		}
+		req.Keyframes = append(req.Keyframes, &xaiv1.VideoKeyframe{Image: image, TimestampS: frame.Timestamp})
 	}
 	if opts.VideoURL != "" {
 		req.Video = videoURLContent(opts.VideoURL)
@@ -279,6 +302,9 @@ func (c *Client) GenerateDeferred(ctx context.Context, req *xaiv1.GenerateVideoR
 }
 
 func (c *Client) Start(ctx context.Context, prompt, model string, opts *GenerateOptions) (*xaiv1.StartDeferredResponse, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
 	return c.GenerateDeferred(ctx, NewGenerateRequestWithOptions(prompt, model, opts))
 }
 
@@ -378,4 +404,36 @@ func (c *Client) poll(ctx context.Context, requestID string, opts *GenerateOptio
 		case <-ticker.C:
 		}
 	}
+}
+
+// Validate checks mutually exclusive input sources and keyframe image values.
+// Duration-dependent keyframe constraints remain server-side, as in Python.
+func (opts *GenerateOptions) Validate() error {
+	if opts == nil {
+		return nil
+	}
+	for _, pair := range [][3]string{{"image", opts.ImageURL, opts.ImageFileID}, {"video", opts.VideoURL, opts.VideoFileID}, {"last_frame", opts.LastFrameURL, opts.LastFrameFileID}} {
+		if pair[1] != "" && pair[2] != "" {
+			return fmt.Errorf("only one URL or file ID may be set for %s", pair[0])
+		}
+	}
+	for i, frame := range opts.Keyframes {
+		if (frame.ImageURL != "" && frame.ImageFileID != "") || (strings.TrimSpace(frame.ImageURL) == "" && strings.TrimSpace(frame.ImageFileID) == "") {
+			return fmt.Errorf("keyframe %d must contain exactly one nonempty image URL or file ID", i)
+		}
+	}
+	return nil
+}
+
+// PrepareChecked validates inputs before preparing a batch request. Prepare retains
+// its original no-error signature for callers that validate their own inputs.
+func PrepareChecked(prompt, model, batchRequestID string, opts *GenerateOptions) (*xaiv1.BatchRequest, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
+	return Prepare(prompt, model, batchRequestID, opts), nil
+}
+
+func (c *Client) PrepareChecked(prompt, model, batchRequestID string, opts *GenerateOptions) (*xaiv1.BatchRequest, error) {
+	return PrepareChecked(prompt, model, batchRequestID, opts)
 }

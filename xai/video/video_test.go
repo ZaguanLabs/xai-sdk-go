@@ -1,6 +1,8 @@
 package video
 
 import (
+	"context"
+	"google.golang.org/protobuf/proto"
 	"testing"
 	"time"
 
@@ -188,5 +190,59 @@ func TestResponseStorageAccessors(t *testing.T) {
 	})
 	if resp.FileOutput().GetFileId() != "file-1" || resp.PublicURL() != publicURL || resp.PublicURLError() != publicURLError || resp.StorageError() != storageError {
 		t.Fatalf("unexpected storage accessors")
+	}
+}
+
+func TestPinnedFramesWireRoundTrip(t *testing.T) {
+	for _, opts := range []*GenerateOptions{
+		{ImageFileID: "first", LastFrameURL: "https://example.com/last.png", Keyframes: []Keyframe{{ImageURL: " https://example.com/middle.png ", Timestamp: 2.5}, {ImageFileID: " middle-file ", Timestamp: 4}}},
+		{LastFrameFileID: "last-file"},
+	} {
+		batch, err := PrepareChecked("prompt", "grok-imagine-video-1.5", "id", opts)
+		if err != nil {
+			t.Fatal(err)
+		}
+		wire, err := proto.Marshal(batch.GetVideoRequest())
+		if err != nil {
+			t.Fatal(err)
+		}
+		var got xaiv1.GenerateVideoRequest
+		if err := proto.Unmarshal(wire, &got); err != nil {
+			t.Fatal(err)
+		}
+		if got.GetLastFrame().GetImageUrl() != opts.LastFrameURL || got.GetLastFrame().GetFileId() != opts.LastFrameFileID {
+			t.Fatalf("last frame: %v", got.GetLastFrame())
+		}
+		if len(opts.Keyframes) > 0 {
+			if len(got.Keyframes) != 2 || got.Keyframes[0].TimestampS != 2.5 || got.Keyframes[0].Image.ImageUrl != "https://example.com/middle.png" || got.Keyframes[1].Image.FileId != "middle-file" {
+				t.Fatalf("keyframes: %v", got.Keyframes)
+			}
+		}
+	}
+	fields := (&xaiv1.GenerateVideoRequest{}).ProtoReflect().Descriptor().Fields()
+	if fields.ByName("last_frame").Number() != 18 || fields.ByName("keyframes").Number() != 20 {
+		t.Fatal("upstream field numbers differ")
+	}
+}
+
+func TestPinnedFramesValidation(t *testing.T) {
+	for _, opts := range []*GenerateOptions{
+		{LastFrameURL: "url", LastFrameFileID: "file"},
+		{ImageURL: "url", ImageFileID: "file"},
+		{VideoURL: "url", VideoFileID: "file"},
+		{Keyframes: []Keyframe{{}}},
+		{Keyframes: []Keyframe{{ImageURL: " "}}},
+		{Keyframes: []Keyframe{{ImageURL: "url", ImageFileID: "file"}}},
+	} {
+		if _, err := PrepareChecked("", "", "", opts); err == nil {
+			t.Fatalf("accepted invalid options: %+v", opts)
+		}
+		if _, err := NewClient(nil).Start(context.Background(), "", "", opts); err == nil {
+			t.Fatal("Start accepted invalid options")
+		}
+	}
+	// Python leaves timestamp bounds/count/model support to the service.
+	if err := (&GenerateOptions{Keyframes: []Keyframe{{ImageFileID: "file", Timestamp: -1}}}).Validate(); err != nil {
+		t.Fatal(err)
 	}
 }

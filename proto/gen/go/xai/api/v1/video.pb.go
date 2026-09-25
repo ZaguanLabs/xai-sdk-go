@@ -353,6 +353,58 @@ func (x *GeneratedVideo) GetStorageError() string {
 	return ""
 }
 
+type VideoKeyframe struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Image         *ImageUrlContent       `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
+	TimestampS    float32                `protobuf:"fixed32,2,opt,name=timestamp_s,json=timestampS,proto3" json:"timestamp_s,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VideoKeyframe) Reset() {
+	*x = VideoKeyframe{}
+	mi := &file_xai_api_v1_video_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VideoKeyframe) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VideoKeyframe) ProtoMessage() {}
+
+func (x *VideoKeyframe) ProtoReflect() protoreflect.Message {
+	mi := &file_xai_api_v1_video_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VideoKeyframe.ProtoReflect.Descriptor instead.
+func (*VideoKeyframe) Descriptor() ([]byte, []int) {
+	return file_xai_api_v1_video_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *VideoKeyframe) GetImage() *ImageUrlContent {
+	if x != nil {
+		return x.Image
+	}
+	return nil
+}
+
+func (x *VideoKeyframe) GetTimestampS() float32 {
+	if x != nil {
+		return x.TimestampS
+	}
+	return 0
+}
+
 type GenerateVideoRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Prompt          string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
@@ -366,13 +418,15 @@ type GenerateVideoRequest struct {
 	StorageOptions  *StorageOptions        `protobuf:"bytes,14,opt,name=storage_options,json=storageOptions,proto3,oneof" json:"storage_options,omitempty"`
 	ReferenceAudios []*AudioUrlContent     `protobuf:"bytes,16,rep,name=reference_audios,json=referenceAudios,proto3" json:"reference_audios,omitempty"`
 	GenerateAudio   *bool                  `protobuf:"varint,17,opt,name=generate_audio,json=generateAudio,proto3,oneof" json:"generate_audio,omitempty"`
+	LastFrame       *ImageUrlContent       `protobuf:"bytes,18,opt,name=last_frame,json=lastFrame,proto3" json:"last_frame,omitempty"`
+	Keyframes       []*VideoKeyframe       `protobuf:"bytes,20,rep,name=keyframes,proto3" json:"keyframes,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
 
 func (x *GenerateVideoRequest) Reset() {
 	*x = GenerateVideoRequest{}
-	mi := &file_xai_api_v1_video_proto_msgTypes[4]
+	mi := &file_xai_api_v1_video_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -384,7 +438,7 @@ func (x *GenerateVideoRequest) String() string {
 func (*GenerateVideoRequest) ProtoMessage() {}
 
 func (x *GenerateVideoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_video_proto_msgTypes[4]
+	mi := &file_xai_api_v1_video_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -397,7 +451,7 @@ func (x *GenerateVideoRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateVideoRequest.ProtoReflect.Descriptor instead.
 func (*GenerateVideoRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_video_proto_rawDescGZIP(), []int{4}
+	return file_xai_api_v1_video_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GenerateVideoRequest) GetPrompt() string {
@@ -477,6 +531,20 @@ func (x *GenerateVideoRequest) GetGenerateAudio() bool {
 	return false
 }
 
+func (x *GenerateVideoRequest) GetLastFrame() *ImageUrlContent {
+	if x != nil {
+		return x.LastFrame
+	}
+	return nil
+}
+
+func (x *GenerateVideoRequest) GetKeyframes() []*VideoKeyframe {
+	if x != nil {
+		return x.Keyframes
+	}
+	return nil
+}
+
 type GetDeferredVideoRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RequestId     string                 `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
@@ -486,7 +554,7 @@ type GetDeferredVideoRequest struct {
 
 func (x *GetDeferredVideoRequest) Reset() {
 	*x = GetDeferredVideoRequest{}
-	mi := &file_xai_api_v1_video_proto_msgTypes[5]
+	mi := &file_xai_api_v1_video_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -498,7 +566,7 @@ func (x *GetDeferredVideoRequest) String() string {
 func (*GetDeferredVideoRequest) ProtoMessage() {}
 
 func (x *GetDeferredVideoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_video_proto_msgTypes[5]
+	mi := &file_xai_api_v1_video_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -511,7 +579,7 @@ func (x *GetDeferredVideoRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeferredVideoRequest.ProtoReflect.Descriptor instead.
 func (*GetDeferredVideoRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_video_proto_rawDescGZIP(), []int{5}
+	return file_xai_api_v1_video_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetDeferredVideoRequest) GetRequestId() string {
@@ -534,7 +602,7 @@ type VideoResponse struct {
 
 func (x *VideoResponse) Reset() {
 	*x = VideoResponse{}
-	mi := &file_xai_api_v1_video_proto_msgTypes[6]
+	mi := &file_xai_api_v1_video_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -546,7 +614,7 @@ func (x *VideoResponse) String() string {
 func (*VideoResponse) ProtoMessage() {}
 
 func (x *VideoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_video_proto_msgTypes[6]
+	mi := &file_xai_api_v1_video_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -559,7 +627,7 @@ func (x *VideoResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VideoResponse.ProtoReflect.Descriptor instead.
 func (*VideoResponse) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_video_proto_rawDescGZIP(), []int{6}
+	return file_xai_api_v1_video_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *VideoResponse) GetVideo() *GeneratedVideo {
@@ -607,7 +675,7 @@ type GetDeferredVideoResponse struct {
 
 func (x *GetDeferredVideoResponse) Reset() {
 	*x = GetDeferredVideoResponse{}
-	mi := &file_xai_api_v1_video_proto_msgTypes[7]
+	mi := &file_xai_api_v1_video_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -619,7 +687,7 @@ func (x *GetDeferredVideoResponse) String() string {
 func (*GetDeferredVideoResponse) ProtoMessage() {}
 
 func (x *GetDeferredVideoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_video_proto_msgTypes[7]
+	mi := &file_xai_api_v1_video_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -632,7 +700,7 @@ func (x *GetDeferredVideoResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeferredVideoResponse.ProtoReflect.Descriptor instead.
 func (*GetDeferredVideoResponse) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_video_proto_rawDescGZIP(), []int{7}
+	return file_xai_api_v1_video_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetDeferredVideoResponse) GetStatus() DeferredStatus {
@@ -659,7 +727,7 @@ type VideoError struct {
 
 func (x *VideoError) Reset() {
 	*x = VideoError{}
-	mi := &file_xai_api_v1_video_proto_msgTypes[8]
+	mi := &file_xai_api_v1_video_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -671,7 +739,7 @@ func (x *VideoError) String() string {
 func (*VideoError) ProtoMessage() {}
 
 func (x *VideoError) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_video_proto_msgTypes[8]
+	mi := &file_xai_api_v1_video_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -684,7 +752,7 @@ func (x *VideoError) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VideoError.ProtoReflect.Descriptor instead.
 func (*VideoError) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_video_proto_rawDescGZIP(), []int{8}
+	return file_xai_api_v1_video_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *VideoError) GetCode() string {
@@ -714,7 +782,7 @@ type ExtendVideoRequest struct {
 
 func (x *ExtendVideoRequest) Reset() {
 	*x = ExtendVideoRequest{}
-	mi := &file_xai_api_v1_video_proto_msgTypes[9]
+	mi := &file_xai_api_v1_video_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -726,7 +794,7 @@ func (x *ExtendVideoRequest) String() string {
 func (*ExtendVideoRequest) ProtoMessage() {}
 
 func (x *ExtendVideoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_xai_api_v1_video_proto_msgTypes[9]
+	mi := &file_xai_api_v1_video_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -739,7 +807,7 @@ func (x *ExtendVideoRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExtendVideoRequest.ProtoReflect.Descriptor instead.
 func (*ExtendVideoRequest) Descriptor() ([]byte, []int) {
-	return file_xai_api_v1_video_proto_rawDescGZIP(), []int{9}
+	return file_xai_api_v1_video_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ExtendVideoRequest) GetPrompt() string {
@@ -799,7 +867,11 @@ const file_xai_api_v1_video_proto_rawDesc = "" +
 	"fileOutput\x88\x01\x01\x12(\n" +
 	"\rstorage_error\x18\a \x01(\tH\x01R\fstorageError\x88\x01\x01B\x0e\n" +
 	"\f_file_outputB\x10\n" +
-	"\x0e_storage_error\"\x98\x05\n" +
+	"\x0e_storage_error\"`\n" +
+	"\rVideoKeyframe\x12.\n" +
+	"\x05image\x18\x01 \x01(\v2\x18.xai_api.ImageUrlContentR\x05image\x12\x1f\n" +
+	"\vtimestamp_s\x18\x02 \x01(\x02R\n" +
+	"timestampS\"\x87\x06\n" +
 	"\x14GenerateVideoRequest\x12\x16\n" +
 	"\x06prompt\x18\x01 \x01(\tR\x06prompt\x12.\n" +
 	"\x05image\x18\x02 \x01(\v2\x18.xai_api.ImageUrlContentR\x05image\x12\x14\n" +
@@ -813,7 +885,10 @@ const file_xai_api_v1_video_proto_rawDesc = "" +
 	"\x10reference_images\x18\r \x03(\v2\x18.xai_api.ImageUrlContentR\x0freferenceImages\x12E\n" +
 	"\x0fstorage_options\x18\x0e \x01(\v2\x17.xai_api.StorageOptionsH\x03R\x0estorageOptions\x88\x01\x01\x12C\n" +
 	"\x10reference_audios\x18\x10 \x03(\v2\x18.xai_api.AudioUrlContentR\x0freferenceAudios\x12*\n" +
-	"\x0egenerate_audio\x18\x11 \x01(\bH\x04R\rgenerateAudio\x88\x01\x01B\v\n" +
+	"\x0egenerate_audio\x18\x11 \x01(\bH\x04R\rgenerateAudio\x88\x01\x01\x127\n" +
+	"\n" +
+	"last_frame\x18\x12 \x01(\v2\x18.xai_api.ImageUrlContentR\tlastFrame\x124\n" +
+	"\tkeyframes\x18\x14 \x03(\v2\x16.xai_api.VideoKeyframeR\tkeyframesB\v\n" +
 	"\t_durationB\x0f\n" +
 	"\r_aspect_ratioB\r\n" +
 	"\v_resolutionB\x12\n" +
@@ -879,7 +954,7 @@ func file_xai_api_v1_video_proto_rawDescGZIP() []byte {
 }
 
 var file_xai_api_v1_video_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_xai_api_v1_video_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_xai_api_v1_video_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_xai_api_v1_video_proto_goTypes = []any{
 	(VideoAspectRatio)(0),            // 0: xai_api.VideoAspectRatio
 	(VideoResolution)(0),             // 1: xai_api.VideoResolution
@@ -887,46 +962,50 @@ var file_xai_api_v1_video_proto_goTypes = []any{
 	(*AudioUrlContent)(nil),          // 3: xai_api.AudioUrlContent
 	(*VideoOutput)(nil),              // 4: xai_api.VideoOutput
 	(*GeneratedVideo)(nil),           // 5: xai_api.GeneratedVideo
-	(*GenerateVideoRequest)(nil),     // 6: xai_api.GenerateVideoRequest
-	(*GetDeferredVideoRequest)(nil),  // 7: xai_api.GetDeferredVideoRequest
-	(*VideoResponse)(nil),            // 8: xai_api.VideoResponse
-	(*GetDeferredVideoResponse)(nil), // 9: xai_api.GetDeferredVideoResponse
-	(*VideoError)(nil),               // 10: xai_api.VideoError
-	(*ExtendVideoRequest)(nil),       // 11: xai_api.ExtendVideoRequest
-	(*FileOutput)(nil),               // 12: xai_api.FileOutput
-	(*ImageUrlContent)(nil),          // 13: xai_api.ImageUrlContent
-	(*StorageOptions)(nil),           // 14: xai_api.StorageOptions
-	(*SamplingUsage)(nil),            // 15: xai_api.SamplingUsage
-	(DeferredStatus)(0),              // 16: xai_api.DeferredStatus
-	(*StartDeferredResponse)(nil),    // 17: xai_api.StartDeferredResponse
+	(*VideoKeyframe)(nil),            // 6: xai_api.VideoKeyframe
+	(*GenerateVideoRequest)(nil),     // 7: xai_api.GenerateVideoRequest
+	(*GetDeferredVideoRequest)(nil),  // 8: xai_api.GetDeferredVideoRequest
+	(*VideoResponse)(nil),            // 9: xai_api.VideoResponse
+	(*GetDeferredVideoResponse)(nil), // 10: xai_api.GetDeferredVideoResponse
+	(*VideoError)(nil),               // 11: xai_api.VideoError
+	(*ExtendVideoRequest)(nil),       // 12: xai_api.ExtendVideoRequest
+	(*FileOutput)(nil),               // 13: xai_api.FileOutput
+	(*ImageUrlContent)(nil),          // 14: xai_api.ImageUrlContent
+	(*StorageOptions)(nil),           // 15: xai_api.StorageOptions
+	(*SamplingUsage)(nil),            // 16: xai_api.SamplingUsage
+	(DeferredStatus)(0),              // 17: xai_api.DeferredStatus
+	(*StartDeferredResponse)(nil),    // 18: xai_api.StartDeferredResponse
 }
 var file_xai_api_v1_video_proto_depIdxs = []int32{
-	12, // 0: xai_api.GeneratedVideo.file_output:type_name -> xai_api.FileOutput
-	13, // 1: xai_api.GenerateVideoRequest.image:type_name -> xai_api.ImageUrlContent
-	2,  // 2: xai_api.GenerateVideoRequest.video:type_name -> xai_api.VideoUrlContent
-	0,  // 3: xai_api.GenerateVideoRequest.aspect_ratio:type_name -> xai_api.VideoAspectRatio
-	1,  // 4: xai_api.GenerateVideoRequest.resolution:type_name -> xai_api.VideoResolution
-	13, // 5: xai_api.GenerateVideoRequest.reference_images:type_name -> xai_api.ImageUrlContent
-	14, // 6: xai_api.GenerateVideoRequest.storage_options:type_name -> xai_api.StorageOptions
-	3,  // 7: xai_api.GenerateVideoRequest.reference_audios:type_name -> xai_api.AudioUrlContent
-	5,  // 8: xai_api.VideoResponse.video:type_name -> xai_api.GeneratedVideo
-	15, // 9: xai_api.VideoResponse.usage:type_name -> xai_api.SamplingUsage
-	10, // 10: xai_api.VideoResponse.error:type_name -> xai_api.VideoError
-	16, // 11: xai_api.GetDeferredVideoResponse.status:type_name -> xai_api.DeferredStatus
-	8,  // 12: xai_api.GetDeferredVideoResponse.response:type_name -> xai_api.VideoResponse
-	2,  // 13: xai_api.ExtendVideoRequest.video:type_name -> xai_api.VideoUrlContent
-	14, // 14: xai_api.ExtendVideoRequest.storage_options:type_name -> xai_api.StorageOptions
-	6,  // 15: xai_api.Video.GenerateVideo:input_type -> xai_api.GenerateVideoRequest
-	11, // 16: xai_api.Video.ExtendVideo:input_type -> xai_api.ExtendVideoRequest
-	7,  // 17: xai_api.Video.GetDeferredVideo:input_type -> xai_api.GetDeferredVideoRequest
-	17, // 18: xai_api.Video.GenerateVideo:output_type -> xai_api.StartDeferredResponse
-	17, // 19: xai_api.Video.ExtendVideo:output_type -> xai_api.StartDeferredResponse
-	9,  // 20: xai_api.Video.GetDeferredVideo:output_type -> xai_api.GetDeferredVideoResponse
-	18, // [18:21] is the sub-list for method output_type
-	15, // [15:18] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	13, // 0: xai_api.GeneratedVideo.file_output:type_name -> xai_api.FileOutput
+	14, // 1: xai_api.VideoKeyframe.image:type_name -> xai_api.ImageUrlContent
+	14, // 2: xai_api.GenerateVideoRequest.image:type_name -> xai_api.ImageUrlContent
+	2,  // 3: xai_api.GenerateVideoRequest.video:type_name -> xai_api.VideoUrlContent
+	0,  // 4: xai_api.GenerateVideoRequest.aspect_ratio:type_name -> xai_api.VideoAspectRatio
+	1,  // 5: xai_api.GenerateVideoRequest.resolution:type_name -> xai_api.VideoResolution
+	14, // 6: xai_api.GenerateVideoRequest.reference_images:type_name -> xai_api.ImageUrlContent
+	15, // 7: xai_api.GenerateVideoRequest.storage_options:type_name -> xai_api.StorageOptions
+	3,  // 8: xai_api.GenerateVideoRequest.reference_audios:type_name -> xai_api.AudioUrlContent
+	14, // 9: xai_api.GenerateVideoRequest.last_frame:type_name -> xai_api.ImageUrlContent
+	6,  // 10: xai_api.GenerateVideoRequest.keyframes:type_name -> xai_api.VideoKeyframe
+	5,  // 11: xai_api.VideoResponse.video:type_name -> xai_api.GeneratedVideo
+	16, // 12: xai_api.VideoResponse.usage:type_name -> xai_api.SamplingUsage
+	11, // 13: xai_api.VideoResponse.error:type_name -> xai_api.VideoError
+	17, // 14: xai_api.GetDeferredVideoResponse.status:type_name -> xai_api.DeferredStatus
+	9,  // 15: xai_api.GetDeferredVideoResponse.response:type_name -> xai_api.VideoResponse
+	2,  // 16: xai_api.ExtendVideoRequest.video:type_name -> xai_api.VideoUrlContent
+	15, // 17: xai_api.ExtendVideoRequest.storage_options:type_name -> xai_api.StorageOptions
+	7,  // 18: xai_api.Video.GenerateVideo:input_type -> xai_api.GenerateVideoRequest
+	12, // 19: xai_api.Video.ExtendVideo:input_type -> xai_api.ExtendVideoRequest
+	8,  // 20: xai_api.Video.GetDeferredVideo:input_type -> xai_api.GetDeferredVideoRequest
+	18, // 21: xai_api.Video.GenerateVideo:output_type -> xai_api.StartDeferredResponse
+	18, // 22: xai_api.Video.ExtendVideo:output_type -> xai_api.StartDeferredResponse
+	10, // 23: xai_api.Video.GetDeferredVideo:output_type -> xai_api.GetDeferredVideoResponse
+	21, // [21:24] is the sub-list for method output_type
+	18, // [18:21] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_xai_api_v1_video_proto_init() }
@@ -939,17 +1018,17 @@ func file_xai_api_v1_video_proto_init() {
 	file_xai_api_v1_usage_proto_init()
 	file_xai_api_v1_video_proto_msgTypes[1].OneofWrappers = []any{}
 	file_xai_api_v1_video_proto_msgTypes[3].OneofWrappers = []any{}
-	file_xai_api_v1_video_proto_msgTypes[4].OneofWrappers = []any{}
-	file_xai_api_v1_video_proto_msgTypes[6].OneofWrappers = []any{}
+	file_xai_api_v1_video_proto_msgTypes[5].OneofWrappers = []any{}
 	file_xai_api_v1_video_proto_msgTypes[7].OneofWrappers = []any{}
-	file_xai_api_v1_video_proto_msgTypes[9].OneofWrappers = []any{}
+	file_xai_api_v1_video_proto_msgTypes[8].OneofWrappers = []any{}
+	file_xai_api_v1_video_proto_msgTypes[10].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_xai_api_v1_video_proto_rawDesc), len(file_xai_api_v1_video_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   10,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

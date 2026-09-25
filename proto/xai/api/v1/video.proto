@@ -27,6 +27,11 @@ message GeneratedVideo {
   optional string storage_error = 7;
 }
 
+message VideoKeyframe {
+  ImageUrlContent image = 1;
+  float timestamp_s = 2;
+}
+
 message GenerateVideoRequest {
   string prompt = 1;
   ImageUrlContent image = 2;
@@ -39,6 +44,8 @@ message GenerateVideoRequest {
   optional StorageOptions storage_options = 14;
   repeated AudioUrlContent reference_audios = 16;
   optional bool generate_audio = 17;
+  ImageUrlContent last_frame = 18;
+  repeated VideoKeyframe keyframes = 20;
 }
 
 message GetDeferredVideoRequest {
