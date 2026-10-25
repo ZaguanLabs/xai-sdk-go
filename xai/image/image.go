@@ -237,9 +237,9 @@ func inputProto(input *Input) *xaiv1.ImageUrlContent {
 	}
 	pb := &xaiv1.ImageUrlContent{Detail: input.Detail}
 	if input.FileID != "" {
-		pb.FileId = input.FileID
+		pb.Source = &xaiv1.ImageUrlContent_FileId{FileId: input.FileID}
 	} else {
-		pb.ImageUrl = input.ImageURL
+		pb.Source = &xaiv1.ImageUrlContent_ImageUrl{ImageUrl: input.ImageURL}
 	}
 	return pb
 }

@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.21.0 - 2026-10-25
+
+- Correct protocol field numbers, oneofs, optional presence and missing RPCs against all official API descriptors.
+- Use native streaming gRPC for Files, including expiry, download formats and pagination.
+- Add context compaction, service tiers, inline files, generated-file metadata, byte chunking and batch-status filters.
+- Direct protobuf content/citation users must migrate to the official Source/Citation wrappers; high-level helpers retain their signatures.
+
+- Port Python SDK 1.21.0 safety identifiers and per-category policy guidelines.
+- Preserve optional identifier presence and upstream protobuf field and enum numbers.
+- Add validated native guidelines and a protobuf path with independent request copies.
+
 ## v1.20.0 - 2026-09-25
 
 - Match Python SDK 1.20.0 video protobuf fields and first/last-frame and keyframe inputs.

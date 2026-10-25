@@ -835,6 +835,8 @@ func splitResponses(resp *xaiv1.GetChatCompletionResponse) []*Response {
 			Settings:          resp.Settings,
 			DebugOutput:       resp.DebugOutput,
 			Citations:         resp.Citations,
+			OutputFiles:       resp.OutputFiles,
+			ServiceTier:       resp.ServiceTier,
 			Outputs:           []*xaiv1.CompletionOutput{output},
 		}
 		responses = append(responses, &Response{proto: responseProto})
@@ -1678,6 +1680,8 @@ func cloneChunkWithOutput(chunk *xaiv1.GetChatCompletionChunk, output *xaiv1.Com
 		SystemFingerprint: chunk.SystemFingerprint,
 		Usage:             chunk.Usage,
 		Citations:         chunk.Citations,
+		OutputFiles:       chunk.OutputFiles,
+		ServiceTier:       chunk.ServiceTier,
 	}
 	if output != nil {
 		cloned.Outputs = []*xaiv1.CompletionOutputChunk{output}
@@ -1686,7 +1690,7 @@ func cloneChunkWithOutput(chunk *xaiv1.GetChatCompletionChunk, output *xaiv1.Com
 }
 
 func applyChunkToResponse(resp *Response, chunk *xaiv1.GetChatCompletionChunk, output *xaiv1.CompletionOutputChunk) {
-	if resp == nil || resp.proto == nil || output == nil {
+	if resp == nil || resp.proto == nil || chunk == nil {
 		return
 	}
 	resp.proto.Id = chunk.Id
@@ -1694,7 +1698,18 @@ func applyChunkToResponse(resp *Response, chunk *xaiv1.GetChatCompletionChunk, o
 	resp.proto.Created = chunk.Created
 	resp.proto.SystemFingerprint = chunk.SystemFingerprint
 	resp.proto.Usage = chunk.Usage
-	resp.proto.Citations = chunk.Citations
+	resp.proto.Citations = append(resp.proto.Citations, chunk.Citations...)
+	resp.proto.OutputFiles = append(resp.proto.OutputFiles, chunk.OutputFiles...)
+	if chunk.ServiceTier != xaiv1.ServiceTier_SERVICE_TIER_UNSPECIFIED {
+		resp.proto.ServiceTier = chunk.ServiceTier
+	}
+	if output == nil {
+		return
+	}
+
+	applyChunkOutput(resp, output)
+}
+func applyChunkOutput(resp *Response, output *xaiv1.CompletionOutputChunk) {
 
 	if len(resp.proto.Outputs) == 0 || resp.proto.Outputs[0] == nil {
 		resp.proto.Outputs = []*xaiv1.CompletionOutput{{Index: output.Index, Message: &xaiv1.CompletionMessage{}}}
@@ -1746,6 +1761,7 @@ func (s *BatchStream) Next() bool {
 	s.currentChunks = make([]*Chunk, s.count)
 	for i := int32(0); i < s.count; i++ {
 		s.currentChunks[i] = &Chunk{proto: cloneChunkWithOutput(chunk, nil)}
+		applyChunkToResponse(s.responses[i], chunk, nil)
 	}
 
 	for _, output := range chunk.Outputs {
@@ -1756,7 +1772,7 @@ func (s *BatchStream) Next() bool {
 		if index < 0 || index >= len(s.responses) {
 			continue
 		}
-		applyChunkToResponse(s.responses[index], chunk, output)
+		applyChunkOutput(s.responses[index], output)
 		s.currentChunks[index] = &Chunk{proto: cloneChunkWithOutput(chunk, output)}
 	}
 

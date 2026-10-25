@@ -26,8 +26,8 @@ func NewMessage(role string, parts ...Part) *Message {
 				contents = append(contents, &xaiv1.Content{
 					Content: &xaiv1.Content_ImageUrl{
 						ImageUrl: &xaiv1.ImageUrlContent{
-							ImageUrl: img.ImageURL(),
-							Detail:   img.Detail(),
+							Source: &xaiv1.ImageUrlContent_ImageUrl{ImageUrl: img.ImageURL()},
+							Detail: img.Detail(),
 						},
 					},
 				})
@@ -39,6 +39,7 @@ func NewMessage(role string, parts ...Part) *Message {
 					Content: &xaiv1.Content_File{
 						File: &xaiv1.FileContent{
 							FileId: file.FileID(),
+							Data:   append([]byte(nil), file.data...), Filename: file.filename, MimeType: file.mimeType, Url: file.url,
 						},
 					},
 				})

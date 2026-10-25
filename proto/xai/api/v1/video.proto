@@ -7,12 +7,17 @@ import "xai/api/v1/image.proto";
 import "xai/api/v1/usage.proto";
 
 message VideoUrlContent {
-  string url = 1;
-  string file_id = 2;
+  oneof source {
+    string url = 1;
+    string file_id = 2;
+  }
 }
 
 message AudioUrlContent {
-  optional string voice_id = 2;
+  reserved 1;
+  oneof source {
+    string voice_id = 2;
+  }
 }
 
 message VideoOutput {

@@ -73,7 +73,7 @@ func TestRequestBuilders(t *testing.T) {
 		t.Errorf("ImageURL = %v, want http://example.com/img.jpg", req.Image.ImageURL)
 	}
 	protoReq := req.Proto()
-	if len(protoReq.Images) != 1 || protoReq.Images[0].ImageUrl != "http://example.com/ref.jpg" {
+	if len(protoReq.Images) != 1 || protoReq.Images[0].GetImageUrl() != "http://example.com/ref.jpg" {
 		t.Errorf("Images = %v, want one reference image", protoReq.Images)
 	}
 	if protoReq.GetAspectRatio() != aspectRatio {

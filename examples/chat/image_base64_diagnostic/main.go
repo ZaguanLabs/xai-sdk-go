@@ -64,8 +64,8 @@ func main() {
 			}
 			if img := content.GetImageUrl(); img != nil {
 				fmt.Printf("  Type: Image\n")
-				fmt.Printf("  ImageUrl length: %d\n", len(img.ImageUrl))
-				fmt.Printf("  ImageUrl prefix: %s...\n", img.ImageUrl[:50])
+				fmt.Printf("  ImageUrl length: %d\n", len(img.GetImageUrl()))
+				fmt.Printf("  ImageUrl prefix: %s...\n", img.GetImageUrl()[:50])
 				fmt.Printf("  Detail: %v\n", img.Detail)
 			}
 			if file := content.GetFile(); file != nil {

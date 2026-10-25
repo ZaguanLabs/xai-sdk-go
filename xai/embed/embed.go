@@ -80,8 +80,8 @@ func Image(imageURL string, detail xaiv1.ImageDetail) Input {
 		proto: &xaiv1.EmbedInput{
 			Input: &xaiv1.EmbedInput_ImageUrl{
 				ImageUrl: &xaiv1.ImageUrlContent{
-					ImageUrl: imageURL,
-					Detail:   detail,
+					Source: &xaiv1.ImageUrlContent_ImageUrl{ImageUrl: imageURL},
+					Detail: detail,
 				},
 			},
 		},

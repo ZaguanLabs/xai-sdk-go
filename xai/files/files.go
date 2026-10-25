@@ -4,8 +4,10 @@ package files
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -18,6 +20,7 @@ import (
 // Client provides access to the xAI Files API.
 type Client struct {
 	restClient *rest.Client
+	grpcClient xaiv1.FilesClient
 }
 
 // NewClient creates a new Files API client.
@@ -25,6 +28,11 @@ func NewClient(restClient *rest.Client) *Client {
 	return &Client{
 		restClient: restClient,
 	}
+}
+
+// NewGRPCClient uses the native Files protocol and retains REST for legacy URL helpers.
+func NewGRPCClient(client xaiv1.FilesClient, restClient *rest.Client) *Client {
+	return &Client{grpcClient: client, restClient: restClient}
 }
 
 // File represents a file with metadata.
@@ -56,8 +64,11 @@ type ListResult struct {
 
 // UploadOptions contains options for uploading a file.
 type UploadOptions struct {
-	Name    string
-	Purpose string
+	Name string
+	// Purpose is retained for legacy REST clients. Native uploads use expiry instead.
+	Purpose      string
+	ExpiresAfter *time.Duration
+	OnProgress   func(uploaded, total int64)
 	// MaxSize is the maximum file size in bytes. If 0, defaults to DefaultMaxFileSize (100MB).
 	MaxSize int64
 }
@@ -114,7 +125,6 @@ func fromProto(pf *xaiv1.File) *File {
 		ID:       pf.Id,
 		Filename: pf.Filename,
 		Size:     pf.Size,
-		TeamID:   pf.TeamId,
 	}
 
 	if pf.CreatedAt != nil {
@@ -136,6 +146,9 @@ func fromProto(pf *xaiv1.File) *File {
 
 // Upload uploads a file.
 func (c *Client) Upload(ctx context.Context, reader io.Reader, opts UploadOptions) (*File, error) {
+	if c.grpcClient != nil {
+		return c.uploadGRPC(ctx, reader, opts)
+	}
 	if c.restClient == nil {
 		return nil, ErrClientNotInitialized
 	}
@@ -160,16 +173,8 @@ func (c *Client) Upload(ctx context.Context, reader io.Reader, opts UploadOption
 		return nil, fmt.Errorf("%w: file size %d exceeds limit %d", ErrFileTooLarge, len(content), maxSize)
 	}
 
-	// Create upload request
-	req := &xaiv1.UploadFileChunk{
-		Init: &xaiv1.UploadFileInit{
-			Name:    opts.Name,
-			Purpose: opts.Purpose,
-		},
-		Data: content,
-	}
-
-	jsonData, err := protojson.Marshal(req)
+	// Legacy JSON endpoint accepts both initialization and content in one request.
+	jsonData, err := json.Marshal(map[string]any{"init": map[string]any{"name": opts.Name, "purpose": opts.Purpose}, "data": content})
 	if err != nil {
 		return nil, err
 	}
@@ -189,6 +194,19 @@ func (c *Client) Upload(ctx context.Context, reader io.Reader, opts UploadOption
 
 // Download downloads a file's content.
 func (c *Client) Download(ctx context.Context, fileID string) (io.ReadCloser, error) {
+	return c.DownloadWithFormat(ctx, fileID, nil)
+}
+
+func (c *Client) DownloadWithFormat(ctx context.Context, fileID string, format *xaiv1.DownloadFormat) (io.ReadCloser, error) {
+	if c.grpcClient != nil {
+		streamCtx, cancel := context.WithCancel(ctx)
+		stream, err := c.grpcClient.RetrieveFileContent(streamCtx, &xaiv1.RetrieveFileContentRequest{FileId: fileID, Format: format})
+		if err != nil {
+			cancel()
+			return nil, err
+		}
+		return &contentReader{recv: stream.Recv, cancel: cancel}, nil
+	}
 	if c.restClient == nil {
 		return nil, ErrClientNotInitialized
 	}
@@ -221,34 +239,43 @@ func (c *Client) Content(ctx context.Context, fileID string) ([]byte, error) {
 
 // List lists files with optional filtering and pagination.
 func (c *Client) List(ctx context.Context, opts *ListOptions) (*ListResult, error) {
-	if c.restClient == nil {
-		return nil, ErrClientNotInitialized
-	}
 
 	req := &xaiv1.ListFilesRequest{}
 	if opts != nil {
 		req.Limit = opts.Limit
 		req.Order = opts.Order
-		req.PaginationToken = opts.PaginationToken
-		req.SortBy = opts.SortBy
+		if opts.PaginationToken != "" {
+			req.PaginationToken = &opts.PaginationToken
+		}
+		req.SortBy = &opts.SortBy
 		if opts.Filter != "" {
 			req.Filter = &opts.Filter
 		}
 	}
 
-	jsonData, err := protojson.Marshal(req)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := c.restClient.Post(ctx, "/files/list", jsonData)
-	if err != nil {
-		return nil, err
-	}
-
-	var listResp xaiv1.ListFilesResponse
-	if err := protojson.Unmarshal(resp.Body, &listResp); err != nil {
-		return nil, err
+	var listResp *xaiv1.ListFilesResponse
+	if c.grpcClient != nil {
+		var err error
+		listResp, err = c.grpcClient.ListFiles(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		if c.restClient == nil {
+			return nil, ErrClientNotInitialized
+		}
+		jsonData, err := protojson.Marshal(req)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.restClient.Post(ctx, "/files/list", jsonData)
+		if err != nil {
+			return nil, err
+		}
+		listResp = &xaiv1.ListFilesResponse{}
+		if err := protojson.Unmarshal(resp.Body, listResp); err != nil {
+			return nil, err
+		}
 	}
 
 	files := make([]*File, len(listResp.Data))
@@ -258,12 +285,20 @@ func (c *Client) List(ctx context.Context, opts *ListOptions) (*ListResult, erro
 
 	return &ListResult{
 		Files:           files,
-		PaginationToken: listResp.PaginationToken,
+		PaginationToken: listResp.GetPaginationToken(),
 	}, nil
 }
 
 // CreatePublicURL creates a publicly shareable URL for a stored file.
 func (c *Client) CreatePublicURL(ctx context.Context, fileID string, expiresAfter time.Duration) (*xaiv1.CreatePublicUrlResponse, error) {
+	if c.grpcClient != nil {
+		req := &xaiv1.CreatePublicUrlRequest{FileId: fileID}
+		if expiresAfter != 0 {
+			seconds := int64(expiresAfter.Seconds())
+			req.ExpiresAfter = &seconds
+		}
+		return c.grpcClient.CreatePublicUrl(ctx, req)
+	}
 	if c.restClient == nil {
 		return nil, ErrClientNotInitialized
 	}
@@ -293,6 +328,9 @@ func (c *Client) CreatePublicURL(ctx context.Context, fileID string, expiresAfte
 
 // RevokePublicURL revokes the public URL for a stored file.
 func (c *Client) RevokePublicURL(ctx context.Context, fileID string) (*xaiv1.RevokePublicUrlResponse, error) {
+	if c.grpcClient != nil {
+		return c.grpcClient.RevokePublicUrl(ctx, &xaiv1.RevokePublicUrlRequest{FileId: fileID})
+	}
 	if c.restClient == nil {
 		return nil, ErrClientNotInitialized
 	}
@@ -311,6 +349,10 @@ func (c *Client) RevokePublicURL(ctx context.Context, fileID string) (*xaiv1.Rev
 
 // Get retrieves file metadata by ID.
 func (c *Client) Get(ctx context.Context, fileID string) (*File, error) {
+	if c.grpcClient != nil {
+		f, err := c.grpcClient.RetrieveFile(ctx, &xaiv1.RetrieveFileRequest{FileId: fileID})
+		return fromProto(f), err
+	}
 	if c.restClient == nil {
 		return nil, ErrClientNotInitialized
 	}
@@ -349,6 +391,10 @@ func (c *Client) GetURL(ctx context.Context, fileID string) (string, error) {
 
 // Delete deletes a file by ID.
 func (c *Client) Delete(ctx context.Context, fileID string) error {
+	if c.grpcClient != nil {
+		_, err := c.grpcClient.DeleteFile(ctx, &xaiv1.DeleteFileRequest{FileId: fileID})
+		return err
+	}
 	if c.restClient == nil {
 		return ErrClientNotInitialized
 	}
@@ -447,3 +493,101 @@ func (c *Client) BatchUpload(
 	wg.Wait()
 	return results, nil
 }
+
+// uploadGRPC streams bounded chunks without buffering the entire file.
+func (c *Client) uploadGRPC(ctx context.Context, reader io.Reader, opts UploadOptions) (*File, error) {
+	if reader == nil {
+		return nil, fmt.Errorf("file reader is required")
+	}
+	name := opts.Name
+	if name == "" {
+		if named, ok := reader.(interface{ Name() string }); ok {
+			name = filepath.Base(named.Name())
+		}
+	}
+	if name == "" {
+		return nil, fmt.Errorf("file name is required")
+	}
+	if opts.ExpiresAfter != nil && *opts.ExpiresAfter <= 0 {
+		return nil, fmt.Errorf("expiry must be positive")
+	}
+	streamCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	stream, err := c.grpcClient.UploadFile(streamCtx)
+	if err != nil {
+		return nil, err
+	}
+	init := &xaiv1.UploadFileInit{Name: name}
+	if opts.ExpiresAfter != nil {
+		seconds := int64(opts.ExpiresAfter.Seconds())
+		init.ExpiresAfter = &seconds
+	}
+	if err := stream.Send(&xaiv1.UploadFileChunk{Chunk: &xaiv1.UploadFileChunk_Init{Init: init}}); err != nil {
+		return nil, err
+	}
+	var uploaded, total int64
+	total = -1
+	if seeker, ok := reader.(io.Seeker); ok {
+		current, err := seeker.Seek(0, io.SeekCurrent)
+		if err == nil {
+			end, err := seeker.Seek(0, io.SeekEnd)
+			if err == nil {
+				total = end - current
+			}
+			if _, err := seeker.Seek(current, io.SeekStart); err != nil {
+				return nil, err
+			}
+		}
+	}
+	buffer := make([]byte, 3*1024*1024)
+	for {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		n, readErr := reader.Read(buffer)
+		if n > 0 {
+			uploaded += int64(n)
+			if opts.MaxSize > 0 && uploaded > opts.MaxSize {
+				return nil, ErrFileTooLarge
+			}
+			if err := stream.Send(&xaiv1.UploadFileChunk{Chunk: &xaiv1.UploadFileChunk_Data{Data: buffer[:n]}}); err != nil {
+				return nil, err
+			}
+			if opts.OnProgress != nil {
+				opts.OnProgress(uploaded, total)
+			}
+		}
+		if readErr == io.EOF {
+			break
+		}
+		if readErr != nil {
+			return nil, readErr
+		}
+	}
+	file, err := stream.CloseAndRecv()
+	return fromProto(file), err
+}
+
+type contentReader struct {
+	recv    func() (*xaiv1.FileContentChunk, error)
+	cancel  context.CancelFunc
+	pending []byte
+}
+
+func (r *contentReader) Read(p []byte) (int, error) {
+	if len(p) == 0 {
+		return 0, nil
+	}
+	for len(r.pending) == 0 {
+		chunk, err := r.recv()
+		if err != nil {
+			r.cancel()
+			return 0, err
+		}
+		r.pending = chunk.Data
+	}
+	n := copy(p, r.pending)
+	r.pending = r.pending[n:]
+	return n, nil
+}
+func (r *contentReader) Close() error { r.cancel(); return nil }

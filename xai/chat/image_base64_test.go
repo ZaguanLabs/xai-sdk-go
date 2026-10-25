@@ -33,8 +33,8 @@ func TestImageBase64Encoding(t *testing.T) {
 		t.Fatal("ImageUrl is nil")
 	}
 
-	if msg.proto.Content[1].GetImageUrl().ImageUrl != base64Image {
-		t.Errorf("Expected base64 image URL %q, got %q", base64Image, msg.proto.Content[1].GetImageUrl().ImageUrl)
+	if msg.proto.Content[1].GetImageUrl().GetImageUrl() != base64Image {
+		t.Errorf("Expected base64 image URL %q, got %q", base64Image, msg.proto.Content[1].GetImageUrl().GetImageUrl())
 	}
 
 	if msg.proto.Content[1].GetImageUrl().Detail != xaiv1.ImageDetail_DETAIL_AUTO {
@@ -61,8 +61,8 @@ func TestImageWithHighDetail(t *testing.T) {
 		t.Fatal("ImageUrl is nil")
 	}
 
-	if msg.proto.Content[0].GetImageUrl().ImageUrl != imageURL {
-		t.Errorf("Expected image URL %q, got %q", imageURL, msg.proto.Content[0].GetImageUrl().ImageUrl)
+	if msg.proto.Content[0].GetImageUrl().GetImageUrl() != imageURL {
+		t.Errorf("Expected image URL %q, got %q", imageURL, msg.proto.Content[0].GetImageUrl().GetImageUrl())
 	}
 
 	if msg.proto.Content[0].GetImageUrl().Detail != xaiv1.ImageDetail_DETAIL_HIGH {
@@ -97,8 +97,8 @@ func TestMultipleImages(t *testing.T) {
 	if msg.proto.Content[1].GetImageUrl() == nil {
 		t.Fatal("First ImageUrl is nil")
 	}
-	if msg.proto.Content[1].GetImageUrl().ImageUrl != img1 {
-		t.Errorf("Expected first image URL %q, got %q", img1, msg.proto.Content[1].GetImageUrl().ImageUrl)
+	if msg.proto.Content[1].GetImageUrl().GetImageUrl() != img1 {
+		t.Errorf("Expected first image URL %q, got %q", img1, msg.proto.Content[1].GetImageUrl().GetImageUrl())
 	}
 	if msg.proto.Content[1].GetImageUrl().Detail != xaiv1.ImageDetail_DETAIL_LOW {
 		t.Errorf("Expected DETAIL_LOW for first image, got %v", msg.proto.Content[1].GetImageUrl().Detail)
@@ -108,8 +108,8 @@ func TestMultipleImages(t *testing.T) {
 	if msg.proto.Content[2].GetImageUrl() == nil {
 		t.Fatal("Second ImageUrl is nil")
 	}
-	if msg.proto.Content[2].GetImageUrl().ImageUrl != img2 {
-		t.Errorf("Expected second image URL %q, got %q", img2, msg.proto.Content[2].GetImageUrl().ImageUrl)
+	if msg.proto.Content[2].GetImageUrl().GetImageUrl() != img2 {
+		t.Errorf("Expected second image URL %q, got %q", img2, msg.proto.Content[2].GetImageUrl().GetImageUrl())
 	}
 	if msg.proto.Content[2].GetImageUrl().Detail != xaiv1.ImageDetail_DETAIL_HIGH {
 		t.Errorf("Expected DETAIL_HIGH for second image, got %v", msg.proto.Content[2].GetImageUrl().Detail)

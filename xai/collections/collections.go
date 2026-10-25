@@ -74,14 +74,12 @@ type Document struct {
 }
 
 // IndexConfiguration contains index settings.
-type IndexConfiguration struct {
-	// Configuration fields from types.proto
-}
+type IndexConfiguration = xaiv1.IndexConfiguration
 
 // ChunkConfiguration contains chunking settings.
-type ChunkConfiguration struct {
-	// Configuration fields from types.proto
-}
+type ChunkConfiguration = xaiv1.ChunkConfiguration
+
+type BytesConfiguration = xaiv1.BytesConfiguration
 
 // CreateCollectionOptions contains options for creating a collection.
 type CreateCollectionOptions struct {
@@ -157,6 +155,7 @@ func (c *Client) CreateCollection(ctx context.Context, opts CreateCollectionOpti
 		TeamId:                stringPtr(opts.TeamID),
 		CollectionName:        opts.Name,
 		CollectionDescription: stringPtr(opts.Description),
+		IndexConfiguration:    opts.IndexConfiguration, ChunkConfiguration: opts.ChunkConfiguration,
 	}
 
 	jsonData, err := protojson.Marshal(req)

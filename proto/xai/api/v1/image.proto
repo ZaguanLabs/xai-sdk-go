@@ -102,20 +102,11 @@ message GeneratedImage {
 
 // Contains data relating to an image that is provided to the model.
 message ImageUrlContent {
-  // This is either an image URL or a base64-encoded version of the image.
-  // The following image formats are supported: PNG and JPG.
-  // If an image URL is provided, the image will be downloaded for every API
-  // request without being cached. Images are fetched using
-  // "XaiImageApiFetch/1.0" user agent, and will timeout after 5 seconds.
-  // The image size is limited to 10 MiB. If the image download fails, the API
-  // request will fail as well.
-  string image_url = 1;
-
-  // A Files API file ID for an image to provide to the model.
-  string file_id = 3;
-
-  // The level of pre-processing resolution that will be applied to the image.
-  ImageDetail detail = 2;
+  .xai_api.ImageDetail detail = 2;
+  oneof source {
+    string image_url = 1;
+    string file_id = 3;
+  }
 }
 
 // Indicates the level of preprocessing to apply to images that will be fed to

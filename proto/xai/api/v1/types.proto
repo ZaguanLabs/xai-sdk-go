@@ -15,12 +15,13 @@ message IndexConfiguration {
 }
 
 message ChunkConfiguration {
-  oneof config {
-    CharsConfiguration chars_configuration = 1;
-    TokensConfiguration tokens_configuration = 2;
-  }
   bool strip_whitespace = 3;
   bool inject_name_into_chunks = 4;
+  oneof config {
+    .rag.CharsConfiguration chars_configuration = 1;
+    .rag.TokensConfiguration tokens_configuration = 2;
+    .rag.BytesConfiguration bytes_configuration = 11;
+  }
 }
 
 message CharsConfiguration {
@@ -39,4 +40,9 @@ enum HNSWMetric {
   HNSW_METRIC_COSINE = 1;
   HNSW_METRIC_EUCLIDEAN = 2;
   HNSW_METRIC_INNER_PRODUCT = 3;
+}
+
+message BytesConfiguration {
+  int32 max_chunk_size_bytes = 1;
+  int32 chunk_overlap_bytes = 2;
 }

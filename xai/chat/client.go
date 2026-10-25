@@ -107,6 +107,8 @@ func (c *Client) GetStoredCompletion(ctx context.Context, responseID string, opt
 			SystemFingerprint: response.SystemFingerprint,
 			Usage:             response.Usage,
 			Citations:         response.Citations,
+			OutputFiles:       response.OutputFiles,
+			ServiceTier:       response.ServiceTier,
 			Outputs:           []*xaiv1.CompletionOutput{response.Outputs[i]},
 		}
 		responses = append(responses, &Response{proto: outputProto})

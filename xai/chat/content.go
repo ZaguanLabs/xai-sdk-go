@@ -122,7 +122,11 @@ func Image(imageURL string, detail ...ImageDetail) Part {
 
 // FilePart represents a file part of a message.
 type FilePart struct {
-	fileID string
+	fileID   string
+	data     []byte
+	filename string
+	mimeType string
+	url      string
 }
 
 // Content returns the file ID.
@@ -146,3 +150,11 @@ func (f *FilePart) FileID() string {
 func File(fileID string) Part {
 	return &FilePart{fileID: fileID}
 }
+
+// FileData attaches an owned copy of inline file bytes.
+func FileData(data []byte, filename, mimeType string) Part {
+	return &FilePart{data: append([]byte(nil), data...), filename: filename, mimeType: mimeType}
+}
+
+// FileURL attaches a remotely hosted file.
+func FileURL(url string) Part { return &FilePart{url: url} }

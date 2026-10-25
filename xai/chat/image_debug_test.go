@@ -50,8 +50,8 @@ func TestImageProtoSerialization(t *testing.T) {
 	if imageContent.GetImageUrl() == nil {
 		t.Fatal("Image content should have ImageUrl")
 	}
-	if imageContent.GetImageUrl().ImageUrl != base64Image {
-		t.Errorf("ImageUrl mismatch:\nExpected: %q\nGot: %q", base64Image, imageContent.GetImageUrl().ImageUrl)
+	if imageContent.GetImageUrl().GetImageUrl() != base64Image {
+		t.Errorf("ImageUrl mismatch:\nExpected: %q\nGot: %q", base64Image, imageContent.GetImageUrl().GetImageUrl())
 	}
 	if imageContent.GetImageUrl().Detail != xaiv1.ImageDetail_DETAIL_HIGH {
 		t.Errorf("Expected DETAIL_HIGH, got %v", imageContent.GetImageUrl().Detail)
@@ -125,7 +125,7 @@ func TestRequestWithImageProto(t *testing.T) {
 	if imageContent.GetImageUrl() == nil {
 		t.Fatal("ImageUrl is nil in request proto")
 	}
-	if imageContent.GetImageUrl().ImageUrl != base64Image {
+	if imageContent.GetImageUrl().GetImageUrl() != base64Image {
 		t.Error("Base64 image not preserved in request proto")
 	}
 

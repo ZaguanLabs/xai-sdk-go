@@ -32,238 +32,105 @@ service Chat {
 
   // Delete a stored response using the response ID.
   rpc DeleteStoredCompletion(DeleteStoredCompletionRequest) returns (DeleteStoredCompletionResponse) {}
+  rpc CompactContext(.xai_api.CompactContextRequest) returns (.xai_api.CompactContextResponse) {}
 }
 
 // Options for including additional output in responses.
 enum IncludeOption {
   INCLUDE_OPTION_INVALID = 0;
-  // Include web search call output in the response.
   INCLUDE_OPTION_WEB_SEARCH_CALL_OUTPUT = 1;
-  // Include X search call output in the response.
   INCLUDE_OPTION_X_SEARCH_CALL_OUTPUT = 2;
-  // Include code execution call output in the response.
   INCLUDE_OPTION_CODE_EXECUTION_CALL_OUTPUT = 3;
-  // Include collections search call output in the response.
   INCLUDE_OPTION_COLLECTIONS_SEARCH_CALL_OUTPUT = 4;
-  // Include attachment search call output in the response.
   INCLUDE_OPTION_ATTACHMENT_SEARCH_CALL_OUTPUT = 5;
-  // Include MCP call output in the response.
   INCLUDE_OPTION_MCP_CALL_OUTPUT = 6;
-  // Include inline citations in the response.
   INCLUDE_OPTION_INLINE_CITATIONS = 7;
-  // Include verbose streaming output in the response.
-  // When enabled, provides more detailed streaming information during agentic tool calls.
   INCLUDE_OPTION_VERBOSE_STREAMING = 8;
+  INCLUDE_OPTION_CODE_EXECUTION_FILES_OUTPUT = 9;
+}
+
+enum GuidelineCategory {
+  GUIDELINE_CATEGORY_INVALID = 0;
+  GUIDELINE_CATEGORY_NSFW = 1;
+  GUIDELINE_CATEGORY_VIOLENCE = 2;
+  reserved 3 to 4;
+  GUIDELINE_CATEGORY_PROFANITY = 5;
+}
+
+enum GuidelineBehavior {
+  GUIDELINE_BEHAVIOR_INVALID = 0;
+  GUIDELINE_BEHAVIOR_DECLINE = 1;
+  reserved 2;
+}
+
+message PolicyGuideline {
+  GuidelineCategory category = 1;
+  GuidelineBehavior behavior = 2;
+}
+
+message Guideline {
+  oneof kind {
+    PolicyGuideline policy = 1;
+  }
 }
 
 message GetCompletionsRequest {
   reserved 4;
-
-  // A sequence of messages in the conversation. There must be at least a single
-  // message that the model can respond to.
-  repeated Message messages = 1;
-
-  // Name of the model. This is the name as reported by the models API. More
-  // details can be found on your console at https://console.x.ai.
+  repeated .xai_api.Message messages = 1;
   string model = 2;
-
-  // An opaque string supplied by the API client (customer) to identify a user.
-  // The string will be stored in the logs and can be used in customer service
-  // requests to identify certain requests.
   string user = 16;
-
-  // The number of completions to create concurrently. A single completion will
-  // be generated if the parameter is unset. Each completion is charged at the
-  // same rate. You can generate at most 128 concurrent completions.
-  // PLEASE NOTE: This field is deprecated and will be removed in the future.
   optional int32 n = 8;
-
-  // The maximum number of tokens to sample. If unset, the model samples until
-  // one of the following stop-conditions is reached:
-  // - The context length of the model is exceeded
-  // - One of the `stop` sequences has been observed.
-  // - The time limit exceeds.
-  //
-  // Note that for reasoning models and models that support function calls, the
-  // limit is only applied to the main content and not to the reasoning content
-  // or function calls.
-  //
-  // We recommend choosing a reasonable value to reduce the risk of accidental
-  // long-generations that consume many tokens.
   optional int32 max_tokens = 7;
-
-  // A random seed used to make the sampling process deterministic. This is
-  // provided in a best-effort basis without guarantee that sampling is 100%
-  // deterministic given a seed. This is primarily provided for short-lived
-  // testing purposes. Given a fixed request and seed, the answers may change
-  // over time as our systems evolve.
   optional int32 seed = 11;
-
-  // String patterns that will cause the sampling procedure to stop prematurely
-  // when observed.
-  // Note that the completion is based on individual tokens and sampling can
-  // only terminate at token boundaries. If a stop string is a substring of an
-  // individual token, the completion will include the entire token, which
-  // extends beyond the stop string.
-  // For example, if `stop = ["wor"]` and we prompt the model with "hello" to
-  // which it responds with "world", then the sampling procedure will stop after
-  // observing the "world" token and the completion will contain
-  // the entire world "world" even though the stop string was just "wor".
-  // You can provide at most 8 stop strings.
   repeated string stop = 12;
-
-  // A number between 0 and 2 used to control the variance of completions.
-  // The smaller the value, the more deterministic the model will become. For
-  // example, if we sample 1000 answers to the same prompt at a temperature of
-  // 0.001, then most of the 1000 answers will be identical. Conversely, if we
-  // conduct the same experiment at a temperature of 2, virtually no two answers
-  // will be identical. Note that increasing the temperature will cause
-  // the model to hallucinate more strongly.
   optional float temperature = 14;
-
-  // A number between 0 and 1 controlling the likelihood of the model to use
-  // less-common answers. Recall that the model produces a probability for
-  // each token. This means, for any choice of token there are thousands of
-  // possibilities to choose from. This parameter controls the "nucleus sampling
-  // algorithm". Instead of considering every possible token at every step, we
-  // only look at the K tokens who's probabilities exceed `top_p`.
-  // For example, if we set `top_p = 0.9`, then the set of tokens we actually
-  // sample from, will have a probability mass of at least 90%. In practice,
-  // low values will make the model more deterministic.
   optional float top_p = 15;
-
-  // If set to true, log probabilities of the sampling are returned.
   bool logprobs = 5;
-
-  // Number of top log probabilities to return.
   optional int32 top_logprobs = 6;
-
-  // A list of tools the model may call. Currently, only functions are supported
-  // as a tool. Use this to provide a list of functions the model may generate
-  // JSON inputs for.
-  repeated Tool tools = 17;
-
-  // Controls if the model can, should, or must not use tools.
-  ToolChoice tool_choice = 18;
-
-  // Formatting constraint on the response.
-  ResponseFormat response_format = 10;
-
-  // Positive values penalize new tokens based on their existing frequency in
-  // the text so far, decreasing the model's likelihood to repeat the same line
-  // verbatim.
+  repeated .xai_api.Tool tools = 17;
+  .xai_api.ToolChoice tool_choice = 18;
+  .xai_api.ResponseFormat response_format = 10;
   optional float frequency_penalty = 3;
-
-  // Positive values penalize new tokens based on whether they appear in
-  // the text so far, increasing the model's likelihood to talk about
-  // new topics.
   optional float presence_penalty = 9;
-
-  // Constrains effort on reasoning for reasoning models. Default to `EFFORT_MEDIUM`.
-  optional ReasoningEffort reasoning_effort = 19;
-
-  // Set the parameters to be used for realtime data. If not set, no realtime data will be acquired by the model.
-  optional SearchParameters search_parameters = 20;
-
-  /// If set to false, the model can perform maximum one tool call per response. Default to true.
+  optional .xai_api.ReasoningEffort reasoning_effort = 19;
+  optional .xai_api.SearchParameters search_parameters = 20;
   optional bool parallel_tool_calls = 21;
-
-  // Previous response id. The messages from this response must be chained.
   optional string previous_response_id = 22;
-
-  // Whether to store request and responses. Default is false.
   bool store_messages = 23;
-
-  // Whether to use encrypted thinking for thinking trace rehydration.
   bool use_encrypted_content = 24;
-
-  // Maximum number of agentic tool calling turns allowed for this request.
-  // If not set, defaults to the server's global cap.
-  // The effective max_turns will be the min of the server's global cap and the request's max_turns.
-  // This parameter will be ignored for any non-agentic requests.
-  // With parallel tool calls, multiple tool calls can occur within a single turn,
-  // so max_turns does not necessarily equal the total number of tool calls.
   optional int32 max_turns = 25;
-
-  // A list of output options to include in the response.
-  // Use this to request additional data like tool call outputs or inline citations.
-  repeated IncludeOption include = 26;
-
-  optional AgentCount agent_count = 29;
+  repeated .xai_api.IncludeOption include = 26;
+  optional .xai_api.AgentCount agent_count = 29;
+  .xai_api.ServiceTier service_tier = 31;
+  optional string safety_identifier = 34;
+  repeated .xai_api.Guideline guidelines = 39;
 }
 
 message GetChatCompletionResponse {
-  // The ID of this request. This ID will also show up on your billing records
-  // and you can use it when contacting us regarding a specific request.
   string id = 1;
-
-  // Model-generated outputs/responses to the input messages. Each output contains
-  // the model's response including text content, reasoning traces, tool calls, and
-  // metadata about the generation process.
-  repeated CompletionOutput outputs = 2;
-
-  // A UNIX timestamp (UTC) indicating when the response object was created.
-  // The timestamp is taken when the model starts generating response.
-  google.protobuf.Timestamp created = 5;
-
-  // The name of the model used for the request. This model name contains
-  // the actual model name used rather than any aliases.
-  // This means the this can be `grok-2-1212` even when the request was
-  // specifying `grok-2-latest`.
+  repeated .xai_api.CompletionOutput outputs = 2;
+  .google.protobuf.Timestamp created = 5;
   string model = 6;
-
-  // This fingerprint represents the backend configuration that the model runs
-  // with.
   string system_fingerprint = 7;
-
-  // The number of tokens consumed by this request.
-  SamplingUsage usage = 9;
-
-  /// List of all the external pages (urls) used by the model to produce its final answer.
-  // This is only present when live search is enabled, (That is `SearchParameters` have been defined in `GetCompletionsRequest`).
+  .xai_api.SamplingUsage usage = 9;
   repeated string citations = 10;
-
-  // Settings used while generating the response.
-  RequestSettings settings = 11;
-
-  // Debug output. Only available to trusted testers.
-  DebugOutput debug_output = 12;
+  .xai_api.RequestSettings settings = 11;
+  .xai_api.DebugOutput debug_output = 12;
+  repeated .xai_api.OutputFile output_files = 13;
+  .xai_api.ServiceTier service_tier = 15;
 }
 
 message GetChatCompletionChunk {
-  // The ID of this request. This ID will also show up on your billing records
-  // and you can use it when contacting us regarding a specific request.
   string id = 1;
-
-  // Model-generated outputs/responses being streamed as they are generated.
-  // Each output chunk contains incremental updates to the model's response.
-  repeated CompletionOutputChunk outputs = 2;
-
-  // A UNIX timestamp (UTC) indicating when the response object was created.
-  // The timestamp is taken when the model starts generating response.
-  google.protobuf.Timestamp created = 3;
-
-  // The name of the model used for the request. This model name contains
-  // the actual model name used rather than any aliases.
-  // This means the this can be `grok-2-1212` even when the request was
-  // specifying `grok-2-latest`.
+  repeated .xai_api.CompletionOutputChunk outputs = 2;
+  .google.protobuf.Timestamp created = 3;
   string model = 4;
-
-  // This fingerprint represents the backend configuration that the model runs
-  // with.
   string system_fingerprint = 5;
-
-  // The total number of tokens consumed when this chunk was streamed. Note that
-  // this is not the final number of tokens billed unless this is the last chunk
-  // in the stream.
-  SamplingUsage usage = 6;
-
-  /// List of all the external pages used by the model to answer. Only populated for the last chunk.
-  // This is only present for requests that make use of live search or server-side search tools.
+  .xai_api.SamplingUsage usage = 6;
   repeated string citations = 7;
-
-  // Only available for teams that have debugging privileges.
-  DebugOutput debug_output = 10;
+  .xai_api.DebugOutput debug_output = 10;
+  repeated .xai_api.OutputFile output_files = 11;
+  .xai_api.ServiceTier service_tier = 12;
 }
 
 // Response from GetDeferredCompletion, including the response if the completion
@@ -355,23 +222,14 @@ message Delta {
 
 // Represents an inline citation in the response content.
 message InlineCitation {
-  // Unique identifier for this citation.
   string id = 1;
-
-  // The character index in the content where this citation starts.
   int32 start_index = 2;
-
-  // The character index in the content where this citation ends (exclusive).
   int32 end_index = 6;
-
-  // Web citation details (if this is a web citation).
-  WebCitation web_citation = 3;
-
-  // X citation details (if this is an X/Twitter citation).
-  XCitation x_citation = 4;
-
-  // Collections citation details (if this is a collections citation).
-  CollectionsCitation collections_citation = 5;
+  oneof citation {
+    .xai_api.WebCitation web_citation = 3;
+    .xai_api.XCitation x_citation = 4;
+    .xai_api.CollectionsCitation collections_citation = 5;
+  }
 }
 
 // Citation from a web source.
@@ -459,9 +317,11 @@ message Content {
 
 // A file attachment in a message.
 message FileContent {
-  // The file ID returned by the Files API when a user uploads a file.
-  // This ID is used to reference the uploaded file in chat conversations.
   string file_id = 1;
+  bytes data = 2;
+  string filename = 3;
+  string mime_type = 4;
+  string url = 5;
 }
 
 // A message in a conversation. This message is part of the model input. Each
@@ -696,8 +556,7 @@ message CollectionsSearch {
 
 // Built-in attachment search tool for searching within uploaded file attachments.
 message AttachmentSearch {
-  // Optional number of results to limit the search to.
-  optional int32 limit = 1;
+  optional int32 limit = 2;
 }
 
 message Function {
@@ -1071,4 +930,21 @@ message DebugOutput {
 
   // The tag of the sampler that served this request.
   string sampler_tag = 11;
+}
+
+message OutputFile {
+  string file_id = 1;
+  string name = 2;
+}
+
+message CompactContextRequest {
+  string model = 1;
+  repeated .xai_api.Message input = 2;
+}
+
+message CompactContextResponse {
+  string id = 1;
+  string encrypted_content = 2;
+  uint32 dropped_message_count = 3;
+  .xai_api.SamplingUsage usage = 4;
 }

@@ -180,7 +180,7 @@ func NewGenerateRequestWithOptions(prompt, model string, opts *GenerateOptions) 
 		req.ReferenceImages = append(req.ReferenceImages, imageURLContent(imageURL))
 	}
 	for _, voiceID := range opts.ReferenceAudioVoiceIDs {
-		req.ReferenceAudios = append(req.ReferenceAudios, &xaiv1.AudioUrlContent{VoiceId: &voiceID})
+		req.ReferenceAudios = append(req.ReferenceAudios, &xaiv1.AudioUrlContent{Source: &xaiv1.AudioUrlContent_VoiceId{VoiceId: voiceID}})
 	}
 	if opts.GenerateAudio != nil {
 		req.GenerateAudio = opts.GenerateAudio
@@ -232,24 +232,24 @@ func NewExtendRequestFromFileID(prompt, model, videoFileID string, duration *int
 
 func imageURLContent(imageURL string) *xaiv1.ImageUrlContent {
 	return &xaiv1.ImageUrlContent{
-		ImageUrl: imageURL,
-		Detail:   xaiv1.ImageDetail_DETAIL_AUTO,
+		Source: &xaiv1.ImageUrlContent_ImageUrl{ImageUrl: imageURL},
+		Detail: xaiv1.ImageDetail_DETAIL_AUTO,
 	}
 }
 
 func imageFileContent(fileID string) *xaiv1.ImageUrlContent {
 	return &xaiv1.ImageUrlContent{
-		FileId: fileID,
+		Source: &xaiv1.ImageUrlContent_FileId{FileId: fileID},
 		Detail: xaiv1.ImageDetail_DETAIL_AUTO,
 	}
 }
 
 func videoURLContent(videoURL string) *xaiv1.VideoUrlContent {
-	return &xaiv1.VideoUrlContent{Url: videoURL}
+	return &xaiv1.VideoUrlContent{Source: &xaiv1.VideoUrlContent_Url{Url: videoURL}}
 }
 
 func videoFileContent(fileID string) *xaiv1.VideoUrlContent {
-	return &xaiv1.VideoUrlContent{FileId: fileID}
+	return &xaiv1.VideoUrlContent{Source: &xaiv1.VideoUrlContent_FileId{FileId: fileID}}
 }
 
 func Prepare(prompt, model, batchRequestID string, opts *GenerateOptions) *xaiv1.BatchRequest {

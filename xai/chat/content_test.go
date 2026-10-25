@@ -138,8 +138,8 @@ func TestMessageWithImage(t *testing.T) {
 		t.Fatal("Content[1].ImageUrl is nil")
 	}
 
-	if proto.Content[1].GetImageUrl().ImageUrl != "https://example.com/photo.jpg" {
-		t.Errorf("ImageUrl = %q, want %q", proto.Content[1].GetImageUrl().ImageUrl, "https://example.com/photo.jpg")
+	if proto.Content[1].GetImageUrl().GetImageUrl() != "https://example.com/photo.jpg" {
+		t.Errorf("ImageUrl = %q, want %q", proto.Content[1].GetImageUrl().GetImageUrl(), "https://example.com/photo.jpg")
 	}
 
 	if proto.Content[1].GetImageUrl().Detail != xaiv1.ImageDetail_DETAIL_HIGH {
@@ -170,8 +170,8 @@ func TestMessageWithMultipleImages(t *testing.T) {
 	if proto.Content[1].GetImageUrl() == nil {
 		t.Fatal("Content[1].ImageUrl is nil")
 	}
-	if proto.Content[1].GetImageUrl().ImageUrl != "https://example.com/photo1.jpg" {
-		t.Errorf("ImageUrl[1] = %q, want %q", proto.Content[1].GetImageUrl().ImageUrl, "https://example.com/photo1.jpg")
+	if proto.Content[1].GetImageUrl().GetImageUrl() != "https://example.com/photo1.jpg" {
+		t.Errorf("ImageUrl[1] = %q, want %q", proto.Content[1].GetImageUrl().GetImageUrl(), "https://example.com/photo1.jpg")
 	}
 	if proto.Content[1].GetImageUrl().Detail != xaiv1.ImageDetail_DETAIL_AUTO {
 		t.Errorf("Detail[1] = %v, want %v", proto.Content[1].GetImageUrl().Detail, xaiv1.ImageDetail_DETAIL_AUTO)
@@ -181,8 +181,8 @@ func TestMessageWithMultipleImages(t *testing.T) {
 	if proto.Content[2].GetImageUrl() == nil {
 		t.Fatal("Content[2].ImageUrl is nil")
 	}
-	if proto.Content[2].GetImageUrl().ImageUrl != "https://example.com/photo2.jpg" {
-		t.Errorf("ImageUrl[2] = %q, want %q", proto.Content[2].GetImageUrl().ImageUrl, "https://example.com/photo2.jpg")
+	if proto.Content[2].GetImageUrl().GetImageUrl() != "https://example.com/photo2.jpg" {
+		t.Errorf("ImageUrl[2] = %q, want %q", proto.Content[2].GetImageUrl().GetImageUrl(), "https://example.com/photo2.jpg")
 	}
 	if proto.Content[2].GetImageUrl().Detail != xaiv1.ImageDetail_DETAIL_LOW {
 		t.Errorf("Detail[2] = %v, want %v", proto.Content[2].GetImageUrl().Detail, xaiv1.ImageDetail_DETAIL_LOW)
@@ -274,7 +274,7 @@ func TestBase64Image(t *testing.T) {
 		t.Fatal("Content[1].ImageUrl is nil")
 	}
 
-	if proto.Content[1].GetImageUrl().ImageUrl != base64Data {
+	if proto.Content[1].GetImageUrl().GetImageUrl() != base64Data {
 		t.Errorf("Base64 image URL not preserved correctly")
 	}
 

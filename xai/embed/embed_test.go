@@ -43,8 +43,8 @@ func TestImage(t *testing.T) {
 	if input.proto.GetImageUrl() == nil {
 		t.Fatal("ImageUrl is nil")
 	}
-	if input.proto.GetImageUrl().ImageUrl != "http://example.com/image.jpg" {
-		t.Errorf("ImageUrl = %v, want http://example.com/image.jpg", input.proto.GetImageUrl().ImageUrl)
+	if input.proto.GetImageUrl().GetImageUrl() != "http://example.com/image.jpg" {
+		t.Errorf("ImageUrl = %v, want http://example.com/image.jpg", input.proto.GetImageUrl().GetImageUrl())
 	}
 }
 

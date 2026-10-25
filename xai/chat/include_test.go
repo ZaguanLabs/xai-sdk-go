@@ -124,9 +124,9 @@ func TestInlineCitation(t *testing.T) {
 		Id:         "cite-1",
 		StartIndex: 42,
 		EndIndex:   55,
-		WebCitation: &xaiv1.WebCitation{
+		Citation: &xaiv1.InlineCitation_WebCitation{WebCitation: &xaiv1.WebCitation{
 			Url: "https://example.com",
-		},
+		}},
 	}
 	ic = &InlineCitation{proto: webCitation}
 	if ic.ID() != "cite-1" {
@@ -148,9 +148,9 @@ func TestInlineCitation(t *testing.T) {
 	xCitation := &xaiv1.InlineCitation{
 		Id:         "cite-2",
 		StartIndex: 100,
-		XCitation: &xaiv1.XCitation{
+		Citation: &xaiv1.InlineCitation_XCitation{XCitation: &xaiv1.XCitation{
 			Url: "https://x.com/user/status/123",
-		},
+		}},
 	}
 	ic = &InlineCitation{proto: xCitation}
 	if ic.XCitation() == nil {
@@ -163,13 +163,13 @@ func TestInlineCitation(t *testing.T) {
 	collectionsCitation := &xaiv1.InlineCitation{
 		Id:         "cite-3",
 		StartIndex: 200,
-		CollectionsCitation: &xaiv1.CollectionsCitation{
+		Citation: &xaiv1.InlineCitation_CollectionsCitation{CollectionsCitation: &xaiv1.CollectionsCitation{
 			FileId:        "file-123",
 			ChunkId:       "chunk-456",
 			ChunkContent:  "Some content from the document",
 			Score:         0.95,
 			CollectionIds: []string{"col-1", "col-2"},
-		},
+		}},
 	}
 	ic = &InlineCitation{proto: collectionsCitation}
 	cc := ic.CollectionsCitation()
@@ -212,16 +212,16 @@ func TestResponseInlineCitations(t *testing.T) {
 							{
 								Id:         "cite-1",
 								StartIndex: 10,
-								WebCitation: &xaiv1.WebCitation{
+								Citation: &xaiv1.InlineCitation_WebCitation{WebCitation: &xaiv1.WebCitation{
 									Url: "https://example.com",
-								},
+								}},
 							},
 							{
 								Id:         "cite-2",
 								StartIndex: 25,
-								XCitation: &xaiv1.XCitation{
+								Citation: &xaiv1.InlineCitation_XCitation{XCitation: &xaiv1.XCitation{
 									Url: "https://x.com/post",
-								},
+								}},
 							},
 						},
 					},

@@ -214,7 +214,7 @@ func TestPinnedFramesWireRoundTrip(t *testing.T) {
 			t.Fatalf("last frame: %v", got.GetLastFrame())
 		}
 		if len(opts.Keyframes) > 0 {
-			if len(got.Keyframes) != 2 || got.Keyframes[0].TimestampS != 2.5 || got.Keyframes[0].Image.ImageUrl != "https://example.com/middle.png" || got.Keyframes[1].Image.FileId != "middle-file" {
+			if len(got.Keyframes) != 2 || got.Keyframes[0].TimestampS != 2.5 || got.Keyframes[0].Image.GetImageUrl() != "https://example.com/middle.png" || got.Keyframes[1].Image.GetFileId() != "middle-file" {
 				t.Fatalf("keyframes: %v", got.Keyframes)
 			}
 		}

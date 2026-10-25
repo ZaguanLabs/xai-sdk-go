@@ -285,6 +285,8 @@ func (lps *LogProbs) Content() []*LogProb {
 // IncludeOption specifies additional output to include in responses.
 type IncludeOption string
 
+const IncludeCodeExecutionFilesOutput IncludeOption = "code_execution_files_output"
+
 const (
 	// IncludeWebSearchCallOutput includes web search call output in the response.
 	IncludeWebSearchCallOutput IncludeOption = "web_search_call_output"
@@ -308,6 +310,8 @@ const (
 // includeOptionToProto converts an IncludeOption to its proto enum value.
 func includeOptionToProto(opt IncludeOption) xaiv1.IncludeOption {
 	switch opt {
+	case IncludeCodeExecutionFilesOutput:
+		return xaiv1.IncludeOption_INCLUDE_OPTION_CODE_EXECUTION_FILES_OUTPUT
 	case IncludeWebSearchCallOutput:
 		return xaiv1.IncludeOption_INCLUDE_OPTION_WEB_SEARCH_CALL_OUTPUT
 	case IncludeXSearchCallOutput:
@@ -332,6 +336,8 @@ func includeOptionToProto(opt IncludeOption) xaiv1.IncludeOption {
 // includeOptionFromProto converts a proto enum value to an IncludeOption.
 func includeOptionFromProto(opt xaiv1.IncludeOption) IncludeOption {
 	switch opt {
+	case xaiv1.IncludeOption_INCLUDE_OPTION_CODE_EXECUTION_FILES_OUTPUT:
+		return IncludeCodeExecutionFilesOutput
 	case xaiv1.IncludeOption_INCLUDE_OPTION_WEB_SEARCH_CALL_OUTPUT:
 		return IncludeWebSearchCallOutput
 	case xaiv1.IncludeOption_INCLUDE_OPTION_X_SEARCH_CALL_OUTPUT:
@@ -388,26 +394,26 @@ func (ic *InlineCitation) EndIndex() int32 {
 
 // WebCitation returns the web citation details if this is a web citation.
 func (ic *InlineCitation) WebCitation() *WebCitationInfo {
-	if ic.proto == nil || ic.proto.WebCitation == nil {
+	if ic.proto == nil || ic.proto.GetWebCitation() == nil {
 		return nil
 	}
-	return &WebCitationInfo{proto: ic.proto.WebCitation}
+	return &WebCitationInfo{proto: ic.proto.GetWebCitation()}
 }
 
 // XCitation returns the X citation details if this is an X/Twitter citation.
 func (ic *InlineCitation) XCitation() *XCitationInfo {
-	if ic.proto == nil || ic.proto.XCitation == nil {
+	if ic.proto == nil || ic.proto.GetXCitation() == nil {
 		return nil
 	}
-	return &XCitationInfo{proto: ic.proto.XCitation}
+	return &XCitationInfo{proto: ic.proto.GetXCitation()}
 }
 
 // CollectionsCitation returns the collections citation details if this is a collections citation.
 func (ic *InlineCitation) CollectionsCitation() *CollectionsCitationInfo {
-	if ic.proto == nil || ic.proto.CollectionsCitation == nil {
+	if ic.proto == nil || ic.proto.GetCollectionsCitation() == nil {
 		return nil
 	}
-	return &CollectionsCitationInfo{proto: ic.proto.CollectionsCitation}
+	return &CollectionsCitationInfo{proto: ic.proto.GetCollectionsCitation()}
 }
 
 // Proto returns the underlying protobuf message.

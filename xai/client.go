@@ -485,7 +485,7 @@ func (c *Client) Embed() *embed.Client {
 func (c *Client) Files() *files.Client {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	return files.NewClient(c.restClient)
+	return files.NewGRPCClient(xaiv1.NewFilesClient(c.grpcConn), c.restClient)
 }
 
 // Collections returns the collections service client.

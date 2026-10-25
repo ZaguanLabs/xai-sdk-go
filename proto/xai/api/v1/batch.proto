@@ -12,14 +12,14 @@ import "xai/api/v1/video.proto";
 message Batch {
   string batch_id = 1;
   string name = 2;
-  google.protobuf.Timestamp create_time = 3;
-  google.protobuf.Timestamp expire_time = 4;
+  .google.protobuf.Timestamp create_time = 3;
+  .google.protobuf.Timestamp expire_time = 4;
   string create_api_key_id = 5;
-  google.protobuf.Timestamp cancel_time = 6;
+  .google.protobuf.Timestamp cancel_time = 6;
   optional string cancel_by_xai_message = 7;
-  BatchState state = 8;
-  BatchCostBreakdown cost_breakdown = 9;
-  string input_file_id = 10;
+  .xai_api.BatchState state = 8;
+  .xai_api.BatchCostBreakdown cost_breakdown = 9;
+  optional string input_file_id = 10;
 }
 
 message BatchState {
@@ -117,6 +117,7 @@ message ListBatchRequestMetadataRequest {
   string batch_id = 1;
   int32 limit = 2;
   optional string pagination_token = 3;
+  repeated .xai_api.BatchRequestMetadata.State status = 4;
 }
 
 message ListBatchRequestMetadataResponse {

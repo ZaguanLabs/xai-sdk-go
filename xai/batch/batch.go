@@ -18,6 +18,7 @@ type Client struct {
 type ListOptions struct {
 	Limit           int32
 	PaginationToken string
+	Status          []xaiv1.BatchRequestMetadata_State
 }
 
 type ListBatchResultsResponse struct {
@@ -143,6 +144,7 @@ func (c *Client) ListRequestMetadata(ctx context.Context, batchID string, opts *
 	req := &xaiv1.ListBatchRequestMetadataRequest{BatchId: batchID}
 	if opts != nil {
 		req.Limit = opts.Limit
+		req.Status = opts.Status
 		if opts.PaginationToken != "" {
 			req.PaginationToken = &opts.PaginationToken
 		}
