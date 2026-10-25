@@ -191,18 +191,27 @@ func (r *Response) ImageOutputs() ([]*ImageGenerationOutput, error) {
 		if err := json.Unmarshal([]byte(output.Message.Content), &envelope); err != nil || envelope.Type != "image_generation_result" {
 			return nil, fmt.Errorf("malformed image generation result")
 		}
-		comma := strings.Index(envelope.Result, "base64,")
-		semicolon := strings.Index(envelope.Result, ";")
-		if !strings.HasPrefix(envelope.Result, "data:image/") || comma < 0 || semicolon < len("data:") {
-			return nil, fmt.Errorf("malformed image generation data URL")
-		}
-		data, err := base64.StdEncoding.DecodeString(envelope.Result[comma+len("base64,"):])
+		data, mimeType, err := decodeImageDataURL(envelope.Result)
 		if err != nil {
-			return nil, fmt.Errorf("decode image generation result: %w", err)
+			return nil, err
 		}
-		images = append(images, &ImageGenerationOutput{Image: data, MIMEType: envelope.Result[len("data:"):semicolon], DataURL: envelope.Result, ImageUUID: envelope.ImageUUID, ToolCall: call})
+
+		images = append(images, &ImageGenerationOutput{Image: data, MIMEType: mimeType, DataURL: envelope.Result, ImageUUID: envelope.ImageUUID, ToolCall: call})
 	}
 	return images, nil
+}
+
+func decodeImageDataURL(value string) ([]byte, string, error) {
+	comma := strings.Index(value, "base64,")
+	semicolon := strings.Index(value, ";")
+	if !strings.HasPrefix(value, "data:image/") || comma < 0 || semicolon < len("data:") {
+		return nil, "", fmt.Errorf("malformed image generation data URL")
+	}
+	data, err := base64.StdEncoding.DecodeString(value[comma+len("base64,"):])
+	if err != nil {
+		return nil, "", fmt.Errorf("decode image generation result: %w", err)
+	}
+	return data, value[len("data:"):semicolon], nil
 }
 
 // Chunk represents a streaming response chunk.

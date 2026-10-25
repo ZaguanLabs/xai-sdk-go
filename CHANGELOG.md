@@ -2,6 +2,8 @@
 
 ## v1.21.0 - 2026-10-25
 
+- Update gRPC and networking dependencies to patched versions; require Go 1.26 and select the 1.26.10 toolchain.
+
 - Correct protocol field numbers, oneofs, optional presence and missing RPCs against all official API descriptors.
 - Use native streaming gRPC for Files, including expiry, download formats and pagination.
 - Add context compaction, service tiers, inline files, generated-file metadata, byte chunking and batch-status filters.

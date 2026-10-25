@@ -182,6 +182,11 @@ func NewGenerateRequestWithOptions(prompt, model string, opts *GenerateOptions) 
 	for _, voiceID := range opts.ReferenceAudioVoiceIDs {
 		req.ReferenceAudios = append(req.ReferenceAudios, &xaiv1.AudioUrlContent{Source: &xaiv1.AudioUrlContent_VoiceId{VoiceId: voiceID}})
 	}
+	applyVideoOutputOptions(req, opts)
+	return req
+}
+
+func applyVideoOutputOptions(req *xaiv1.GenerateVideoRequest, opts *GenerateOptions) {
 	if opts.GenerateAudio != nil {
 		req.GenerateAudio = opts.GenerateAudio
 	}
@@ -197,7 +202,6 @@ func NewGenerateRequestWithOptions(prompt, model string, opts *GenerateOptions) 
 	if opts.Storage != nil {
 		req.StorageOptions = opts.Storage.Proto()
 	}
-	return req
 }
 
 func NewExtendRequest(prompt, model, videoURL string, duration *int32) *xaiv1.ExtendVideoRequest {

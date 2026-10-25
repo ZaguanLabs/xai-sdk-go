@@ -3,9 +3,10 @@ package chat
 import (
 	"context"
 	"errors"
+	"testing"
+
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"google.golang.org/grpc"
-	"testing"
 )
 
 type compactStub struct{ fail bool }

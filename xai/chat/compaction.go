@@ -3,6 +3,7 @@ package chat
 import (
 	"context"
 	"fmt"
+
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"

@@ -522,48 +522,17 @@ func (c *Client) uploadGRPC(ctx context.Context, reader io.Reader, opts UploadOp
 		seconds := int64(opts.ExpiresAfter.Seconds())
 		init.ExpiresAfter = &seconds
 	}
-	if err := stream.Send(&xaiv1.UploadFileChunk{Chunk: &xaiv1.UploadFileChunk_Init{Init: init}}); err != nil {
-		return nil, err
+	if sendErr := stream.Send(&xaiv1.UploadFileChunk{Chunk: &xaiv1.UploadFileChunk_Init{Init: init}}); sendErr != nil {
+		return nil, sendErr
 	}
-	var uploaded, total int64
-	total = -1
-	if seeker, ok := reader.(io.Seeker); ok {
-		current, err := seeker.Seek(0, io.SeekCurrent)
-		if err == nil {
-			end, err := seeker.Seek(0, io.SeekEnd)
-			if err == nil {
-				total = end - current
-			}
-			if _, err := seeker.Seek(current, io.SeekStart); err != nil {
-				return nil, err
-			}
-		}
+	total, sizeErr := remainingUploadSize(reader)
+	if sizeErr != nil {
+		return nil, sizeErr
 	}
-	buffer := make([]byte, 3*1024*1024)
-	for {
-		if err := ctx.Err(); err != nil {
-			return nil, err
-		}
-		n, readErr := reader.Read(buffer)
-		if n > 0 {
-			uploaded += int64(n)
-			if opts.MaxSize > 0 && uploaded > opts.MaxSize {
-				return nil, ErrFileTooLarge
-			}
-			if err := stream.Send(&xaiv1.UploadFileChunk{Chunk: &xaiv1.UploadFileChunk_Data{Data: buffer[:n]}}); err != nil {
-				return nil, err
-			}
-			if opts.OnProgress != nil {
-				opts.OnProgress(uploaded, total)
-			}
-		}
-		if readErr == io.EOF {
-			break
-		}
-		if readErr != nil {
-			return nil, readErr
-		}
+	if sendErr := sendUploadChunks(ctx, reader, opts, stream, total); sendErr != nil {
+		return nil, sendErr
 	}
+
 	file, err := stream.CloseAndRecv()
 	return fromProto(file), err
 }
@@ -591,3 +560,59 @@ func (r *contentReader) Read(p []byte) (int, error) {
 	return n, nil
 }
 func (r *contentReader) Close() error { r.cancel(); return nil }
+
+func remainingUploadSize(reader io.Reader) (int64, error) {
+	seeker, ok := reader.(io.Seeker)
+	if !ok {
+		return -1, nil
+	}
+	current, currentErr := seeker.Seek(0, io.SeekCurrent)
+	if currentErr != nil {
+		return -1, nil
+	}
+	end, endErr := seeker.Seek(0, io.SeekEnd)
+	if _, restoreErr := seeker.Seek(current, io.SeekStart); restoreErr != nil {
+		return -1, restoreErr
+	}
+	if endErr != nil {
+		return -1, nil
+	}
+	return end - current, nil
+}
+func sendUploadChunks(ctx context.Context, reader io.Reader, opts UploadOptions, stream interface {
+	Send(*xaiv1.UploadFileChunk) error
+}, total int64) error {
+	buffer := make([]byte, 3*1024*1024)
+	var uploaded int64
+	emptyReads := 0
+	for {
+		if cancelErr := ctx.Err(); cancelErr != nil {
+			return cancelErr
+		}
+		n, readErr := reader.Read(buffer)
+		if n > 0 {
+			emptyReads = 0
+			uploaded += int64(n)
+			if opts.MaxSize > 0 && uploaded > opts.MaxSize {
+				return ErrFileTooLarge
+			}
+			if sendErr := stream.Send(&xaiv1.UploadFileChunk{Chunk: &xaiv1.UploadFileChunk_Data{Data: buffer[:n]}}); sendErr != nil {
+				return sendErr
+			}
+			if opts.OnProgress != nil {
+				opts.OnProgress(uploaded, total)
+			}
+		} else {
+			emptyReads++
+			if emptyReads >= 100 && readErr == nil {
+				return io.ErrNoProgress
+			}
+		}
+		if readErr == io.EOF {
+			return nil
+		}
+		if readErr != nil {
+			return readErr
+		}
+	}
+}

@@ -2,9 +2,10 @@ package video
 
 import (
 	"context"
-	"google.golang.org/protobuf/proto"
 	"testing"
 	"time"
+
+	"google.golang.org/protobuf/proto"
 
 	xaiv1 "github.com/ZaguanLabs/xai-sdk-go/proto/gen/go/xai/api/v1"
 	xaifiles "github.com/ZaguanLabs/xai-sdk-go/xai/files"
